@@ -1,0 +1,14 @@
+//
+// Created by alpachec on 19-08-18.
+//
+
+#ifndef IMPROVED_GRAMMAR_INDEX_SAMPLED_PATRICA_TREE_H
+#define IMPROVED_GRAMMAR_INDEX_SAMPLED_PATRICA_TREE_H
+
+
+class sampled_patrica_tree {
+
+};
+
+
+#endif //IMPROVED_GRAMMAR_INDEX_SAMPLED_PATRICA_TREE_H
