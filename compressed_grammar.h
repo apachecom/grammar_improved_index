@@ -8,7 +8,7 @@
 
 #include <sdsl/rrr_vector.hpp>
 #include <sdsl/wavelet_trees.hpp>
-#include <inv_perm_support.hpp>
+#include <sdsl/inv_perm_support.hpp>
 #include "trees/dfuds_tree.h"
 #include "utils/grammar.h"
 #include "trees/trie/compact_trie.h"

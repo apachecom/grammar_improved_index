@@ -10,7 +10,7 @@
 #include <map>
 #include <vector>
 #include <cassert>
-#include <io.hpp>
+#include <sdsl/io.hpp>
 #include <climits>
 
 namespace m_patricia {

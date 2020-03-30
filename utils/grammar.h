@@ -10,7 +10,7 @@
 #include <map>
 #include <assert.h>
 #include "repair/RePair.h"
-#include <io.hpp>
+#include <sdsl/io.hpp>
 
 struct rule{
 
