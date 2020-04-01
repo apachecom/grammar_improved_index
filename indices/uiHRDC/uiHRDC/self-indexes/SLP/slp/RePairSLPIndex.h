@@ -1,4 +1,4 @@
-/* RePairSLPIndex.h
+                                                                                                                                                                                                                                                                            /* RePairSLPIndex.h
  * Copyright (C) 2010, Miguel A. Martinez-Prieto
  * all rights reserved.
  *

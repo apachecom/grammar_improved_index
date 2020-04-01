@@ -14,8 +14,8 @@
 #include <slp/RePairSLPIndex.h>
 #include "../SelfGrammarIndexPT.h"
 #include <ri/r_index.hpp>
-#include "../utils/build_hyb_lz77.h"
-#include <hyb/HybridSelfIndex.h>
+//#include "../utils/build_hyb_lz77.h"
+//#include <hyb/HybridSelfIndex.h>
 #include "repetitive_collections.h"
 #include "../SelfGrammarIndexBS.h"
 #include "../SelfGrammarIndexPTS.h"
@@ -29,7 +29,7 @@ std::vector<std::string> patt;
 int code = 0;
 size_t lenght;
 std::string data_bs;
-HybridSelfIndex* idx_hyb;
+// HybridSelfIndex* idx_hyb;
 ri::r_index<>* idx_r;
 cds_static::RePairSLPIndex *idx_slp;
 SelfGrammarIndexPT* idx_gimp;

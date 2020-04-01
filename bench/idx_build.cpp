@@ -14,8 +14,8 @@
 #include "../SelfGrammarIndexPT.h"
 #include "../SelfGrammarIndexBS.h"
 #include <ri/r_index.hpp>
-#include "../utils/build_hyb_lz77.h"
-#include <hyb/HybridSelfIndex.h>
+//#include "../utils/build_hyb_lz77.h"
+//#include <hyb/HybridSelfIndex.h>
 
 #include "repetitive_collections.h"
 #include "../SelfGrammarIndexPTS.h"
@@ -72,35 +72,35 @@ auto lzEndbuild = [](benchmark::State &st, const string &file_collection){
 };
 
 */
-auto hybbuild = [](benchmark::State &st, const string &file_collection){
+// auto hybbuild = [](benchmark::State &st, const string &file_collection){
 
-    std::string filename = path+std::to_string(collections_code[file_collection]);
-    char* _f = (char *)filename.c_str();
-    std::string temp = "temp_collection";
-    char* input_file_parser = (char*)temp.c_str();
-    char parser_file [] = "lz77_parser_file_hyb.lz";
-    build_hyb_lz77(input_file_parser,parser_file);
+//     std::string filename = path+std::to_string(collections_code[file_collection]);
+//     char* _f = (char *)filename.c_str();
+//     std::string temp = "temp_collection";
+//     char* input_file_parser = (char*)temp.c_str();
+//     char parser_file [] = "lz77_parser_file_hyb.lz";
+//     build_hyb_lz77(input_file_parser,parser_file);
 
-    //build_hyb_lz77("temp_collection",parser_file);
+//     //build_hyb_lz77("temp_collection",parser_file);
 
 
-    HybridSelfIndex* index;
+//     HybridSelfIndex* index;
 
-    // saving the index ...
-    mem_monitor mm("mem-mon-out-"+collections_name[file_collection]+"-hyb-index.csv");
+//     // saving the index ...
+//     mem_monitor mm("mem-mon-out-"+collections_name[file_collection]+"-hyb-index.csv");
 
-    for (auto _ : st)
-    {
-        mm.event("HYB-INDEX-BUILD");
-        index = new HybridSelfIndex(parser_file,MAX_LENGTH_PATTERN, _f);
-    }
+//     for (auto _ : st)
+//     {
+//         mm.event("HYB-INDEX-BUILD");
+//         index = new HybridSelfIndex(parser_file,MAX_LENGTH_PATTERN, _f);
+//     }
 
-    index->saveStructure();
+//     index->saveStructure();
 
-    st.counters["Size"] = index->sizeDS;
+//     st.counters["Size"] = index->sizeDS;
 
-    delete index;
-};
+//     delete index;
+// };
 
 auto ribuild = [](benchmark::State &st, const string &file_collection){
 
@@ -134,7 +134,7 @@ auto ribuild = [](benchmark::State &st, const string &file_collection){
     }
 
     idx.serialize(f_ridx);
-    st.counters["Size"] = sdsl::size_in_bytes(idx);
+//    st.counters["Size"] = sdsl::size_in_bytes(idx);
 
 };
 
@@ -151,7 +151,7 @@ auto slpbuild = [](benchmark::State &st, const string &file_collection, int qgra
     {
 
         ifstream in(file_collection, ifstream::in);
-	    //ifstream in("temp_collection",ifstream::in);
+//	    ifstream in("temp_collection",ifstream::in);
         in.seekg(0,ios_base::end);
         uint tsize = in.tellg();
         in.seekg(0,ios_base::beg);
@@ -184,9 +184,13 @@ auto slpbuild = [](benchmark::State &st, const string &file_collection, int qgra
 };
 
 
+/***
+ * Este metodo necesita los ficheros .C y .R de la gramatica
+ * */
+
 auto balslpbuild = [](benchmark::State &st, const string &file_collection, int qgram){
 
-    std::string filename = path+std::to_string(collections_code[file_collection])+"_"+std::to_string(qgram);
+    std::string filename = path+std::to_string(collections_code[file_collection])+"_bal_"+std::to_string(qgram);
     char* _f = (char *)filename.c_str();
     RePairSLPIndex *indexer = new RePairSLPIndex();
 
@@ -265,25 +269,6 @@ auto g_imp_build_bal_basics = [](benchmark::State &st, const string &file_collec
 
 };
 auto g_imp_build_basics = [](benchmark::State &st, const string &file_collection){
-
-   /* std::fstream f(file_collection, std::ios::in| std::ios::binary);
-    std::string data;
-    if(!f.is_open()){
-        std::cout<<"Error the file could not opened!!\n";
-        return 0;
-    }
-    std::string buff;
-    unsigned char buffer[1000];
-    while(!f.eof()){
-        f.read((char*)buffer,1000);
-        data.append((char*) buffer,f.gcount());
-    }
-
-    for (int i = 0; i < data.size(); ++i) {
-        if(data[i] == 0 || data[i] == 1)
-            data[i] = 2;
-    }
-*/
 
     std::fstream fbasics(path+std::to_string(collections_code[file_collection])+"basics", std::ios::out| std::ios::binary);
     std::fstream fsuffixes(path+std::to_string(collections_code[file_collection])+"suffixes", std::ios::out| std::ios::binary);
@@ -566,15 +551,16 @@ int main (int argc, char *argv[] ){
         std::cout<<"Error the file could not opened!!\n";
         return 0;
     }
-    std::string buff;
+
+        std::string buff;
     unsigned char buffer[1000];
-    while(!f.eof() && data.size() < 1000000){
+    while(!f.eof()  ){
         f.read((char*)buffer,1000);
         data.append((char*) buffer,f.gcount());
     }
     for (int i = 0; i < data.size(); ++i) {
         if(data[i] == 0 || data[i] == 1 || data[i] == 2)
-            data[i] = 65;
+            data[i] = 3;
     }
 
 	f.close();
@@ -584,7 +570,6 @@ int main (int argc, char *argv[] ){
 {
 	f2 << data[i];
 }
-
 	f2.close();
 
     ///slp_build2();
@@ -593,26 +578,34 @@ int main (int argc, char *argv[] ){
 
     // New RePairSLPIndex
   // //cout << " >> Building the SLP Index:" << endl;
-//   benchmark::RegisterBenchmark("R-Index", ribuild, collection);
+   benchmark::RegisterBenchmark("R-Index", ribuild, collection);
     //benchmark::RegisterBenchmark("Hyb-Index", hybbuild, collection);
-//    benchmark::RegisterBenchmark("SLP-Index-2",  balslpbuild,collection,2);
-//    benchmark::RegisterBenchmark("SLP-Index-4",  balslpbuild,collection,4);
-//    benchmark::RegisterBenchmark("SLP-Index-6",  balslpbuild,collection,6);
-//    benchmark::RegisterBenchmark("SLP-Index-8",  balslpbuild,collection,8);
-//    benchmark::RegisterBenchmark("SLP-Index-10", balslpbuild,collection,10);
-//    benchmark::RegisterBenchmark("SLP-Index-12", balslpbuild,collection,12);
-//    benchmark::RegisterBenchmark("SLP-Index-32", balslpbuild,collection,32);
-//    benchmark::RegisterBenchmark("SLP-Index-64", balslpbuild,collection,64);
+
+//    benchmark::RegisterBenchmark("SLP-Index-2",  slpbuild,collection,2);
+//    benchmark::RegisterBenchmark("SLP-Index-4",  slpbuild,collection,4);
+//    benchmark::RegisterBenchmark("SLP-Index-6",  slpbuild,collection,6);
+//    benchmark::RegisterBenchmark("SLP-Index-8",  slpbuild,collection,8);
+//    benchmark::RegisterBenchmark("SLP-Index-10", slpbuild,collection,10);
+//    benchmark::RegisterBenchmark("SLP-Index-12", slpbuild,collection,12);
+//    benchmark::RegisterBenchmark("SLP-Index-16", slpbuild,collection,16);
+
+    benchmark::RegisterBenchmark("SLP-Index-BAL-2",  balslpbuild,collection,2);
+    benchmark::RegisterBenchmark("SLP-Index-BAL-4",  balslpbuild,collection,4);
+    benchmark::RegisterBenchmark("SLP-Index-BAL-6",  balslpbuild,collection,6);
+    benchmark::RegisterBenchmark("SLP-Index-BAL-8",  balslpbuild,collection,8);
+    benchmark::RegisterBenchmark("SLP-Index-BAL-10", balslpbuild,collection,10);
+    benchmark::RegisterBenchmark("SLP-Index-BAL-12", balslpbuild,collection,12);
+    benchmark::RegisterBenchmark("SLP-Index-BAL-16", balslpbuild,collection,16);
 
 
-   benchmark::RegisterBenchmark("Grammar-Improved-Index Binary Search", g_imp_build_bal_basics, collection);
+//   benchmark::RegisterBenchmark("Grammar-Improved-Index Binary Search", g_imp_build_bal_basics, collection);
 ////   benchmark::RegisterBenchmark("Grammar-Improved-PT-Index"    , g_imp_build_bal, collection);
-   benchmark::RegisterBenchmark("Grammar-Improved-PT-Index<2>" , g_imp_pts_build_bal, collection, 2);
-   benchmark::RegisterBenchmark("Grammar-Improved-PT-Index<4>" , g_imp_pts_build_bal, collection, 4);
-   benchmark::RegisterBenchmark("Grammar-Improved-PT-Index<8>" , g_imp_pts_build_bal, collection, 8);
-   benchmark::RegisterBenchmark("Grammar-Improved-PT-Index<16>", g_imp_pts_build_bal, collection, 16);
-   benchmark::RegisterBenchmark("Grammar-Improved-PT-Index<32>", g_imp_pts_build_bal, collection, 32);
-   benchmark::RegisterBenchmark("Grammar-Improved-PT-Index<64>", g_imp_pts_build_bal, collection, 64);
+//   benchmark::RegisterBenchmark("Grammar-Improved-PT-Index<2>" , g_imp_pts_build_bal, collection, 2);
+//   benchmark::RegisterBenchmark("Grammar-Improved-PT-Index<4>" , g_imp_pts_build_bal, collection, 4);
+//   benchmark::RegisterBenchmark("Grammar-Improved-PT-Index<8>" , g_imp_pts_build_bal, collection, 8);
+//   benchmark::RegisterBenchmark("Grammar-Improved-PT-Index<16>", g_imp_pts_build_bal, collection, 16);
+//   benchmark::RegisterBenchmark("Grammar-Improved-PT-Index<32>", g_imp_pts_build_bal, collection, 32);
+//   benchmark::RegisterBenchmark("Grammar-Improved-PT-Index<64>", g_imp_pts_build_bal, collection, 64);
 ////
 
 

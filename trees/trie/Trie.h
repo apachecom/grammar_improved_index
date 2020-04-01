@@ -99,6 +99,8 @@ namespace _trie{
                     }
                     current->leaf = true;
                 });
+
+                return true;
             }
 
             template<typename F>

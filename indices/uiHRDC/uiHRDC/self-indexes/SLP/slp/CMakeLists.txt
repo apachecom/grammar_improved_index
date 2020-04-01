@@ -21,7 +21,7 @@ set(SOURCES_FILES
     Samplings/VByte2.cpp
     Utils/deltacodes.cpp
     Utils/SuffixArray.cpp
-    RePairSLPIndex.cpp
+                                RePairSLPIndex.cpp
 
     BinRel/FullQuery.h
     BinRel/Occ.h

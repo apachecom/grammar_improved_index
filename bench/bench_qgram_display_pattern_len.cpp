@@ -5,13 +5,11 @@
 #include <gtest/gtest.h>
 #include <benchmark/benchmark.h>
 #include <fstream>
-
 #include "repetitive_collections.h"
 #include "utils.h"
-
 #include "../SelfGrammarIndexBSQ.h"
 #include <slp/RePairSLPIndex.h>
-#include <hyb/HybridSelfIndex.h>
+//#include <hyb/HybridSelfIndex.h>
 
 using namespace std::chrono;
 using timer = std::chrono::high_resolution_clock;
@@ -34,7 +32,7 @@ using timer = std::chrono::high_resolution_clock;
 #define G_INDEX_QGRAM_RANK_PHRASES_REC 11
 
 
-HybridSelfIndex*            idx_hyb;
+//HybridSelfIndex*            idx_hyb;
 cds_static::RePairSLPIndex* idx_slp;
 SelfGrammarIndexBSQ idx_g;
 
@@ -102,45 +100,45 @@ auto load_data_coll=[](benchmark::State &state,  const uint& _code, const uint& 
 
 
 };
-static void h_index(benchmark::State &state) {
-
-    int64_t code_coll = state.range(0);
-    int64_t len = state.range(1);
-
-    std::string filename = files_dir+"/files/indices/"+std::to_string(code_coll);
-
-    char* _f = (char *)filename.c_str();
-
-    idx_hyb = new HybridSelfIndex(_f);
-
-
-
-    size_t ptt ;
-    for (auto _ : state) {
-        ptt = 0;
-        for (uint ii=  0; ii < MAX_Q && ii < R.size();++ii) {
-            uint m = R[ii].second-R[ii].first+1;
-            unsigned char *s;
-            idx_hyb->extract(R[ii].first,m,&s);
-            std::cout<<"Hyb "<<(char*)s<<std::endl;
-            delete []s;
-            ++ptt;
-        }
-    }
-
-
-    state.counters["1 n_ptt"]     = ptt;
-    state.counters["2 n_occ"]     = 0;
-    state.counters["3 ptt_len"]   = len_q;
-    state.counters["4 coll_size"] = data.size();
-    state.counters["5 coll_id"]   = code;
-    state.counters["6 size"]      = idx_hyb->sizeDS;
-    state.counters["7 samp"]      = 0;
-    state.counters["8 name"]      = H_I;
-    state.counters["9 valid"]     = 1;
-
-//    delete idx_hyb;
-}
+//static void h_index(benchmark::State &state) {
+//
+//    int64_t code_coll = state.range(0);
+//    int64_t len = state.range(1);
+//
+//    std::string filename = files_dir+"/files/indices/"+std::to_string(code_coll);
+//
+//    char* _f = (char *)filename.c_str();
+//
+//    idx_hyb = new HybridSelfIndex(_f);
+//
+//
+//
+//    size_t ptt ;
+//    for (auto _ : state) {
+//        ptt = 0;
+//        for (uint ii=  0; ii < MAX_Q && ii < R.size();++ii) {
+//            uint m = R[ii].second-R[ii].first+1;
+//            unsigned char *s;
+//            idx_hyb->extract(R[ii].first,m,&s);
+//            std::cout<<"Hyb "<<(char*)s<<std::endl;
+//            delete []s;
+//            ++ptt;
+//        }
+//    }
+//
+//
+//    state.counters["1 n_ptt"]     = ptt;
+//    state.counters["2 n_occ"]     = 0;
+//    state.counters["3 ptt_len"]   = len_q;
+//    state.counters["4 coll_size"] = data.size();
+//    state.counters["5 coll_id"]   = code;
+//    state.counters["6 size"]      = idx_hyb->sizeDS;
+//    state.counters["7 samp"]      = 0;
+//    state.counters["8 name"]      = H_I;
+//    state.counters["9 valid"]     = 1;
+//
+////    delete idx_hyb;
+//}
 auto slp_index = [](benchmark::State &state, const uint& _code , const uint& _len, const uint& _samp = 0)
 {
 
@@ -179,48 +177,48 @@ auto slp_index = [](benchmark::State &state, const uint& _code , const uint& _le
 
     delete idx_slp;
 };
-auto bal_slp_index = [](benchmark::State &state, const uint& _code , const uint& _len, const uint& _samp = 0)
-{
-
-
-    int64_t code_coll = _code;
-    int64_t len = _len;
-    int64_t samp = _samp;
-
-    std::string filename = files_dir+"/files/new_divided_indices/bal_slp"+std::to_string(code_coll)+"_"+std::to_string(samp);
-    char* _f = (char *)filename.c_str();
-    int q = cds_static::RePairSLPIndex::load(_f, &idx_slp);
-    if(!q){
-
-        std::cout<<"Error en fichero slp\n";
-        std::cout<<filename<<"\n";
-        return;
-
-    }
-
-    size_t ptt ;
-    for (auto _ : state) {
-        ptt = 0 ;
-        for (uint ii=  0; ii < MAX_Q &&  ii < R.size();++ii) {
-            unsigned char * s = idx_slp->RePairSLPIndex::extract(R[ii].first,R[ii].second-1);
-            ++ptt;
-            delete s;
-        }
-    }
-
-    state.counters["1 n_ptt"]     = ptt;
-    state.counters["2 n_occ"]     = 0;
-    state.counters["3 ptt_len"]   = len_q;
-    state.counters["4 coll_size"] = data.size();
-    state.counters["5 coll_id"]   = code;
-    state.counters["6 size"]      = idx_slp->size();
-    state.counters["7 samp"]      = samp;
-    state.counters["8 name"]      = BAL_SLP_I;
-    state.counters["9 valid"]     = 1;
-
-
-    delete idx_slp;
-};
+//auto bal_slp_index = [](benchmark::State &state, const uint& _code , const uint& _len, const uint& _samp = 0)
+//{
+//
+//
+//    int64_t code_coll = _code;
+//    int64_t len = _len;
+//    int64_t samp = _samp;
+//
+//    std::string filename = files_dir+"/files/new_divided_indices/bal_slp"+std::to_string(code_coll)+"_"+std::to_string(samp);
+//    char* _f = (char *)filename.c_str();
+//    int q = cds_static::RePairSLPIndex::load(_f, &idx_slp);
+//    if(!q){
+//
+//        std::cout<<"Error en fichero slp\n";
+//        std::cout<<filename<<"\n";
+//        return;
+//
+//    }
+//
+//    size_t ptt ;
+//    for (auto _ : state) {
+//        ptt = 0 ;
+//        for (uint ii=  0; ii < MAX_Q &&  ii < R.size();++ii) {
+//            unsigned char * s = idx_slp->RePairSLPIndex::extract(R[ii].first,R[ii].second-1);
+//            ++ptt;
+//            delete s;
+//        }
+//    }
+//
+//    state.counters["1 n_ptt"]     = ptt;
+//    state.counters["2 n_occ"]     = 0;
+//    state.counters["3 ptt_len"]   = len_q;
+//    state.counters["4 coll_size"] = data.size();
+//    state.counters["5 coll_id"]   = code;
+//    state.counters["6 size"]      = idx_slp->size();
+//    state.counters["7 samp"]      = samp;
+//    state.counters["8 name"]      = BAL_SLP_I;
+//    state.counters["9 valid"]     = 1;
+//
+//
+//    delete idx_slp;
+//};
 auto g_index_binary_search_leaf_notrie = [] (benchmark::State &state, const uint& _code, const uint& _len, const uint& _samp = 0)
 {
 

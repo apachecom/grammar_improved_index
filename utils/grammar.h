@@ -38,6 +38,8 @@ struct rule{
         _rule = R._rule;
         l = R.l;
         r = R.r;
+
+        return *this;
     }
     rule::r_long size_in_bytes()const
     {

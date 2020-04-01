@@ -6,12 +6,6 @@
 #define IMPROVED_GRAMMAR_INDEX_BUILD_HYB_LZ77_H
 
 
-
-
-
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>

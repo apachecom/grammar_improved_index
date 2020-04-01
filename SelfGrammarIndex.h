@@ -50,9 +50,7 @@ public:
     virtual const m_patricia::compact_patricia_tree &get_pt_suffixes() const = 0;
     virtual void locateNoTrie(std::string &, std::vector<uint> &) = 0;
 
-
     void build_bitvector_occ(sdsl::bit_vector& B) const;
-
 
     virtual void set_code(const unsigned int &c) { code = c; }
     virtual void build(const std::string &);
@@ -65,9 +63,6 @@ public:
 
     virtual grammar_representation &get_grammar() { return _g; }
     virtual range_search2d &get_grid() { return grid; }
-
-
-
     virtual void display(const std::size_t &, const std::size_t &, std::string &);
     virtual void display_trie(const std::size_t &, const std::size_t &, std::string &);
     virtual void display_L_trie(const std::size_t &i, const std::size_t &j, std::string &str) {
@@ -1192,6 +1187,87 @@ public:
         return 0;
     }
 
+
+    typedef std::vector<std::pair<uint, uint>> rvect;
+    typedef std::vector<uint> lvect;
+
+    /*uint calc_len(const uint &X, rvect &D, lvect &L, const int & t) {
+
+        if (X < t) return 1;
+
+        if (L[X-t] != 0)
+            return L[X-t];
+
+        L[X -t] = calc_len(D[X-t].first, D, L,t) + calc_len(D[X-t].second, D, L,t);
+        return L[X -t];
+    }
+    void read_repair_grammar(std::fstream &in_grammar,
+                             std::fstream &in_first_rule, uint& terminals, uint textlength, rvect& V, lvect& L)
+                             {
+
+        if (!in_grammar.is_open()) {
+            std::cout << "Problem grammar file error\n";
+            return;
+        }
+
+        in_grammar.read((char *) &terminals, sizeof(terminals));
+
+        unsigned char *symbols = new unsigned char[terminals];
+
+        for (int i = 0; i < terminals; ++i) {
+            char b;
+            in_grammar.read((char *) &b, sizeof(char));
+
+            symbols[i] = b;
+        }
+
+        rvect V;
+        lvect L;
+
+        while (!in_grammar.eof()) {
+
+            int p1, p2;
+            in_grammar.read((char *) &p1, sizeof(int));
+            in_grammar.read((char *) &p2, sizeof(int));
+            V.push_back(std::make_pair(p1, p2));
+
+
+        }
+        V.pop_back();
+        L.resize(V.size());
+
+        for (int k = 0; k < L.size(); ++k) {
+            L[k] = 0;
+        }
+
+        for (int j = 0; j < V.size(); ++j){
+            calc_len(j+terminals, V, L,terminals);
+        }
+
+
+        std::vector<uint> S;
+        while (!in_first_rule.eof()) {
+            int X;
+            in_first_rule.read((char *) &X, sizeof(int));
+            S.push_back(X);
+        }
+        S.pop_back();
+
+        int *ctext = new int[S.size()];
+        uint clength = S.size();
+        for (size_t i = 0; i < clength; ++i){
+            ctext[i] = S[i];
+        }
+        S.clear();
+
+        // Variables for the dictionary rules
+        uint cdicc = V.size();
+        uint rules = terminals+cdicc;
+
+
+    }
+
+*/
 };
 
 

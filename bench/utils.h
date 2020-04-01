@@ -48,7 +48,7 @@ void load_data(const size_t &_max,std::string& data, const std::string &coll) {
     }
     for (int i = 0; i < data.size(); ++i) {
         if (data[i] == 0 || data[i] == 1 || data[i] == 2)
-            data[i] = 65;
+            data[i] = 3;
     }
 
 

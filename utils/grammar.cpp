@@ -6,8 +6,8 @@
 #include <sdsl/int_vector.hpp>
 #include <sdsl/wavelet_trees.hpp>
 #include <sdsl/inv_perm_support.hpp>
-#include <lcp_bitcompressed.hpp>
-#include <rmq_succinct_sada.hpp>
+#include <sdsl/lcp_bitcompressed.hpp>
+#include <sdsl/rmq_succinct_sada.hpp>
 
 #include "grammar.h"
 

@@ -7,7 +7,7 @@
 #include <fstream>
 #include <slp/RePairSLPIndex.h>
 #include <ri/r_index.hpp>
-#include <hyb/HybridSelfIndex.h>
+//#include <hyb/HybridSelfIndex.h>
 
 
 #include "../bench/repetitive_collections.h"
@@ -26,7 +26,7 @@ using namespace std::chrono;
 using timer = std::chrono::high_resolution_clock;
 
 
-HybridSelfIndex*            idx_hyb;
+//HybridSelfIndex*            idx_hyb;
 ri::r_index<>*              idx_r;
 cds_static::RePairSLPIndex* idx_slp;
 std::string data;
@@ -125,14 +125,14 @@ static void  load_indice(benchmark::State &state){
         idx_r->load(rf);
 
     }
-    if(op_i == H_I){
-
-        std::string filename = "../files/new_indices/"+std::to_string(code_coll);
-        char* _f = (char *)filename.c_str();
-        idx_hyb = new HybridSelfIndex(_f);
-
-
-    }
+//    if(op_i == H_I){
+//
+//        std::string filename = "../files/new_indices/"+std::to_string(code_coll);
+//        char* _f = (char *)filename.c_str();
+//        idx_hyb = new HybridSelfIndex(_f);
+//
+//
+//    }
     if(op_i == SLP_I){
 
         std::string filename = "../files/indices/"+std::to_string(code_coll)+"_"+std::to_string(samp);
@@ -186,7 +186,7 @@ static void locate_r_index(benchmark::State &state) {
     state.counters["3 ptt_len"]   = len;
     state.counters["4 coll_size"] = data.size();
     state.counters["5 coll_id"]   = code;
-    state.counters["6 size"]      = sdsl::size_in_bytes(*idx_r);
+//    state.counters["6 size"]      = sdsl::size_in_bytes(*idx_r);
     state.counters["7 samp"]      = 0;
     state.counters["8 name"]      = R_I;
     state.counters["9 valid"]     = 1;
@@ -195,47 +195,47 @@ static void locate_r_index(benchmark::State &state) {
 //    delete idx_r;
 
 }
-static void locate_h_index(benchmark::State &state) {
-
-    int64_t len = state.range(0);
-
-    size_t nocc,ptt = 0;
-    for (auto _ : state) {
-        nocc = 0; ptt = 0;
-
-        for (uint ii=  0; ii < MAX_Q &&  ii < R.size();++ii) {
-
-//            std::string ss;
-//            ss.resize(len);
-//            std::copy(R[ii].begin(),R[ii].begin()+len,ss.begin());
-
-            unsigned long _Occ;
-            unsigned long* _occ;
-
-            unsigned int m = len;
-            idx_hyb->locate((uchar*)R[ii].c_str(),m,&_Occ,&_occ);
-            nocc += _Occ;++ptt;
-            if(nocc > MAX_OCC)break;
-        }
-    }
-
-//    state.counters["occ"] = nocc;
-//    state.counters["space"] = idx_hyb->sizeDS;
-//    state.counters["bps"] = idx_hyb->sizeDS*(8.0/data.size());
-//    state.counters["len_coll"] = data.size();
+//static void locate_h_index(benchmark::State &state) {
 //
-
-    state.counters["1 n_ptt"]     = ptt;
-    state.counters["2 n_occ"]     = nocc;
-    state.counters["3 ptt_len"]   = len;
-    state.counters["4 coll_size"] = data.size();
-    state.counters["5 coll_id"]   = code;
-    state.counters["6 size"]      = idx_hyb->sizeDS;
-    state.counters["7 samp"]      = 0;
-    state.counters["8 name"]      = H_I;
-    state.counters["9 valid"]     = 1;
-
-}
+//    int64_t len = state.range(0);
+//
+//    size_t nocc,ptt = 0;
+//    for (auto _ : state) {
+//        nocc = 0; ptt = 0;
+//
+//        for (uint ii=  0; ii < MAX_Q &&  ii < R.size();++ii) {
+//
+////            std::string ss;
+////            ss.resize(len);
+////            std::copy(R[ii].begin(),R[ii].begin()+len,ss.begin());
+//
+//            unsigned long _Occ;
+//            unsigned long* _occ;
+//
+//            unsigned int m = len;
+//            idx_hyb->locate((uchar*)R[ii].c_str(),m,&_Occ,&_occ);
+//            nocc += _Occ;++ptt;
+//            if(nocc > MAX_OCC)break;
+//        }
+//    }
+//
+////    state.counters["occ"] = nocc;
+////    state.counters["space"] = idx_hyb->sizeDS;
+////    state.counters["bps"] = idx_hyb->sizeDS*(8.0/data.size());
+////    state.counters["len_coll"] = data.size();
+////
+//
+//    state.counters["1 n_ptt"]     = ptt;
+//    state.counters["2 n_occ"]     = nocc;
+//    state.counters["3 ptt_len"]   = len;
+//    state.counters["4 coll_size"] = data.size();
+//    state.counters["5 coll_id"]   = code;
+//    state.counters["6 size"]      = idx_hyb->sizeDS;
+//    state.counters["7 samp"]      = 0;
+//    state.counters["8 name"]      = H_I;
+//    state.counters["9 valid"]     = 1;
+//
+//}
 static void locate_slp_index(benchmark::State &state) {
 
     int64_t code_coll = state.range(0);
@@ -281,53 +281,53 @@ static void locate_slp_index(benchmark::State &state) {
     delete idx_slp;
 
 }
-static void locate_balslp_index(benchmark::State &state) {
-
-    int64_t code_coll = state.range(0);
-    int64_t len = state.range(1);
-    int64_t samp = state.range(3);
-
-    std::string filename = "../files/new_divided_indices/bal_slp"+std::to_string(code_coll)+"_"+std::to_string(samp);
-    char* _f = (char *)filename.c_str();
-//    std::cout<<_f<<std::endl;
-
-    int q = cds_static::RePairSLPIndex::load(0,_f, &idx_slp);
-
-    size_t nocc,ptt = 0;
-    for (auto _ : state) {
-        nocc = 0; ptt = 0;
-
-        for (uint ii=  0; ii < R.size() && ii < MAX_Q;++ii) {
-//            std::string ss;
-//            ss.resize(len);
-//            std::copy(R[ii].begin(),R[ii].begin()+len,ss.begin());
-            uint occs;
-            uchar *tt = (uchar * )(R[ii].c_str());
-            std::vector<uint> *pos = idx_slp->RePairSLPIndex::locate(tt,len, &occs);
-            delete pos;
-            nocc += occs;ptt++;
-            if(nocc > MAX_OCC)break;
-        }
-    }
-
-//    state.counters["occ"] = nocc;
-//    state.counters["space"] = idx_slp->size();
-//    state.counters["bps"] = idx_slp->size()*(8.0/data.size());
-//    state.counters["len_coll"] = data.size();
-
-    state.counters["1 n_ptt"]     = ptt;
-    state.counters["2 n_occ"]     = nocc;
-    state.counters["3 ptt_len"]   = len;
-    state.counters["4 coll_size"] = data.size();
-    state.counters["5 coll_id"]   = code;
-    state.counters["6 size"]      = idx_slp->size();
-    state.counters["7 samp"]      = samp;
-    state.counters["8 name"]      = BAL_SLP_I;
-    state.counters["9 valid"]     = 1;
-
-
-    delete idx_slp;
-}
+//static void locate_balslp_index(benchmark::State &state) {
+//
+//    int64_t code_coll = state.range(0);
+//    int64_t len = state.range(1);
+//    int64_t samp = state.range(3);
+//
+//    std::string filename = "../files/new_divided_indices/bal_slp"+std::to_string(code_coll)+"_"+std::to_string(samp);
+//    char* _f = (char *)filename.c_str();
+////    std::cout<<_f<<std::endl;
+//
+//    int q = cds_static::RePairSLPIndex::load(0,_f, &idx_slp);
+//
+//    size_t nocc,ptt = 0;
+//    for (auto _ : state) {
+//        nocc = 0; ptt = 0;
+//
+//        for (uint ii=  0; ii < R.size() && ii < MAX_Q;++ii) {
+////            std::string ss;
+////            ss.resize(len);
+////            std::copy(R[ii].begin(),R[ii].begin()+len,ss.begin());
+//            uint occs;
+//            uchar *tt = (uchar * )(R[ii].c_str());
+//            std::vector<uint> *pos = idx_slp->RePairSLPIndex::locate(tt,len, &occs);
+//            delete pos;
+//            nocc += occs;ptt++;
+//            if(nocc > MAX_OCC)break;
+//        }
+//    }
+//
+////    state.counters["occ"] = nocc;
+////    state.counters["space"] = idx_slp->size();
+////    state.counters["bps"] = idx_slp->size()*(8.0/data.size());
+////    state.counters["len_coll"] = data.size();
+//
+//    state.counters["1 n_ptt"]     = ptt;
+//    state.counters["2 n_occ"]     = nocc;
+//    state.counters["3 ptt_len"]   = len;
+//    state.counters["4 coll_size"] = data.size();
+//    state.counters["5 coll_id"]   = code;
+//    state.counters["6 size"]      = idx_slp->size();
+//    state.counters["7 samp"]      = samp;
+//    state.counters["8 name"]      = BAL_SLP_I;
+//    state.counters["9 valid"]     = 1;
+//
+//
+//    delete idx_slp;
+//}
 static void free_indexes(benchmark::State &state) {
 
     for (auto _ : state) {
@@ -407,63 +407,63 @@ BENCHMARK(locate_r_index)     ->Args({4,5         })->Unit(benchmark::kMicroseco
 BENCHMARK(locate_slp_index)   ->Args({4,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({4,10,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({4,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({4,10         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({4,20,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({4,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({4,20         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({4,30,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({4,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({4,30         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({4,40,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({4,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({4,40         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({4,50,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({4,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({4,50         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({4,100,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({4,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({4,100         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({4,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({4,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({4,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(free_indexes)       ->Args({4,50         })->Unit(benchmark::kMicrosecond);
 
 
@@ -474,63 +474,63 @@ BENCHMARK(locate_r_index)     ->Args({5,5         })->Unit(benchmark::kMicroseco
 BENCHMARK(locate_slp_index)   ->Args({5,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({5,10,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({5,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({5,10         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({5,20,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({5,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({5,20         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({5,30,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({5,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({5,30         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({5,40,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({5,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({5,40         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({5,50,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({5,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({5,50         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({5,100,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({5,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({5,100         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({5,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({5,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({5,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(free_indexes)       ->Args({5,50         })->Unit(benchmark::kMicrosecond);
 
 
@@ -542,63 +542,63 @@ BENCHMARK(locate_r_index)     ->Args({1,5         })->Unit(benchmark::kMicroseco
 BENCHMARK(locate_slp_index)   ->Args({1,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({1,10,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 ////BENCHMARK(bt_locate)        ->Args({1,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({1,10         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({1,20,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({1,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({1,20         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({1,30,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({1,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({1,30         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({1,40,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({1,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({1,40         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({1,50,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({1,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({1,50         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({1,100,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({1,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({1,100         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({1,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({1,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({1,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(free_indexes)       ->Args({1,50         })->Unit(benchmark::kMicrosecond);
 
 
@@ -611,63 +611,63 @@ BENCHMARK(locate_r_index)     ->Args({2,5         })->Unit(benchmark::kMicroseco
 BENCHMARK(locate_slp_index)   ->Args({2,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({2,10,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({2,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({2,10         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({2,20,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({2,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({2,20         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({2,30,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({2,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({2,30         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({2,40,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({2,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({2,40         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({2,50,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({2,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({2,50         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({2,100,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({2,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({2,100         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({2,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({2,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({2,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(free_indexes)       ->Args({2,50         })->Unit(benchmark::kMicrosecond);
 
 
@@ -680,63 +680,63 @@ BENCHMARK(locate_r_index)     ->Args({6,5         })->Unit(benchmark::kMicroseco
 BENCHMARK(locate_slp_index)   ->Args({6,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({6,10,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({6,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({6,10         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({6,20,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({6,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({6,20         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({6,30,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 ////BENCHMARK(bt_locate)        ->Args({6,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({6,30         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({6,40,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({6,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({6,40         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({6,50,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({6,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({6,50         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({6,100,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({6,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({6,100         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({6,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({6,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({6,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(free_indexes)       ->Args({6,50         })->Unit(benchmark::kMicrosecond);
 
 
@@ -749,63 +749,63 @@ BENCHMARK(locate_r_index)     ->Args({7,5         })->Unit(benchmark::kMicroseco
 BENCHMARK(locate_slp_index)   ->Args({7,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({7,10,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 ////BENCHMARK(bt_locate)        ->Args({7,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({7,10         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({7,20,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({7,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({7,20         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({7,30,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({7,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({7,30         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({7,40,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({7,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({7,40         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({7,50,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({7,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({7,50         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({7,100,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({7,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({7,100         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({7,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({7,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({7,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(free_indexes)       ->Args({7,50         })->Unit(benchmark::kMicrosecond);
 
 
@@ -818,63 +818,63 @@ BENCHMARK(locate_r_index)     ->Args({8,5         })->Unit(benchmark::kMicroseco
 BENCHMARK(locate_slp_index)   ->Args({8,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({8,10,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 ////BENCHMARK(bt_locate)        ->Args({8,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({8,10         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,10,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,10,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,10,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({8,20,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 ////BENCHMARK(bt_locate)        ->Args({8,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({8,20         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,20,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,20,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,20,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({8,30,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({8,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({8,30         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,30,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,30,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,30,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({8,40,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(bt_locate)        ->Args({8,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({8,40         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,40,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,40,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,40,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({8,50,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 ////BENCHMARK(bt_locate)        ->Args({8,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({8,50         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,50,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,50,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,50,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({8,100,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 ////BENCHMARK(bt_locate)        ->Args({8,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_r_index)     ->Args({8,100         })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(locate_slp_index)   ->Args({8,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-BENCHMARK(locate_balslp_index)->Args({8,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,100,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,100,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(locate_balslp_index)->Args({8,100,SLP_I,16})->Unit(benchmark::kMicrosecond);
 BENCHMARK(free_indexes)       ->Args({8,50         })->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_MAIN();

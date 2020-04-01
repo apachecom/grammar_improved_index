@@ -6,8 +6,9 @@
 #include <benchmark/benchmark.h>
 #include <fstream>
 #include <slp/RePairSLPIndex.h>
-//#include <ri/r_index.hpp>
-#include <hyb/HybridSelfIndex.h>
+#include <ri/r_index.hpp>
+#include <chrono>
+//#include <hyb/HybridSelfIndex.h>
 #include "../bench/repetitive_collections.h"
 //#include "../bench/utils.h"
 
@@ -26,7 +27,7 @@ using timer = std::chrono::high_resolution_clock;
 int len_q = 0;
 int code = 0;
 
-HybridSelfIndex*            idx_hyb;
+//HybridSelfIndex*            idx_hyb;
 //ri::r_index<>*              idx_r;
 cds_static::RePairSLPIndex* idx_slp;
 
@@ -114,29 +115,29 @@ static void  load_indice(benchmark::State &state){
 
 
 }
-static void display_h_index(benchmark::State &state) {
-
-    int64_t len = state.range(0);
-
-    size_t nocc;
-    for (auto _ : state) {
-        nocc = 0;
-        for (uint ii=  0; ii < MAX_Q;++ii) {
-
-            uint m = R[ii].second-R[ii].first+1;
-            unsigned char *s;
-            //idx_hyb->locate((uchar*)(i.c_str()),m,&_Occ,&_occ);
-            idx_hyb->extract(R[ii].first,m,&s);
-            delete []s;
-
-        }
-    }
-
-    state.counters["space"] = idx_hyb->sizeDS;
-    state.counters["data_len"] = data.size();
-    state.counters["bps"] = idx_hyb->sizeDS*(8.0/data.size());
-
-}
+//static void display_h_index(benchmark::State &state) {
+//
+//    int64_t len = state.range(0);
+//
+//    size_t nocc;
+//    for (auto _ : state) {
+//        nocc = 0;
+//        for (uint ii=  0; ii < MAX_Q;++ii) {
+//
+//            uint m = R[ii].second-R[ii].first+1;
+//            unsigned char *s;
+//            //idx_hyb->locate((uchar*)(i.c_str()),m,&_Occ,&_occ);
+//            idx_hyb->extract(R[ii].first,m,&s);
+//            delete []s;
+//
+//        }
+//    }
+//
+//    state.counters["space"] = idx_hyb->sizeDS;
+//    state.counters["data_len"] = data.size();
+//    state.counters["bps"] = idx_hyb->sizeDS*(8.0/data.size());
+//
+//}
 static void display_slp_index(benchmark::State &state) {
 
     int64_t code_coll = state.range(0);
@@ -161,37 +162,37 @@ static void display_slp_index(benchmark::State &state) {
     state.counters["bps"] = idx_slp->size()*(8.0/data.size());
     delete idx_slp;
 }
-static void display_balslp_index(benchmark::State &state) {
-
-    int64_t code_coll = state.range(0);
-    int64_t len = state.range(1);
-    int64_t samp = state.range(3);
-
-    std::string filename = "../files/new_divided_indices/bal_slp"+std::to_string(code_coll)+"_"+std::to_string(samp);
-    char* _f = (char *)filename.c_str();
-    int q = cds_static::RePairSLPIndex::load(_f, &idx_slp);
-    if(!q){
-
-        std::cout<<"Error en fichero slp\n";
-        std::cout<<filename<<"\n";
-        return;
-
-    }
-
-    size_t nocc;
-    for (auto _ : state) {
-        nocc = 0;
-        for (uint ii=  0; ii < MAX_Q &&  ii < R.size();++ii) {
-            unsigned char * s = idx_slp->RePairSLPIndex::extract(R[ii].first,R[ii].second-1);
-//            if(nocc > 1e5)break;
-        }
-    }
-
-    state.counters["space"] = idx_slp->size();
-    state.counters["data_len"] = data.size();
-    state.counters["bps"] = idx_slp->size()*(8.0/data.size());
-    delete idx_slp;
-}
+//static void display_balslp_index(benchmark::State &state) {
+//
+//    int64_t code_coll = state.range(0);
+//    int64_t len = state.range(1);
+//    int64_t samp = state.range(3);
+//
+//    std::string filename = "../files/new_divided_indices/bal_slp"+std::to_string(code_coll)+"_"+std::to_string(samp);
+//    char* _f = (char *)filename.c_str();
+//    int q = cds_static::RePairSLPIndex::load(_f, &idx_slp);
+//    if(!q){
+//
+//        std::cout<<"Error en fichero slp\n";
+//        std::cout<<filename<<"\n";
+//        return;
+//
+//    }
+//
+//    size_t nocc;
+//    for (auto _ : state) {
+//        nocc = 0;
+//        for (uint ii=  0; ii < MAX_Q &&  ii < R.size();++ii) {
+//            unsigned char * s = idx_slp->RePairSLPIndex::extract(R[ii].first,R[ii].second-1);
+////            if(nocc > 1e5)break;
+//        }
+//    }
+//
+//    state.counters["space"] = idx_slp->size();
+//    state.counters["data_len"] = data.size();
+//    state.counters["bps"] = idx_slp->size()*(8.0/data.size());
+//    delete idx_slp;
+//}
 static void free_indexes(benchmark::State &state) {
 
     for (auto _ : state) {
@@ -211,12 +212,12 @@ static void free_indexes(benchmark::State &state) {
 //BENCHMARK(load_indice)     ->Args({1,H_I  ,0 })->Unit(benchmark::kMicrosecond);
 BENCHMARK(load_indice)        ->Args({4,5,R_I  ,0 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(display_r_index)     ->Args({4,5         })->Unit(benchmark::kMicrosecond);
-//BENCHMARK(display_slp_index)   ->Args({4,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
-//BENCHMARK(display_slp_index)   ->Args({4,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
-//BENCHMARK(display_slp_index)   ->Args({4,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
+BENCHMARK(display_slp_index)   ->Args({4,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+BENCHMARK(display_slp_index)   ->Args({4,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
+BENCHMARK(display_slp_index)   ->Args({4,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
 //BENCHMARK(display_slp_index)   ->Args({4,5,SLP_I,32})->Unit(benchmark::kMicrosecond);
 //BENCHMARK(display_slp_index)   ->Args({4,5,SLP_I,64})->Unit(benchmark::kMicrosecond);
-BENCHMARK(display_balslp_index)->Args({4,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
+//BENCHMARK(display_balslp_index)->Args({4,5,SLP_I,4 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(display_balslp_index)->Args({4,5,SLP_I,8 })->Unit(benchmark::kMicrosecond);
 //BENCHMARK(display_balslp_index)->Args({4,5,SLP_I,16})->Unit(benchmark::kMicrosecond);
 //BENCHMARK(display_balslp_index)->Args({4,5,SLP_I,32})->Unit(benchmark::kMicrosecond);
