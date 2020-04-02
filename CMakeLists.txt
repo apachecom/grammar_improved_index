@@ -7,7 +7,9 @@ include_directories(~/include)
 
 include_directories(~/include/ri)
 
-    link_directories(~/lib)
+include_directories(~/include/gflags)
+
+link_directories(~/lib)
 
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
