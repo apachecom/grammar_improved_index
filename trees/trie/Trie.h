@@ -98,6 +98,8 @@ namespace _trie{
                         num_nodes++;
                     }
                     current->leaf = true;
+
+                    return true;
                 });
 
                 return true;
@@ -165,7 +167,7 @@ namespace _trie{
                     return false;
                 }
                 node = node->childs[s[pos]];
-                path(node,s,++pos,f);
+                return path(node,s,++pos,f);
             }
     };
 

@@ -148,10 +148,13 @@ set(SOURCE_FILES
         bench/repetitive_collections.h
 
         SelfGrammarIndexBSQ.cpp SelfGrammarIndexBSQ.h simple_grid.cpp simple_grid.h
+        )
 
-        bench/build-indices.cpp)
+option(USE_MEM_MONITOR "Enter mem-monitor mode" OFF)
 
-
+if (USE_MEM_MONITOR STREQUAL ON)
+    add_definitions(-DMEM_MONITOR)
+endif()
 
 add_executable(improved_grammar_index main.cpp ${SOURCE_FILES} )
 
@@ -222,6 +225,8 @@ cxx_executable_with_flags(bench_qgram_locate_pattern_len    "" "${LIBS};benchmar
 cxx_executable_with_flags(bench_qgram_display_pattern_len    "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_qgram_display_pattern_len.cpp ${SLP_SAMPLING} )
 #cxx_executable_with_flags(locate_other "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_locate.cpp ${SOURCE_FILES})
 cxx_executable_with_flags(idx_build "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/idx_build.cpp ${SOURCE_FILES})
+cxx_executable_with_flags(build_indices "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/build_indices.cpp ${SOURCE_FILES})
+cxx_executable_with_flags(process_coll "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_collections.cpp ${SOURCE_FILES})
 
 
 target_link_libraries(improved_grammar_index sdsl)

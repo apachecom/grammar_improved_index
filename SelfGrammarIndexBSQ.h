@@ -45,15 +45,16 @@ public:
 
     ~SelfGrammarIndexBSQ() {
 
-//        delete grammarSamp;
-//        delete reverseSamp;
+        delete grammarSamp;
+        delete reverseSamp;
+        delete sequenceSamp;
 
     }
 
     size_t n_rules() { return _g.n_rules(); }
 
     void build_basics(const std::string &text) {
-
+        std::cout<<"SelfGrammarIndexBSQ()"<<std::endl;
         /*
      * Building grammar by repair algorithm
      *
@@ -233,10 +234,10 @@ public:
         not_compressed_grammar.permutationSortRules(text, pi, n_rules);
         inv_pi = sdsl::inv_perm_support<>(&pi);
         std::cout << "inv_pi: ";
-        for (int k = 0; k < pi.size(); ++k) {
-            std::cout << inv_pi[k] << " ";
-        }
-        std::cout << "\n";
+//        for (int k = 0; k < pi.size(); ++k) {
+//            std::cout << inv_pi[k] << " ";
+//        }
+//        std::cout << "\n";
 
         C = sdsl::bit_vector(256, 0);
         for (int i = 0; i < _g.alp.size(); ++i) {
@@ -725,7 +726,36 @@ public:
 
     }
 
+    void buildSamplingsFromGrammar(std::fstream &repair_g, const string &text,const uint &samplings) {
+
+        grammar g;
+        g.load(repair_g);
+
+        uint n_rules;
+
+        g.preprocess(text);
+
+        std::cout << "sorting rules (" << g.n_rules() << ")\n";
+
+
+        g.permutationSortRules(text, pi, n_rules);
+        inv_pi = sdsl::inv_perm_support<>(&pi);
+
+        C = sdsl::bit_vector(256, 0);
+        for (int i = 0; i < _g.alp.size(); ++i) {
+            uint c = (uint) _g.alp[i];
+            C[c] = 1;
+        }
+
+        c_rank1 = sdsl::bit_vector::rank_1_type(&C);
+        c_sel1 = sdsl::bit_vector::select_1_type(&C);
+
+        buildSamplings(samplings);
+
+
+    }
     void buildSamplingsFromGrammar(grammar &g, const string &text) {
+
 
         uint n_rules;
 
@@ -1378,6 +1408,13 @@ public:
 
     }
 
+    void load_basics(fstream &f) {
+        std::cout<<"loading.."<<std::endl;
+        SelfGrammarIndexBS::load_basics(f);
+
+        std::cout<<"loaded.."<<std::endl;
+    }
+
     void save(fstream &f) {
         SelfGrammarIndexBS::save(f);
         sdsl::serialize(pi, f);
@@ -1391,6 +1428,30 @@ public:
         sequenceSamp->save(GS);
     }
 
+    void saveSampling(std::ofstream &f, std::ofstream &G, std::ofstream &GR,std::ofstream &GS) {
+
+        sdsl::serialize(pi, f);
+        sdsl::serialize(C, f);
+        grammarSamp->save(G);
+        reverseSamp->save(GR);
+        sequenceSamp->save(GS);
+    }
+
+    void loadSampling(std::ifstream &f, std::ifstream &G, std::ifstream &GR, std::ifstream &GS) {
+
+
+        sdsl::load(pi, f);
+        sdsl::load(C, f);
+        c_rank1 = sdsl::bit_vector::rank_1_type(&C);
+        c_sel1 = sdsl::bit_vector::select_1_type(&C);
+        inv_pi = sdsl::inv_perm_support<>(&pi);
+
+
+        grammarSamp = Sampling::load(G);
+        reverseSamp = Sampling::load(GR);
+        sequenceSamp= Sampling::load(GS);
+
+    }
     void loadSampling(std::ifstream &G, std::ifstream &GR, std::ifstream &GS) {
 
         grammarSamp = Sampling::load(G);
@@ -1400,7 +1461,7 @@ public:
     }
 
     size_t size_in_bytes() {
-        return SelfGrammarIndexBS::size_in_bytes() + grammarSamp->getSize() + reverseSamp->getSize() +
+        return SelfGrammarIndexBS::size_in_bytes() + grammarSamp->getSize() + reverseSamp->getSize() + sequenceSamp->getSize() +
                sdsl::size_in_bytes(pi) + sdsl::size_in_bytes(inv_pi) + sdsl::size_in_bytes(C) +
                sdsl::size_in_bytes(c_sel1) + sdsl::size_in_bytes(c_rank1);
     }

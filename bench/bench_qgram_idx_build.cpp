@@ -87,9 +87,7 @@ static void build_sampling(benchmark::State &state) {
         std::ofstream foutG(read_path_div+std::to_string(code)+".qgramSampG_"+std::to_string(qs),std::ios::out|std::ios::binary);
         std::cout<<"\tsaving sampling rules in $:"<<read_path_div+std::to_string(code)+".qgramSampGR_"+std::to_string(qs)<<std::endl;
         std::ofstream foutGR(read_path_div+std::to_string(code)+".qgramSampGR_"+std::to_string(qs),std::ios::out|std::ios::binary);
-
         std::ofstream foutGS(read_path_div+std::to_string(code)+".qgramSampGS_"+std::to_string(qs),std::ios::out|std::ios::binary);
-
         idx.saveSampling(foutG,foutGR,foutGS);
     }
 
