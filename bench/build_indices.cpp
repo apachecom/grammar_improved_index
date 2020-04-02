@@ -84,7 +84,7 @@ auto ribuild = [](benchmark::State &st, const string &file_collection, const std
 
 #ifdef MEM_MONITOR
 //    std::cout<<file_mem_monitor<<std::endl;
-    mem_monitor mm(file_mem_monitor+".csv");
+    mem_monitor mm(file_mem_monitor+"-ri.csv");
 #endif
 
     for (auto _ : st)
@@ -113,7 +113,7 @@ auto slpbuild = [](benchmark::State &st, const string &file_collection, const st
     RePairSLPIndex *indexer = new RePairSLPIndex();
 
 #ifdef MEM_MONITOR
-    mem_monitor mm(file_mem_monitor+".csv");
+    mem_monitor mm(file_mem_monitor+"-slp.csv");
 #endif
 
     ifstream in("./temp_collection", ifstream::in);
@@ -163,7 +163,7 @@ auto slpbalbuild = [](benchmark::State &st, const string &file_collection, const
     RePairSLPIndex *indexer = new RePairSLPIndex();
 
 #ifdef MEM_MONITOR
-    mem_monitor mm(file_mem_monitor+".csv");
+    mem_monitor mm(file_mem_monitor+"-balspl.csv");
 #endif
     std::cout<<"File collection: "<<file_collection<<std::endl;
     ifstream in(file_collection, ifstream::in);
@@ -230,7 +230,7 @@ auto g_imp_build_basics = [](benchmark::State &st, const string &file_collection
 //    g_index->set_code(collections_code[file_collection]);
 
 #ifdef MEM_MONITOR
-    mem_monitor mm(file_mem_monitor+".csv");
+    mem_monitor mm(file_mem_monitor+"-gi.csv");
 #endif
 
     for (auto _ : st)
@@ -271,7 +271,7 @@ auto g_imp_pts_build = [](
 
 
 #ifdef MEM_MONITOR
-    mem_monitor mm(file_mem_monitor+".csv");
+    mem_monitor mm(file_mem_monitor+"-gi-pts.csv");
 #endif
 
     SelfGrammarIndexPTS* g_index = new SelfGrammarIndexPTS(sampling);
@@ -321,7 +321,7 @@ auto g_imp_qgram_build = [](
 
 #ifdef MEM_MONITOR
 
-    mem_monitor mm(file_mem_monitor+".csv");
+    mem_monitor mm(file_mem_monitor+"-gi-qgram.csv");
 #endif
 
     SelfGrammarIndexBSQ idx;
