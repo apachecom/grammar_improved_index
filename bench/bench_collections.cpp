@@ -96,7 +96,7 @@ int main (int argc, char *argv[] ){
     //"../tests/collections/repetitive/reals/para";
     std::string path_out    = argv[2];
 
-//    benchmark::RegisterBenchmark("First Test",  first_test);
+    benchmark::RegisterBenchmark("First Test",  first_test);
     benchmark::RegisterBenchmark("PROCESSING COLLECTION",  process_coll ,collection,path_out);
 
 
