@@ -2,15 +2,6 @@ cmake_minimum_required(VERSION 3.7)
 project(improved_grammar_index)
 
 set(CMAKE_CXX_STANDARD 14)
-
-include_directories(~/include)
-
-include_directories(~/include/ri)
-
-
-link_directories(~/lib)
-
-
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 
@@ -21,15 +12,13 @@ set(CMAKE_MODULE_PATH
 # Guard against in-source builds and bad build-type strings
 #
 include(ConfigSafeGuards)
-
-
-
 #Testing
 include(CTest)
 #set(LIBS string_dictionaries)
 
 find_package(Threads REQUIRED)
 find_package(GTest)
+
 if (GTEST_FOUND)
     set(LIBS ${LIBS} GTest::Main)
 else ()
@@ -68,6 +57,9 @@ endif ()
 
 include(ConfigGBench)
 
+include_directories(~/include)
+include_directories(~/include/ri)
+link_directories(~/lib)
 
 set(SLP_SAMPLING
         utils/Samplings/binarynode.h
