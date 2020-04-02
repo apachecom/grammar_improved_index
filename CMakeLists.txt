@@ -7,7 +7,6 @@ include_directories(~/include)
 
 include_directories(~/include/ri)
 
-include_directories(~/include/gflags)
 
 link_directories(~/lib)
 

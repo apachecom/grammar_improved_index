@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <gflags/gflags.h>
 #include <benchmark/benchmark.h>
 
 #include <slp/RePairSLPIndex.h>
