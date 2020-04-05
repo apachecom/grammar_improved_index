@@ -1,3 +1,4 @@
+
 //
 // Created by via56 on 02-04-20.
 //
@@ -344,12 +345,12 @@ int main (int argc, char *argv[] ){
         benchmark::RegisterBenchmark("SLP-Index<16>",slplocate,index_prefix,i,16);
 
         benchmark::RegisterBenchmark("G-INDEX-BS",gibslocate,index_prefix,i);
-        benchmark::RegisterBenchmark("G-INDEX-PTS<2>",giptslocate,index_prefix,i,2);
-        benchmark::RegisterBenchmark("G-INDEX-PTS<4>",giptslocate,index_prefix,i,4);
-        benchmark::RegisterBenchmark("G-INDEX-PTS<8>",giptslocate,index_prefix,i,8);
-        benchmark::RegisterBenchmark("G-INDEX-PTS<16>",giptslocate,index_prefix,i,16);
-        benchmark::RegisterBenchmark("G-INDEX-PTS<32>",giptslocate,index_prefix,i,32);
-        benchmark::RegisterBenchmark("G-INDEX-PTS<64>",giptslocate,index_prefix,i,64);
+        // benchmark::RegisterBenchmark("G-INDEX-PTS<2>",giptslocate,index_prefix,i,2);
+        // benchmark::RegisterBenchmark("G-INDEX-PTS<4>",giptslocate,index_prefix,i,4);
+        // benchmark::RegisterBenchmark("G-INDEX-PTS<8>",giptslocate,index_prefix,i,8);
+        // benchmark::RegisterBenchmark("G-INDEX-PTS<16>",giptslocate,index_prefix,i,16);
+        // benchmark::RegisterBenchmark("G-INDEX-PTS<32>",giptslocate,index_prefix,i,32);
+        // benchmark::RegisterBenchmark("G-INDEX-PTS<64>",giptslocate,index_prefix,i,64);
 //
 //
 //        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>" ,giqgramlocate,index_prefix,i,4);
