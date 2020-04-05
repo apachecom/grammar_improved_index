@@ -38,9 +38,9 @@ void load_patterns(const std::string& pattern_file){
 
 
 auto rilocate = [](benchmark::State &st, const string &file_index, const uint& len
-#ifdef MEM_MONITOR
-        , const std::string file_mem_monitor
-#endif
+//#ifdef MEM_MONITOR
+//        , const std::string file_mem_monitor
+//#endif
 ){
     /**
      * load rindex
@@ -62,9 +62,9 @@ auto rilocate = [](benchmark::State &st, const string &file_index, const uint& l
     {
         nocc = 0;
         ptt = 0;
-#ifdef MEM_MONITOR
-        mm.event("R-INDEX-BUILD");
-#endif
+//#ifdef MEM_MONITOR
+//        mm.event("R-INDEX-BUILD");
+//#endif
         for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
             std::string query;
             query.resize(len);
@@ -81,6 +81,7 @@ auto rilocate = [](benchmark::State &st, const string &file_index, const uint& l
       }
 
     st.counters["pLen"] = len;
+    st.counters["queries"] = ptt;
     st.counters["nOcc"] = nocc;
 
     delete idx_r;
@@ -90,9 +91,9 @@ auto rilocate = [](benchmark::State &st, const string &file_index, const uint& l
 
 
 auto slplocate = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling
-#ifdef MEM_MONITOR
-        , const std::string file_mem_monitor
-#endif
+//#ifdef MEM_MONITOR
+//        , const std::string file_mem_monitor
+//#endif
 ){
     /**
      * load slpindex
@@ -112,9 +113,9 @@ auto slplocate = [](benchmark::State &st, const string &file_index, const uint& 
     {
         nocc = 0;
         ptt = 0;
-#ifdef MEM_MONITOR
-        mm.event("R-INDEX-BUILD");
-#endif
+//#ifdef MEM_MONITOR
+//        mm.event("R-INDEX-BUILD");
+//#endif
         for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
             std::string query;
             query.resize(len);
@@ -133,6 +134,7 @@ auto slplocate = [](benchmark::State &st, const string &file_index, const uint& 
     }
 
     st.counters["pLen"] = len;
+    st.counters["queries"] = ptt;
     st.counters["nOcc"] = nocc;
 
 };
@@ -141,9 +143,9 @@ auto slplocate = [](benchmark::State &st, const string &file_index, const uint& 
 
 
 auto gibslocate = [](benchmark::State &st, const string &file_index, const uint& len
-#ifdef MEM_MONITOR
-        , const std::string file_mem_monitor
-#endif
+//#ifdef MEM_MONITOR
+//        , const std::string file_mem_monitor
+//#endif
 ){
     /**
      * load gibsindex
@@ -161,9 +163,9 @@ auto gibslocate = [](benchmark::State &st, const string &file_index, const uint&
     {
         nocc = 0;
         ptt = 0;
-#ifdef MEM_MONITOR
-        mm.event("R-INDEX-BUILD");
-#endif
+//#ifdef MEM_MONITOR
+//        mm.event("R-INDEX-BUILD");
+//#endif
         for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
 
             std::string query;
@@ -183,16 +185,16 @@ auto gibslocate = [](benchmark::State &st, const string &file_index, const uint&
     }
 
     st.counters["pLen"] = len;
+    st.counters["queries"] = ptt;
     st.counters["nOcc"] = nocc;
-
 };
 
 
 
 auto giptslocate = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling
-#ifdef MEM_MONITOR
-        , const std::string file_mem_monitor
-#endif
+//#ifdef MEM_MONITOR
+//        , const std::string file_mem_monitor
+//#endif
 ){
     /**
      * load gibsindex
@@ -212,9 +214,9 @@ auto giptslocate = [](benchmark::State &st, const string &file_index, const uint
     {
         nocc = 0;
         ptt = 0;
-#ifdef MEM_MONITOR
-        mm.event("R-INDEX-BUILD");
-#endif
+//#ifdef MEM_MONITOR
+//        mm.event("R-INDEX-BUILD");
+//#endif
         for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
 
             std::string query;
@@ -233,11 +235,72 @@ auto giptslocate = [](benchmark::State &st, const string &file_index, const uint
 
     }
 
+
     st.counters["pLen"] = len;
+    st.counters["queries"] = ptt;
     st.counters["nOcc"] = nocc;
 
 };
 
+
+auto giqgramlocate = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling
+//#ifdef MEM_MONITOR
+//        , const std::string file_mem_monitor
+//#endif
+){
+    /**
+     * load gibsindex
+     * */
+    std::fstream  fbs (file_index+"-bs.gi",std::ios::in|std::ios::binary);
+
+    std::ifstream  f  (file_index+"-gram-<"+std::to_string(sampling)+">-smp.gi",std::ios::in|std::ios::binary);
+    std::ifstream  fg  (file_index+"-gram-<"+std::to_string(sampling)+">-smp-g.gi",std::ios::in|std::ios::binary);
+    std::ifstream  frev  (file_index+"-gram-<"+std::to_string(sampling)+">-smp-rev.gi",std::ios::in|std::ios::binary);
+    std::ifstream  fseq  (file_index+"-gram-<"+std::to_string(sampling)+">-smp-seq.gi",std::ios::in|std::ios::binary);
+
+    SelfGrammarIndexBSQ idx_giqbs;
+
+    idx_giqbs.load_basics(fbs);
+//    std::cout<<"basic-index-loaded\n";
+    idx_giqbs.loadSampling(f,fg,frev,fseq);
+
+//    std::cout<<"bsgi-index loaded"<<std::endl;
+    uint queries,nocc;
+
+    std::string ss = "";
+//    ss.resize(len);
+
+    for (auto _ : st)
+    {
+        queries = 0;
+        nocc =0;
+//#ifdef MEM_MONITOR
+//        mm.event("R-INDEX-BUILD");
+//#endif
+        for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
+
+            std::string query;
+            query.resize(len);
+            std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
+            std::vector<uint> X;
+            idx_giqbs.qgram_dfs_locate(query,X);
+
+            nocc += X.size();
+            queries++;
+
+        }
+
+
+//        std::cout<<nocc<<std::endl;
+//        sleep(2);
+
+    }
+
+
+    st.counters["pLen"] = len;
+    st.counters["queries"] = queries;
+    st.counters["nOcc"] = nocc;
+};
 
 
 int main (int argc, char *argv[] ){
@@ -252,12 +315,12 @@ int main (int argc, char *argv[] ){
     std::string index_prefix  = argv[1];
 
 
-#ifdef MEM_MONITOR
-    /**
-     * mem monitor file out path
-     */
-    std::string mem_out = argv[6];
-#endif
+//#ifdef MEM_MONITOR
+//    /**
+//     * mem monitor file out path
+//     */
+//    std::string mem_out = argv[6];
+//#endif
 
     uint min_len_patten = std::atoi(argv[3]);
     uint max_len_patten = std::atoi(argv[4]);
@@ -287,6 +350,12 @@ int main (int argc, char *argv[] ){
         benchmark::RegisterBenchmark("G-INDEX-PTS<16>",giptslocate,index_prefix,i,16);
         benchmark::RegisterBenchmark("G-INDEX-PTS<32>",giptslocate,index_prefix,i,32);
         benchmark::RegisterBenchmark("G-INDEX-PTS<64>",giptslocate,index_prefix,i,64);
+//
+//
+//        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>" ,giqgramlocate,index_prefix,i,4);
+//        benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>" ,giqgramlocate,index_prefix,i,8);
+//        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>",giqgramlocate,index_prefix,i,12);
+//        benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>",giqgramlocate,index_prefix,i,16);
 
     }
 
