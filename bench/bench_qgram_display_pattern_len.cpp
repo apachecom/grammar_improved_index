@@ -595,10 +595,10 @@ int main (int argc, char *argv[] ){
 //        benchmark::RegisterBenchmark("BAL_SLP-Index<8>" ,bal_slp_index,collection,len,8)->Unit({benchmark::kMicrosecond});
 //        benchmark::RegisterBenchmark("BAL_SLP-Index<16>" ,bal_slp_index,collection,len,16)->Unit({benchmark::kMicrosecond});
 //
-//        benchmark::RegisterBenchmark("G-INDEX-BINARY_SEARCH_LEAF-TRIE" ,g_index_binary_search_leaf_trie,collection,len,0)->Unit({benchmark::kMicrosecond});
-//        benchmark::RegisterBenchmark("G_INDEX_BINARY_SEARCH_LEAF-NOTRIE" ,g_index_binary_search_leaf_notrie,collection,len,0)->Unit({benchmark::kMicrosecond});
-//        benchmark::RegisterBenchmark("G_INDEX_RANK_PHRASES-TRIE " ,g_index_rank_phrases_trie,collection,len,0)->Unit({benchmark::kMicrosecond});
-//        benchmark::RegisterBenchmark("G_INDEX_RANK_PHRASES-NOTRIE " ,g_index_rank_phrases_notrie,collection,len,0)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-BINARY_SEARCH_LEAF-TRIE" ,g_index_binary_search_leaf_trie,collection,len,0)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G_INDEX_BINARY_SEARCH_LEAF-NOTRIE" ,g_index_binary_search_leaf_notrie,collection,len,0)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G_INDEX_RANK_PHRASES-TRIE " ,g_index_rank_phrases_trie,collection,len,0)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G_INDEX_RANK_PHRASES-NOTRIE " ,g_index_rank_phrases_notrie,collection,len,0)->Unit({benchmark::kMicrosecond});
 //
         benchmark::RegisterBenchmark("G_INDEX_QGRAM<2>_RANK_PHRASES-DFS "  ,g_index_rank_phrases_qgram_dfs,collection,len,2)->Unit({benchmark::kMicrosecond});
         benchmark::RegisterBenchmark("G_INDEX_QGRAM<4>_RANK_PHRASES-DFS "  ,g_index_rank_phrases_qgram_dfs,collection,len,4)->Unit({benchmark::kMicrosecond});

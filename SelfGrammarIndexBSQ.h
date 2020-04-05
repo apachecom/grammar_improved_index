@@ -1409,10 +1409,10 @@ public:
     }
 
     void load_basics(fstream &f) {
-        std::cout<<"loading.."<<std::endl;
+//        std::cout<<"loading.."<<std::endl;
         SelfGrammarIndexBS::load_basics(f);
 
-        std::cout<<"loaded.."<<std::endl;
+//        std::cout<<"loaded.."<<std::endl;
     }
 
     void save(fstream &f) {
