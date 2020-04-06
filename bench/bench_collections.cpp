@@ -123,7 +123,7 @@ auto create_files= [](benchmark::State &st, const std::string& file_coll, const 
 
 
             fpoints<< r1 << "\n";
-            fpatterns << patt << "\n";
+            fpatterns.write(patt.c_str(),max_len);
         }
     }
 
@@ -166,7 +166,7 @@ auto process_coll = [](benchmark::State &st,const std::string &collection,const 
 
 int main (int argc, char *argv[] ){
 
-    std::cout<<argc<<std::endl;
+//    std::cout<<argc<<std::endl;
 
     if(argc < 2){
         std::cout<<"bad parameters...."<<std::endl;
@@ -180,8 +180,8 @@ int main (int argc, char *argv[] ){
 
 
 //    benchmark::RegisterBenchmark("First Test",  first_test);
-   benchmark::RegisterBenchmark("PROCESSING COLLECTION",  process_coll ,collection,path_out);
-    // benchmark::RegisterBenchmark("CREATING FILES",  create_files ,collection,path_out,100,1000);
+//    benchmark::RegisterBenchmark("PROCESSING COLLECTION",  process_coll ,collection,path_out);
+    benchmark::RegisterBenchmark("CREATING FILES",  create_files ,collection,path_out,100,1000);
 
 
 

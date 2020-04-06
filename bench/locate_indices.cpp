@@ -20,20 +20,55 @@
 
 std::vector<std::string> patterns;
 
-void load_patterns(const std::string& pattern_file){
+void load_patterns(const std::string& pattern_file,uint max_len, uint samples){
     std::cout<<pattern_file<<std::endl;
-    patterns.resize(MAX_SAMPLES);
+//    patterns.resize(MAX_SAMPLES);
     std::fstream f(pattern_file, std::ios::in| std::ios::binary);
     if(!f.is_open()){
         std::cout<<"Error the pattern file could not opened!!\n";
     }
-    std::string buff; uint i = 0;
-    while (i < MAX_SAMPLES && !f.eof() && std::getline(f, buff)) {
 
-        patterns[i] = buff;
-        // std::cout<<i<<" "<<patterns[i]<<std::endl;
-        ++i;
+
+
+    char *buff = new char[max_len]; uint i = 0;
+    for (int k = 0; k < samples && !f.eof() ; ++k)
+    {
+        f.read(buff,max_len);
+        std::string pp; pp.resize(max_len);
+        std::copy(buff,buff+max_len,pp.begin());
+        patterns.push_back(pp);
+        std::cout<<pp<<std::endl;
+
+
     }
+//
+//    while (i < MAX_SAMPLES && !f.eof() && std::getline(f, buff)) {
+//        bool obv = 0;
+//        for (int j = 0; j <buff.size() ; ++j) {
+//            int c = buff[j];
+//            if(buff[j] == 0 || buff[j] == 1 || buff[j] == 2  )
+//            {
+//                std::cout<<"Invalid symbol\n";
+//                obv = true;
+//                break;
+//            }
+//        }
+//        if(!obv){
+//
+//            patterns.push_back(buff);
+////            std::cout<<i<<" "<<patterns[i]<<std::endl;
+//
+//            std::cout<<i<<std::endl;
+//
+//            for (int j = 0; j <buff.size() ; ++j) {
+//                std::cout<<(int)buff[j]<<" ";
+//            }
+//            std::cout<<std::endl;
+//
+//        }
+//
+//        ++i;
+//    }
     f.close();
 }
 
@@ -71,7 +106,7 @@ auto rilocate = [](benchmark::State &st, const string &file_index, const uint& l
             query.resize(len);
             std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
 
-//            std::cout<<"r -index query:"<<query<<std::endl;
+            std::cout<<"r -index query:"<<query<<std::endl;
             auto occ = idx_r->locate_all(query);
             nocc += occ.size(); ptt++;
         }
@@ -168,7 +203,7 @@ auto gibslocate = [](benchmark::State &st, const string &file_index, const uint&
 //        mm.event("R-INDEX-BUILD");
 //#endif
         for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
-
+//            std::cout<<"query:"<<ii<<std::endl;
             std::string query;
             query.resize(len);
             std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
@@ -331,7 +366,7 @@ int main (int argc, char *argv[] ){
 
 
 
-    load_patterns(pattern_file+"-"+std::to_string(max_len_patten)+".ptt");
+    load_patterns(pattern_file+"-"+std::to_string(max_len_patten)+".ptt",max_len_patten,1000);
     std::cout<<"PATTERNS LOADED FROM: "<<pattern_file+"-"+std::to_string(max_len_patten)+".ptt"<<std::endl;
 
     for (uint i = min_len_patten; i <= max_len_patten; i+=gap_len_patten)
@@ -339,10 +374,10 @@ int main (int argc, char *argv[] ){
 
         // std::cout<<"Searching patterns len:"<<i<<std::endl;
         benchmark::RegisterBenchmark("R-Index",rilocate,index_prefix,i);
-        benchmark::RegisterBenchmark("SLP-Index<4>" ,slplocate,index_prefix,i,4);
-        benchmark::RegisterBenchmark("SLP-Index<8>" ,slplocate,index_prefix,i,8);
-        benchmark::RegisterBenchmark("SLP-Index<12>",slplocate,index_prefix,i,12);
-        benchmark::RegisterBenchmark("SLP-Index<16>",slplocate,index_prefix,i,16);
+//        benchmark::RegisterBenchmark("SLP-Index<4>" ,slplocate,index_prefix,i,4);
+//        benchmark::RegisterBenchmark("SLP-Index<8>" ,slplocate,index_prefix,i,8);
+//        benchmark::RegisterBenchmark("SLP-Index<12>",slplocate,index_prefix,i,12);
+//        benchmark::RegisterBenchmark("SLP-Index<16>",slplocate,index_prefix,i,16);
 
         benchmark::RegisterBenchmark("G-INDEX-BS",gibslocate,index_prefix,i);
         benchmark::RegisterBenchmark("G-INDEX-PTS<2>",giptslocate,index_prefix,i,2);

@@ -410,29 +410,29 @@ int main (int argc, char *argv[] ){
 ////    );
 //
 
-    benchmark::RegisterBenchmark("SLP-INDEX<4>",  slpbuild ,collection,path_out,4
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-
-    benchmark::RegisterBenchmark("SLP-INDEX<8>",  slpbuild ,collection,path_out,8
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-
-    benchmark::RegisterBenchmark("SLP-INDEX<12>",  slpbuild ,collection,path_out,12
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-
-    benchmark::RegisterBenchmark("SLP-INDEX<16>",  slpbuild ,collection,path_out,16
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
+//    benchmark::RegisterBenchmark("SLP-INDEX<4>",  slpbuild ,collection,path_out,4
+//#ifdef MEM_MONITOR
+//            ,mem_out
+//#endif
+//    );
+//
+//    benchmark::RegisterBenchmark("SLP-INDEX<8>",  slpbuild ,collection,path_out,8
+//#ifdef MEM_MONITOR
+//            ,mem_out
+//#endif
+//    );
+//
+//    benchmark::RegisterBenchmark("SLP-INDEX<12>",  slpbuild ,collection,path_out,12
+//#ifdef MEM_MONITOR
+//            ,mem_out
+//#endif
+//    );
+//
+//    benchmark::RegisterBenchmark("SLP-INDEX<16>",  slpbuild ,collection,path_out,16
+//#ifdef MEM_MONITOR
+//            ,mem_out
+//#endif
+//    );
 
 
         benchmark::RegisterBenchmark("G-INDEX",  g_imp_build_basics ,collection,path_out
