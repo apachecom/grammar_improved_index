@@ -338,11 +338,11 @@ int main (int argc, char *argv[] ){
     {
 
         // std::cout<<"Searching patterns len:"<<i<<std::endl;
-        // benchmark::RegisterBenchmark("R-Index",rilocate,index_prefix,i);
-        // benchmark::RegisterBenchmark("SLP-Index<4>" ,slplocate,index_prefix,i,4);
-        // benchmark::RegisterBenchmark("SLP-Index<8>" ,slplocate,index_prefix,i,8);
-        // benchmark::RegisterBenchmark("SLP-Index<12>",slplocate,index_prefix,i,12);
-        // benchmark::RegisterBenchmark("SLP-Index<16>",slplocate,index_prefix,i,16);
+        benchmark::RegisterBenchmark("R-Index",rilocate,index_prefix,i);
+        benchmark::RegisterBenchmark("SLP-Index<4>" ,slplocate,index_prefix,i,4);
+        benchmark::RegisterBenchmark("SLP-Index<8>" ,slplocate,index_prefix,i,8);
+        benchmark::RegisterBenchmark("SLP-Index<12>",slplocate,index_prefix,i,12);
+        benchmark::RegisterBenchmark("SLP-Index<16>",slplocate,index_prefix,i,16);
 
         benchmark::RegisterBenchmark("G-INDEX-BS",gibslocate,index_prefix,i);
         benchmark::RegisterBenchmark("G-INDEX-PTS<2>",giptslocate,index_prefix,i,2);
