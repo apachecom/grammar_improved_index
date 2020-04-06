@@ -474,26 +474,26 @@ int main (int argc, char *argv[] ){
             ,mem_out
 #endif
     );
-    benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>",  g_imp_qgram_build ,collection,path_out,4
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-    benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>",  g_imp_qgram_build ,collection,path_out,8
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-    benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>",  g_imp_qgram_build ,collection,path_out,12
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-    benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>",  g_imp_qgram_build ,collection,path_out,16
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
+//     benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>",  g_imp_qgram_build ,collection,path_out,4
+// #ifdef MEM_MONITOR
+//             ,mem_out
+// #endif
+//     );
+//     benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>",  g_imp_qgram_build ,collection,path_out,8
+// #ifdef MEM_MONITOR
+//             ,mem_out
+// #endif
+//     );
+//     benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>",  g_imp_qgram_build ,collection,path_out,12
+// #ifdef MEM_MONITOR
+//             ,mem_out
+// #endif
+//     );
+//     benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>",  g_imp_qgram_build ,collection,path_out,16
+// #ifdef MEM_MONITOR
+//             ,mem_out
+// #endif
+//     );
 
 
 
