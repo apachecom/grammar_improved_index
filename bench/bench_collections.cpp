@@ -180,8 +180,8 @@ int main (int argc, char *argv[] ){
 
 
 //    benchmark::RegisterBenchmark("First Test",  first_test);
-//    benchmark::RegisterBenchmark("PROCESSING COLLECTION",  process_coll ,collection,path_out);
-    benchmark::RegisterBenchmark("CREATING FILES",  create_files ,collection,path_out,100,1000);
+   benchmark::RegisterBenchmark("PROCESSING COLLECTION",  process_coll ,collection,path_out);
+    // benchmark::RegisterBenchmark("CREATING FILES",  create_files ,collection,path_out,100,1000);
 
 
 
