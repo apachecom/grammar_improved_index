@@ -337,7 +337,7 @@ int main (int argc, char *argv[] ){
     for (uint i = min_len_patten; i <= max_len_patten; i+=gap_len_patten)
     {
 
-        std::cout<<"Searching patterns len:"<<i<<std::endl;
+        // std::cout<<"Searching patterns len:"<<i<<std::endl;
         // benchmark::RegisterBenchmark("R-Index",rilocate,index_prefix,i);
         // benchmark::RegisterBenchmark("SLP-Index<4>" ,slplocate,index_prefix,i,4);
         // benchmark::RegisterBenchmark("SLP-Index<8>" ,slplocate,index_prefix,i,8);
@@ -345,12 +345,12 @@ int main (int argc, char *argv[] ){
         // benchmark::RegisterBenchmark("SLP-Index<16>",slplocate,index_prefix,i,16);
 
         benchmark::RegisterBenchmark("G-INDEX-BS",gibslocate,index_prefix,i);
-        // benchmark::RegisterBenchmark("G-INDEX-PTS<2>",giptslocate,index_prefix,i,2);
-        // benchmark::RegisterBenchmark("G-INDEX-PTS<4>",giptslocate,index_prefix,i,4);
-        // benchmark::RegisterBenchmark("G-INDEX-PTS<8>",giptslocate,index_prefix,i,8);
-        // benchmark::RegisterBenchmark("G-INDEX-PTS<16>",giptslocate,index_prefix,i,16);
-        // benchmark::RegisterBenchmark("G-INDEX-PTS<32>",giptslocate,index_prefix,i,32);
-        // benchmark::RegisterBenchmark("G-INDEX-PTS<64>",giptslocate,index_prefix,i,64);
+        benchmark::RegisterBenchmark("G-INDEX-PTS<2>",giptslocate,index_prefix,i,2);
+        benchmark::RegisterBenchmark("G-INDEX-PTS<4>",giptslocate,index_prefix,i,4);
+        benchmark::RegisterBenchmark("G-INDEX-PTS<8>",giptslocate,index_prefix,i,8);
+        benchmark::RegisterBenchmark("G-INDEX-PTS<16>",giptslocate,index_prefix,i,16);
+        benchmark::RegisterBenchmark("G-INDEX-PTS<32>",giptslocate,index_prefix,i,32);
+        benchmark::RegisterBenchmark("G-INDEX-PTS<64>",giptslocate,index_prefix,i,64);
 //
 //
 //        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>" ,giqgramlocate,index_prefix,i,4);
