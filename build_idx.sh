@@ -1,4 +1,5 @@
 cd cmake-build-release-mem-monitor
+
 make build_indices
 
 ./build_indices /d1/apacheco/collections/Escherichia_Coli_N0  /d1/apacheco/indices/Escherichia_Coli_N0  /d1/apacheco/results/Escherichia_Coli_N0-mem --benchmark_out=/d1/apacheco/results/build-Escherichia_Coli_N0-mem.csv       --benchmark_out_format=csv
