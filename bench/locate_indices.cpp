@@ -28,6 +28,13 @@ void load_patterns(const std::string& pattern_file,uint max_len, uint samples){
         std::cout<<"Error the pattern file could not opened!!\n";
     }
 
+    std::string forbb  = "";
+    for (size_t i = 0; i < max_len; i++)
+    {
+        forbb+="N";
+    }
+    
+
 
 
     char *buff = new char[max_len]; uint i = 0;
@@ -36,10 +43,10 @@ void load_patterns(const std::string& pattern_file,uint max_len, uint samples){
         f.read(buff,max_len);
         std::string pp; pp.resize(max_len);
         std::copy(buff,buff+max_len,pp.begin());
-        patterns.push_back(pp);
-        std::cout<<pp<<std::endl;
-
-
+        if(pp != forbb){
+            patterns.push_back(pp);
+            std::cout<<pp<<std::endl;
+        }
     }
 //
 //    while (i < MAX_SAMPLES && !f.eof() && std::getline(f, buff)) {

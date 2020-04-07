@@ -28,13 +28,12 @@ make locate_indices
 #./locate_indices ../build-idx/escherichia_coli_p_10 ../collections/escherichia_coli_p_10 5 100 50 --benchmark_out=../locate-Escherichia_Coli.csv       --benchmark_out_format=csv
 #
 #
+#./locate_indices /d1/apacheco/indices/coreutils_N0 /d1/apacheco/collections/coreutils_N0 10 100 10 --benchmark_out=/d1/apacheco/results/self-indices/locate/locate-coreutils_N0.csv       --benchmark_out_format=csv
 
-./locate_indices /d1/apacheco/indices/coreutils_N0 /d1/apacheco/collections/coreutils_N0 10 100 10 --benchmark_out=/d1/apacheco/results/self-indices/locate/locate-coreutils_N0.csv       --benchmark_out_format=csv
-
-./locate_indices /d1/apacheco/indices/einstein.en.txt_N0  /d1/apacheco/collections/einstein.en.txt_N0  10 100 10 --benchmark_out=/d1/apacheco/results/self-indices/locate/locate-einstein.en.txt_N0.csv       --benchmark_out_format=csv
+#./locate_indices /d1/apacheco/indices/einstein.en.txt_N0  /d1/apacheco/collections/einstein.en.txt_N0  10 100 10 --benchmark_out=/d1/apacheco/results/self-indices/locate/locate-einstein.en.txt_N0.csv       --benchmark_out_format=csv
 
 
-./locate_indices /d1/apacheco/indices/kernel_N0 /d1/apacheco/collections/kernel_N0 10 100 10 --benchmark_out=/d1/apacheco/results/self-indices/locate/locate-kernel_N0.csv       --benchmark_out_format=csv
+#./locate_indices /d1/apacheco/indices/kernel_N0 /d1/apacheco/collections/kernel_N0 10 100 10 --benchmark_out=/d1/apacheco/results/self-indices/locate/locate-kernel_N0.csv       --benchmark_out_format=csv
 
 ./locate_indices /d1/apacheco/indices/influenza /d1/apacheco/collections/influenza 10 100 10 --benchmark_out=/d1/apacheco/results/self-indices/locate/locate-influenza.csv       --benchmark_out_format=csv
 
