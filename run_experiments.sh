@@ -1,12 +1,18 @@
 #!/bin/bash
 
-cd cmake-build-release
 
-sudo make bench_qgram_locate_pattern_len
-sudo make bench_pattern_len_other_locate
-sudo make bench_qgram_display_pattern_len
+./build_idx.sh
+cd bench
+./locate.sh
 
-sudo ./bench_pattern_len_other_locate --benchmark_out=../last_results/state_of_art_locate_results.csv --benchmark_out_format=csv
+#
+#cd cmake-build-release
+#
+#sudo make bench_qgram_locate_pattern_len
+#sudo make bench_pattern_len_other_locate
+#sudo make bench_qgram_display_pattern_len
+#
+#sudo ./bench_pattern_len_other_locate --benchmark_out=../last_results/state_of_art_locate_results.csv --benchmark_out_format=csv
 
 #sudo ./bench_qgram_locate_pattern_len 1 --benchmark_out=../last_results/indexes_locate_results_1.csv --benchmark_out_format=csv
 #sudo ./bench_qgram_locate_pattern_len 2 --benchmark_out=../last_results/indexes_locate_results_2.csv --benchmark_out_format=csv
