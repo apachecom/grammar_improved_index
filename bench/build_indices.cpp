@@ -377,16 +377,16 @@ int main (int argc, char *argv[] ){
 
     load_data(collection);
 
-//    benchmark::RegisterBenchmark("First Test",  first_test
+//   benchmark::RegisterBenchmark("First Test",  first_test
 ////#ifdef MEM_MONITOR
 ////            ,mem_out
 ////#endif
-//    );
-    benchmark::RegisterBenchmark("R-INDEX",  ribuild,collection,path_out
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
+//   );
+     benchmark::RegisterBenchmark("R-INDEX",  ribuild,collection,path_out
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
 ////
 ////    benchmark::RegisterBenchmark("SLP-BAL-INDEX<4>",  slpbalbuild,collection,path_out, 4,false
 ////#ifdef MEM_MONITOR
@@ -410,70 +410,70 @@ int main (int argc, char *argv[] ){
 ////    );
 //
 
-//    benchmark::RegisterBenchmark("SLP-INDEX<4>",  slpbuild ,collection,path_out,4
-//#ifdef MEM_MONITOR
-//            ,mem_out
-//#endif
-//    );
-//
-//    benchmark::RegisterBenchmark("SLP-INDEX<8>",  slpbuild ,collection,path_out,8
-//#ifdef MEM_MONITOR
-//            ,mem_out
-//#endif
-//    );
-//
-//    benchmark::RegisterBenchmark("SLP-INDEX<12>",  slpbuild ,collection,path_out,12
-//#ifdef MEM_MONITOR
-//            ,mem_out
-//#endif
-//    );
-//
-//    benchmark::RegisterBenchmark("SLP-INDEX<16>",  slpbuild ,collection,path_out,16
-//#ifdef MEM_MONITOR
-//            ,mem_out
-//#endif
-//    );
+    benchmark::RegisterBenchmark("SLP-INDEX<4>",  slpbuild ,collection,path_out,4
+#ifdef MEM_MONITOR
+            ,mem_out
+#endif
+    );
+
+    benchmark::RegisterBenchmark("SLP-INDEX<8>",  slpbuild ,collection,path_out,8
+#ifdef MEM_MONITOR
+            ,mem_out
+#endif
+    );
+
+    benchmark::RegisterBenchmark("SLP-INDEX<12>",  slpbuild ,collection,path_out,12
+#ifdef MEM_MONITOR
+            ,mem_out
+#endif
+    );
+
+    benchmark::RegisterBenchmark("SLP-INDEX<16>",  slpbuild ,collection,path_out,16
+#ifdef MEM_MONITOR
+            ,mem_out
+#endif
+    );
 
 
-        benchmark::RegisterBenchmark("G-INDEX",  g_imp_build_basics ,collection,path_out
-    #ifdef MEM_MONITOR
-                ,mem_out
-    #endif
-        );
-
+         benchmark::RegisterBenchmark("G-INDEX",  g_imp_build_basics ,collection,path_out
+     #ifdef MEM_MONITOR
+                 ,mem_out
+     #endif
+         );
+//
     benchmark::RegisterBenchmark("G-INDEX-PTS<2>",  g_imp_pts_build ,collection,path_out,2
 #ifdef MEM_MONITOR
             ,mem_out
 #endif
     );
 
-    benchmark::RegisterBenchmark("G-INDEX-PTS<4>",  g_imp_pts_build ,collection,path_out,4
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
+     benchmark::RegisterBenchmark("G-INDEX-PTS<4>",  g_imp_pts_build ,collection,path_out,4
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
 
-    benchmark::RegisterBenchmark("G-INDEX-PTS<8>",  g_imp_pts_build ,collection,path_out,8
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-    benchmark::RegisterBenchmark("G-INDEX-PTS<16>",  g_imp_pts_build ,collection,path_out,16
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-    benchmark::RegisterBenchmark("G-INDEX-PTS<32>",  g_imp_pts_build ,collection,path_out,32
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
+     benchmark::RegisterBenchmark("G-INDEX-PTS<8>",  g_imp_pts_build ,collection,path_out,8
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
+     benchmark::RegisterBenchmark("G-INDEX-PTS<16>",  g_imp_pts_build ,collection,path_out,16
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
+     benchmark::RegisterBenchmark("G-INDEX-PTS<32>",  g_imp_pts_build ,collection,path_out,32
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
 
-    benchmark::RegisterBenchmark("G-INDEX-PTS<64>",  g_imp_pts_build ,collection,path_out,64
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
+     benchmark::RegisterBenchmark("G-INDEX-PTS<64>",  g_imp_pts_build ,collection,path_out,64
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
 //     benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>",  g_imp_qgram_build ,collection,path_out,4
 // #ifdef MEM_MONITOR
 //             ,mem_out

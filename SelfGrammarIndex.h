@@ -142,81 +142,141 @@ public:
     template<typename K>
     bool lower_bound(bool &found , grammar_representation::g_long &lr, grammar_representation::g_long &hr, const K &f) const {
 
-        if (lr >= hr) {
-            if(found)
-                return true;
+        found = false;
 
-            int p = f(hr);
-            found = p == 0;
-            return found;
-        }
+        while(lr < hr){
 
-        size_t m = (lr + hr) / 2;
+            uint64_t mid = (lr+hr)/2;
+            int c = f(mid);
 
-        int res = f(m);
-        if (res < 0) {
-            /*
-             * If value < value(node) f must return
-             * */
-            hr = m - 1;
-        } else {
-            if (res > 0) {
-                /*
-                 * If value > value(node) f must return true
-                 * */
-                lr = m + 1;
-            } else {
-                /*
-                 * If value == value(node) f must return true
-                 * */
-                hr = m;
-                found = true;
+            if(c < 0){
+                /*the rule is greater than the pattern */
+                hr = mid -1;
+            }else{
+                if(c > 0)
+                    lr = mid+1;
+                else{
+                    hr = mid;
+                    found = true;
+                }
+
             }
         }
 
+        if(!found && lr == hr && f(lr) == 0 ) {
+            found = true;
+            return true;
+        }
 
-        return lower_bound(found,lr, hr, f);
+        return false;
+
+
+//        if (lr >= hr) {
+//            if(found)
+//                return true;
+//
+//            int p = f(hr);
+//            found = p == 0;
+//            return found;
+//        }
+//
+//        size_t m = (lr + hr) / 2;
+//
+//        int res = f(m);
+//        if (res < 0) {
+//            /*
+//             * If value < value(node) f must return
+//             * */
+//            hr = m - 1;
+//        } else {
+//            if (res > 0) {
+//                /*
+//                 * If value > value(node) f must return true
+//                 * */
+//                lr = m + 1;
+//            } else {
+//                /*
+//                 * If value == value(node) f must return true
+//                 * */
+//                hr = m;
+//                found = true;
+//            }
+//        }
+//
+//
+//        return lower_bound(found,lr, hr, f);
     }
 
     template<typename K>
     bool upper_bound(bool &found, grammar_representation::g_long &lr, grammar_representation::g_long &hr, const K &f) const {
 
-        if (lr >= hr ) {
-            if(found)
-                return true;
-            int p = f(hr);
-            found = p == 0;
-            return found;
-        }
 
-        size_t m = (size_t)ceil((lr + hr)/2.0);
+        found = false;
 
-        int res = f(m);
+        while(lr < hr){
 
-        if (res < 0) {
-            /*
-             * If value < value(node) f must return true
-             * */
-            hr = m - 1;
-        } else {
+            uint64_t mid = ceil((lr+hr)/2.0);
+            int c = f(mid);
 
-            if (res > 0) {
-                /*
-                 * If value > value(node) f must return true
-                 * */
-                lr = m + 1;
-            } else {
-                /*
-                * If value == value(node) f must return true
-                * */
-                lr = m;
-                found = true;
+            if(c < 0){
+                /*the rule is greater than the pattern */
+                hr = mid -1;
+            }else{
+                if(c > 0)
+                    lr = mid+1;
+                else{
+                    lr = mid;
+                    found = true;
+                }
+
             }
-
-
         }
 
-        return upper_bound(found,lr, hr, f);
+        if(!found && lr == hr && f(lr) == 0 ) {
+            found = true;
+            return true;
+        }
+
+        return false;
+
+
+
+//        if (lr >= hr ) {
+//            if(found)
+//                return true;
+//            int p = f(hr);
+//            found = p == 0;
+//            return found;
+//        }
+//
+//        size_t m = (size_t)ceil((lr + hr)/2.0);
+//
+//        int res = f(m);
+//
+//        if (res < 0) {
+//            /*
+//             * If value < value(node) f must return true
+//             * */
+//            hr = m - 1;
+//        } else {
+//
+//            if (res > 0) {
+//                /*
+//                 * If value > value(node) f must return true
+//                 * */
+//                lr = m + 1;
+//            } else {
+//                /*
+//                * If value == value(node) f must return true
+//                * */
+//                lr = m;
+//                found = true;
+//            }
+//
+//
+//        }
+//
+//        return upper_bound(found,lr, hr, f);
     }
 
 

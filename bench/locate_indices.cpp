@@ -45,7 +45,7 @@ void load_patterns(const std::string& pattern_file,uint max_len, uint samples){
         std::copy(buff,buff+max_len,pp.begin());
         if(pp != forbb){
             patterns.push_back(pp);
-            std::cout<<pp<<std::endl;
+//            std::cout<<pp<<std::endl;
         }
     }
 //
@@ -127,6 +127,8 @@ auto rilocate = [](benchmark::State &st, const string &file_index, const uint& l
     st.counters["queries"] = ptt;
     st.counters["nOcc"] = nocc;
 
+    st.counters["size"] = idx_r->print_space();
+
     delete idx_r;
 
 };
@@ -167,8 +169,15 @@ auto slplocate = [](benchmark::State &st, const string &file_index, const uint& 
             uchar *tt = (uchar * )(query.c_str());
 //            std::cout<<"slp -index query:"<<query<<std::endl;
             std::vector<uint> *pos = idx_slp->RePairSLPIndex::locate(tt,len, &occs);
+            
+            // std::sort(pos->begin(),pos->end());
+            // auto last = std::unique(pos->begin(),pos->end());
+            // pos->erase(last,pos->end());
+
             delete pos;
-            nocc += occs;ptt++;
+            // nocc += occs;
+            nocc += occs;
+            ptt++;
         }
 
 //        std::cout<<nocc<<std::endl;
@@ -179,6 +188,10 @@ auto slplocate = [](benchmark::State &st, const string &file_index, const uint& 
     st.counters["pLen"] = len;
     st.counters["queries"] = ptt;
     st.counters["nOcc"] = nocc;
+
+    st.counters["size"] = idx_slp->size();
+
+    delete idx_slp;
 
 };
 
@@ -216,6 +229,10 @@ auto gibslocate = [](benchmark::State &st, const string &file_index, const uint&
             std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
             std::vector<uint> X;
             idx_gibs.locateNoTrie(query,X);
+//
+//            std::sort(X.begin(),X.end());
+//            auto last = std::unique(X.begin(),X.end());
+//            X.erase(last,X.end());
 
             nocc += X.size();
             ptt++;
@@ -227,6 +244,7 @@ auto gibslocate = [](benchmark::State &st, const string &file_index, const uint&
 
     }
 
+    st.counters["size"] = idx_gibs.size_in_bytes();
     st.counters["pLen"] = len;
     st.counters["queries"] = ptt;
     st.counters["nOcc"] = nocc;
@@ -267,6 +285,10 @@ auto giptslocate = [](benchmark::State &st, const string &file_index, const uint
             std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
             std::vector<uint> X;
             idx_gipts.locateNoTrie(query,X);
+            
+//            std::sort(X.begin(),X.end());
+//            auto last = std::unique(X.begin(),X.end());
+//            X.erase(last,X.end());
 
             nocc += X.size();
             ptt++;
@@ -282,6 +304,8 @@ auto giptslocate = [](benchmark::State &st, const string &file_index, const uint
     st.counters["pLen"] = len;
     st.counters["queries"] = ptt;
     st.counters["nOcc"] = nocc;
+
+    st.counters["size"] = idx_gipts.size_in_bytes();
 
 };
 
@@ -327,6 +351,10 @@ auto giqgramlocate = [](benchmark::State &st, const string &file_index, const ui
             std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
             std::vector<uint> X;
             idx_giqbs.qgram_dfs_locate(query,X);
+            
+//            std::sort(X.begin(),X.end());
+//            auto last = std::unique(X.begin(),X.end());
+//            X.erase(last,X.end());
 
             nocc += X.size();
             queries++;
@@ -380,20 +408,19 @@ int main (int argc, char *argv[] ){
     {
 
         // std::cout<<"Searching patterns len:"<<i<<std::endl;
-        benchmark::RegisterBenchmark("R-Index",rilocate,index_prefix,i);
-        benchmark::RegisterBenchmark("SLP-Index<4>" ,slplocate,index_prefix,i,4);
-        benchmark::RegisterBenchmark("SLP-Index<8>" ,slplocate,index_prefix,i,8);
-        benchmark::RegisterBenchmark("SLP-Index<12>",slplocate,index_prefix,i,12);
-        benchmark::RegisterBenchmark("SLP-Index<16>",slplocate,index_prefix,i,16);
+        benchmark::RegisterBenchmark("R-Index",rilocate,index_prefix,i)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("SLP-Index<4>" ,slplocate,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("SLP-Index<8>" ,slplocate,index_prefix,i,8)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("SLP-Index<12>",slplocate,index_prefix,i,12)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("SLP-Index<16>",slplocate,index_prefix,i,16)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-BS",gibslocate,index_prefix,i)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-PTS<2>",giptslocate,index_prefix,i,2)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-PTS<4>",giptslocate,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-PTS<8>",giptslocate,index_prefix,i,8)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-PTS<16>",giptslocate,index_prefix,i,16)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-PTS<32>",giptslocate,index_prefix,i,32)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-PTS<64>",giptslocate,index_prefix,i,64)->Unit({benchmark::kMicrosecond});;
 
-        benchmark::RegisterBenchmark("G-INDEX-BS",gibslocate,index_prefix,i);
-        benchmark::RegisterBenchmark("G-INDEX-PTS<2>",giptslocate,index_prefix,i,2);
-        benchmark::RegisterBenchmark("G-INDEX-PTS<4>",giptslocate,index_prefix,i,4);
-        benchmark::RegisterBenchmark("G-INDEX-PTS<8>",giptslocate,index_prefix,i,8);
-        benchmark::RegisterBenchmark("G-INDEX-PTS<16>",giptslocate,index_prefix,i,16);
-        benchmark::RegisterBenchmark("G-INDEX-PTS<32>",giptslocate,index_prefix,i,32);
-        benchmark::RegisterBenchmark("G-INDEX-PTS<64>",giptslocate,index_prefix,i,64);
-//
 //
 //        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>" ,giqgramlocate,index_prefix,i,4);
 //        benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>" ,giqgramlocate,index_prefix,i,8);

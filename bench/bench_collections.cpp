@@ -18,6 +18,7 @@ int process_data(const std::string &collection,const std::string &file_out, uint
     std::fstream f(collection, std::ios::in| std::ios::binary);
     //std::string data;
     if(!f.is_open()){
+        std::cout<<collection<<std::endl;
         std::cout<<"Error the file could not opened!!\n";
         return 0;
     }
@@ -25,6 +26,8 @@ int process_data(const std::string &collection,const std::string &file_out, uint
     std::fstream f2(file_out,std::ios::out );
 
     if(!f2.is_open()){
+
+        std::cout<<file_out<<std::endl;
         std::cout<<"Error the file could not opened!!\n";
         return 0;
     }
@@ -72,12 +75,12 @@ int load_data(const std::string &collection, std::string&  data){
     }
 
     f.close();
-    std::fstream f2("./temp_collection",std::ios::out );
-    for(size_t i = 0 ; i < data.size(); ++i)
-        f2 << data[i];
+    // std::fstream f2("./temp_collection",std::ios::out );
+    // for(size_t i = 0 ; i < data.size(); ++i)
+    //     f2 << data[i];
 
-    f2 << '\0';
-    f2.close();
+    // f2 << '\0';
+    // f2.close();
     std::cout<<"DATA LOADED\n";
     return 1;
 }
@@ -180,8 +183,8 @@ int main (int argc, char *argv[] ){
 
 
 //    benchmark::RegisterBenchmark("First Test",  first_test);
-//    benchmark::RegisterBenchmark("PROCESSING COLLECTION",  process_coll ,collection,path_out);
-    benchmark::RegisterBenchmark("CREATING FILES",  create_files ,collection,path_out,100,1000);
+    benchmark::RegisterBenchmark("PROCESSING COLLECTION",  process_coll ,collection,path_out);
+    benchmark::RegisterBenchmark("CREATING FILES",  create_files ,path_out,path_out,100,1000);
 
 
 
