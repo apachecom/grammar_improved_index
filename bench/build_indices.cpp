@@ -116,7 +116,7 @@ auto slpbuild = [](benchmark::State &st, const string &file_collection, const st
     mem_monitor mm(file_mem_monitor+"-slp.csv");
 #endif
 
-    ifstream in("./temp_collection", ifstream::in);
+    ifstream in(file_collection, ifstream::in);
     in.seekg(0,ios_base::end);
     uint tsize = in.tellg();
     in.seekg(0,ios_base::beg);
