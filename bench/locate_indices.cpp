@@ -16,7 +16,7 @@
 #define MAX_LEN_PATT 100
 
 #define MAX_OCC 1e9
-#define MAX_SAMPLES 1000
+#define MAX_SAMPLES 100
 
 std::vector<std::string> patterns;
 
@@ -38,6 +38,7 @@ void load_patterns(const std::string& pattern_file,uint max_len, uint samples){
 
 
     char *buff = new char[max_len]; uint i = 0;
+
     for (int k = 0; k < samples && !f.eof() ; ++k)
     {
         f.read(buff,max_len);
@@ -45,9 +46,11 @@ void load_patterns(const std::string& pattern_file,uint max_len, uint samples){
         std::copy(buff,buff+max_len,pp.begin());
         if(pp != forbb){
             patterns.push_back(pp);
-//            std::cout<<pp<<std::endl;
+            std::cout<<pp<<std::endl;
         }
     }
+
+    delete buff;
 //
 //    while (i < MAX_SAMPLES && !f.eof() && std::getline(f, buff)) {
 //        bool obv = 0;
@@ -408,7 +411,7 @@ int main (int argc, char *argv[] ){
     {
 
         // std::cout<<"Searching patterns len:"<<i<<std::endl;
-        benchmark::RegisterBenchmark("R-Index",rilocate,index_prefix,i)->Unit({benchmark::kMicrosecond});;
+//        benchmark::RegisterBenchmark("R-Index",rilocate,index_prefix,i)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("SLP-Index<4>" ,slplocate,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("SLP-Index<8>" ,slplocate,index_prefix,i,8)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("SLP-Index<12>",slplocate,index_prefix,i,12)->Unit({benchmark::kMicrosecond});;
@@ -421,7 +424,7 @@ int main (int argc, char *argv[] ){
         benchmark::RegisterBenchmark("G-INDEX-PTS<32>",giptslocate,index_prefix,i,32)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("G-INDEX-PTS<64>",giptslocate,index_prefix,i,64)->Unit({benchmark::kMicrosecond});;
 
-//
+
 //        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>" ,giqgramlocate,index_prefix,i,4);
 //        benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>" ,giqgramlocate,index_prefix,i,8);
 //        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>",giqgramlocate,index_prefix,i,12);
