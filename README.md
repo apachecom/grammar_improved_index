@@ -98,6 +98,6 @@ To locate a pattern, one must execute:
 
 where:
 
-- "positions_file" is a file with the patterns to locate NOT separated by a line jump; The patterns must have length = max_len
+- "pattern_file" is a file with the patterns to locate NOT separated by a line jump; The patterns must have length = max_len
 
 The rest of the parameters are the same as for the extraction
