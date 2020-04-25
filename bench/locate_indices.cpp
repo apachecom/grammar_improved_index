@@ -28,14 +28,6 @@ void load_patterns(const std::string& pattern_file,uint max_len, uint samples){
         std::cout<<"Error the pattern file could not opened!!\n";
     }
 
-    std::string forbb  = "";
-    for (size_t i = 0; i < max_len; i++)
-    {
-        forbb+="N";
-    }
-    
-
-
 
     char *buff = new char[max_len]; uint i = 0;
 
@@ -44,10 +36,8 @@ void load_patterns(const std::string& pattern_file,uint max_len, uint samples){
         f.read(buff,max_len);
         std::string pp; pp.resize(max_len);
         std::copy(buff,buff+max_len,pp.begin());
-        if(pp != forbb){
-            patterns.push_back(pp);
-            std::cout<<pp<<std::endl;
-        }
+        patterns.push_back(pp);
+
     }
 
     delete buff;
@@ -412,10 +402,10 @@ int main (int argc, char *argv[] ){
 
         // std::cout<<"Searching patterns len:"<<i<<std::endl;
 //        benchmark::RegisterBenchmark("R-Index",rilocate,index_prefix,i)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("SLP-Index<4>" ,slplocate,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("SLP-Index<8>" ,slplocate,index_prefix,i,8)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("SLP-Index<12>",slplocate,index_prefix,i,12)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("SLP-Index<16>",slplocate,index_prefix,i,16)->Unit({benchmark::kMicrosecond});;
+//        benchmark::RegisterBenchmark("SLP-Index<4>" ,slplocate,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
+//        benchmark::RegisterBenchmark("SLP-Index<8>" ,slplocate,index_prefix,i,8)->Unit({benchmark::kMicrosecond});;
+//        benchmark::RegisterBenchmark("SLP-Index<12>",slplocate,index_prefix,i,12)->Unit({benchmark::kMicrosecond});;
+//        benchmark::RegisterBenchmark("SLP-Index<16>",slplocate,index_prefix,i,16)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("G-INDEX-BS",gibslocate,index_prefix,i)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("G-INDEX-PTS<2>",giptslocate,index_prefix,i,2)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("G-INDEX-PTS<4>",giptslocate,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
@@ -423,12 +413,10 @@ int main (int argc, char *argv[] ){
         benchmark::RegisterBenchmark("G-INDEX-PTS<16>",giptslocate,index_prefix,i,16)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("G-INDEX-PTS<32>",giptslocate,index_prefix,i,32)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("G-INDEX-PTS<64>",giptslocate,index_prefix,i,64)->Unit({benchmark::kMicrosecond});;
-
-
-//        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>" ,giqgramlocate,index_prefix,i,4);
-//        benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>" ,giqgramlocate,index_prefix,i,8);
-//        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>",giqgramlocate,index_prefix,i,12);
-//        benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>",giqgramlocate,index_prefix,i,16);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>" ,giqgramlocate,index_prefix,i,4);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>" ,giqgramlocate,index_prefix,i,8);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>",giqgramlocate,index_prefix,i,12);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>",giqgramlocate,index_prefix,i,16);
 
     }
 

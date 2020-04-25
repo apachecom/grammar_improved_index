@@ -39,7 +39,7 @@ int process_data(const std::string &collection,const std::string &file_out, uint
     while(!f.eof() &&  f.read(&c,1)){
 
         if(c == 0 || c == 1 || c == 2)
-            c = 3;
+            c = 65;
 
         f2.write(&c,1) ;
 

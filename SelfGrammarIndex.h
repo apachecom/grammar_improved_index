@@ -1205,9 +1205,12 @@ public:
             return 0;
         }
 
+
+
         uint rule_node = _g.m_tree[_g.select_occ(X,1)];
 
         uint nch  = _g.m_tree.children(rule_node);
+
         for (int j = nch; j > 0 ; --j)
         {   uint child = _g.m_tree.child(rule_node,j);
             uint V = _g[_g.m_tree.pre_order(child)];
@@ -1219,6 +1222,47 @@ public:
 
         return 0;
     }
+
+    virtual int  dfs_cmp_suffix_node (const uint64_t &node, std::string::iterator & itera, std::string::iterator & end) const{
+
+        uint64_t  rule_node = node;
+
+        if(_g.m_tree.isleaf(node)){
+
+            uint X = _g[_g.m_tree.pre_order(node)];
+
+            if(_g.isTerminal(X) ){
+
+                unsigned char a_th = _g.terminal_simbol(X);
+
+                if(a_th < (unsigned char)(*itera)) return 1;
+                if(a_th > (unsigned char)(*itera)) return  -1;
+                --itera;
+                if(itera == end-1) return 0;
+                return 0;
+            }
+
+            rule_node = _g.m_tree[_g.select_occ(X,1)];
+        }
+
+        uint nch  = _g.m_tree.children(rule_node);
+
+        for (int j = nch; j > 0 ; --j)
+        {
+            uint64_t child = _g.m_tree.child(rule_node,j);
+
+            int r = dfs_cmp_suffix_node(child,itera,end);
+
+            if(r != 0) return r;
+
+            if(r == 0 && itera == end-1)
+                return 0;
+        }
+
+        return 0;
+    }
+
+
     virtual int  dfs_cmp_prefix    (const grammar_representation::g_long & X, std::string::iterator & itera, std::string::iterator & end) const{
 
         if(_g.isTerminal(X) ){

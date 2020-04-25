@@ -79,6 +79,19 @@ auto ribuild = [](benchmark::State &st, const string &file_collection, const std
     f_ridx.write((char*)&fast,sizeof(fast));
 
 
+    string input;
+    {
+
+        std::ifstream fs(file_collection);
+//        std::ifstream fs("temp_collection");
+        std::stringstream buffer;
+        buffer << fs.rdbuf();
+        input = buffer.str();
+
+    }
+
+
+
     ri::r_index<> idx;
 
 
@@ -92,7 +105,7 @@ auto ribuild = [](benchmark::State &st, const string &file_collection, const std
 #ifdef MEM_MONITOR
         mm.event("R-INDEX-BUILD");
 #endif
-        idx = ri::r_index<>(data,sais);
+        idx = ri::r_index<>(input,sais);
     }
     idx.serialize(f_ridx);
 
@@ -384,7 +397,7 @@ int main (int argc, char *argv[] ){
 //   );
      benchmark::RegisterBenchmark("R-INDEX",  ribuild,collection,path_out
  #ifdef MEM_MONITOR
-             ,mem_out   
+             ,mem_out
  #endif
      );
 ////
