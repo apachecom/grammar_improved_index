@@ -18,7 +18,7 @@ In order to compile the program, it is necessary to download, compile and instal
 ```
 git clone https://github.com/simongog/sdsl-lite
 cd sdsl-lite
-./install-sh <path to GCIS repository>
+./install-sh <path to gidx repository>
 ```
 
 In order to run benchmark you will need some external libraries as gflags (https://github.com/gflags/gflags.git) and libcds (https://github.com/fclaude/libcds.git)
