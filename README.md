@@ -1,6 +1,8 @@
 # Improved Grammar Index
 
-This project is the implementation of a grammar-based index [1]. We implement the index and demonstrate its practicality compared to the state of the art, in highly repetitive text collections.
+This project is the implementation of a grammar-based index proposed in [1]. 
+This index uses O(G lg n) bits and can find the occ occurrences of patterns P[1..m] in time O((m2 + occ)lg G).
+We implement the index and demonstrate its practicality compared to the state of the art, in highly repetitive text collections.
 
 [1] Claude, F., Navarro, G., & Pacheco, A. (2020). Grammar-Compressed Indexes with Logarithmic Search Time.
 
