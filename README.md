@@ -1,10 +1,10 @@
 # Improved Grammar Index
 
 This project is the implementation of a grammar-based index proposed in [1]. 
-This index uses O(G lg n) bits and can find the occ occurrences of patterns P[1..m] in time O((m2 + occ)lg G).
+This index uses O(G lg n) bits and can find the occ occurrences of patterns P[1..m] in time O((m^2 + occ)lg G), where G is the size of the grammar.
 We implement the index and demonstrate its practicality compared to the state of the art, in highly repetitive text collections.
 
-[1] Claude, F., Navarro, G., & Pacheco, A. (2020). Grammar-Compressed Indexes with Logarithmic Search Time.
+[1] Claude, F., Navarro, G., & Pacheco, A. (2020). Grammar-Compressed Indexes with Logarithmic Search Time. https://arxiv.org/pdf/2004.01032.pdf
 
 ## Compilation 🚀
 First download the project
@@ -18,8 +18,9 @@ In order to compile the program, it is necessary to download, compile and instal
 ```
 git clone https://github.com/simongog/sdsl-lite
 cd sdsl-lite
-./install-sh <path to gidx repository>
+./install-sh 
 ```
+You also must replace some original files in the library with the files in the folder sdsl-files.
 
 In order to run benchmark you will need some external libraries as gflags (https://github.com/gflags/gflags.git) and libcds (https://github.com/fclaude/libcds.git)
 
@@ -28,7 +29,7 @@ Now, it is posible to compile the binaries
 ```
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=RELEASE
+cmake .. -DCMAKE_BUILD_TYPE=RELEASE 
 make 
 ```
 
@@ -37,7 +38,7 @@ In order to test the algorithm, you can use the collections located in the repos
 wget  http://pizzachili.dcc.uchile.cl/repcorpus/real/einstein.en.txt.gz
 gunzip einstein.en.txt.gz
 ```
-We suggest processing collections in order to remove forbidden characters.
+You must process collections in order to remove forbidden characters.
 ```
 ./process_coll <input_file> <output_file>
 ```
@@ -49,12 +50,6 @@ To build the index, you must run
 ./build_indices <collection_file> <index_out_file> 
 ```
 
-If you use the option -DUSE_MEM_MONITOR to the compilator you should pass the output file for memory measurement
-
-```
-./build_indices <collection_file> <index_out_file> <mem_out_file>
-```
-
 Since we use google-benchmark, you can generate CSV files with the results
 ```
 ./build_indices <collection_file> <index_out_file> <mem_out_file> --benchmark_out=<results_file> --benchmark_out_format=csv
@@ -62,7 +57,7 @@ Since we use google-benchmark, you can generate CSV files with the results
 
 ## Display operation
 
-To extract a substring, one must execute:
+To extract a substring, you must execute:
 
 ```
 ./display_indices <index_file> <positions_file> min_len max_len gap --benchmark_out=<output_result_file>  --benchmark_out_format=csv
@@ -91,7 +86,7 @@ This will perform an experiment which we will measure the extraction procedure f
 
 ## Locate operation
 
-To locate a pattern, one must execute:
+To locate a pattern, you must execute:
 ```
 ./locate_indices <index_file> <pattern_file> min_len max_len gap --benchmark_out=<output_result_file>  --benchmark_out_format=csv
 ```
