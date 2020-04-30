@@ -1,8 +1,11 @@
 # Improved Grammar Index
 
-This project is the implementation of a grammar-based index proposed in [1]. 
-This index uses O(G lg n) bits and can find the occ occurrences of patterns P[1..m] in time O((m^2 + occ)lg G), where G is the size of the grammar.
-We implement the index and demonstrate its practicality compared to the state of the art, in highly repetitive text collections.
+This project is the implementation of a grammar-based index proposed in [1]. Self-indexes are
+Compact Data Structures that represent the text in a compressed way and allows us to count
+the occurrences of a pattern (count), return the positions of the original text where these
+occurrences appear (locate) and extract any substring of the text (display).
+This index uses O(G lg n) bits and can find the occ occurrences of patterns 
+P[1..m] in time O((m^2 + occ)lg G), where G is the size of the grammar.
 
 [1] Claude, F., Navarro, G., & Pacheco, A. (2020). Grammar-Compressed Indexes with Logarithmic Search Time. https://arxiv.org/pdf/2004.01032.pdf
 
