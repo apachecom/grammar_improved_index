@@ -6,9 +6,9 @@
 #include <fstream>
 #include <benchmark/benchmark.h>
 
-#include <slp/RePairSLPIndex.h>
+//#include <slp/RePairSLPIndex.h>
 #include "../SelfGrammarIndexBS.h"
-#include <ri/r_index.hpp>
+//#include <ri/r_index.hpp>
 #include "../SelfGrammarIndexPTS.h"
 #include "../SelfGrammarIndexBSQ.h"
 #include "sdsl/io.hpp"
@@ -72,122 +72,122 @@ void load_patterns(const std::string& pattern_file,uint max_len, uint samples){
     f.close();
 }
 
+//
+//auto rilocate = [](benchmark::State &st, const string &file_index, const uint& len
+////#ifdef MEM_MONITOR
+////        , const std::string file_mem_monitor
+////#endif
+//){
+//    /**
+//     * load rindex
+//     * */
+//
+//    ri::r_index<> *idx_r;
+//
+//    fstream rf(file_index + ".ri",std::ios::in|std::ios::binary);
+//
+//    bool fast;
+//    rf.read((char*)&fast,sizeof(fast));
+//    idx_r = new ri::r_index<>();
+//    idx_r->load(rf);
+//
+//
+////    std::cout<<"r -index loaded"<<std::endl;
+//    uint nocc,ptt;
+//    for (auto _ : st)
+//    {
+//        nocc = 0;
+//        ptt = 0;
+////#ifdef MEM_MONITOR
+////        mm.event("R-INDEX-BUILD");
+////#endif
+//        for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
+//            std::string query;
+//            query.resize(len);
+//            std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
+//
+////            std::cout<<"r -index query:"<<query<<std::endl;
+//            auto occ = idx_r->locate_all(query);
+//            nocc += occ.size(); ptt++;
+//        }
+//
+////        std::cout<<nocc<<std::endl;
+////        sleep(2);
+//
+//      }
+//
+//    st.counters["pLen"] = len;
+//    st.counters["queries"] = ptt;
+//    st.counters["nOcc"] = nocc;
+//
+//    st.counters["size"] = idx_r->print_space();
+//
+//    delete idx_r;
+//
+//};
+//
 
-auto rilocate = [](benchmark::State &st, const string &file_index, const uint& len
-//#ifdef MEM_MONITOR
-//        , const std::string file_mem_monitor
-//#endif
-){
-    /**
-     * load rindex
-     * */
-
-    ri::r_index<> *idx_r;
-
-    fstream rf(file_index + ".ri",std::ios::in|std::ios::binary);
-
-    bool fast;
-    rf.read((char*)&fast,sizeof(fast));
-    idx_r = new ri::r_index<>();
-    idx_r->load(rf);
-
-
-//    std::cout<<"r -index loaded"<<std::endl;
-    uint nocc,ptt;
-    for (auto _ : st)
-    {
-        nocc = 0;
-        ptt = 0;
-//#ifdef MEM_MONITOR
-//        mm.event("R-INDEX-BUILD");
-//#endif
-        for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
-            std::string query;
-            query.resize(len);
-            std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
-
-//            std::cout<<"r -index query:"<<query<<std::endl;
-            auto occ = idx_r->locate_all(query);
-            nocc += occ.size(); ptt++;
-        }
-
-//        std::cout<<nocc<<std::endl;
-//        sleep(2);
-
-      }
-
-    st.counters["pLen"] = len;
-    st.counters["queries"] = ptt;
-    st.counters["nOcc"] = nocc;
-
-    st.counters["size"] = idx_r->print_space();
-
-    delete idx_r;
-
-};
-
-
-
-auto slplocate = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling
-//#ifdef MEM_MONITOR
-//        , const std::string file_mem_monitor
-//#endif
-){
-    /**
-     * load slpindex
-     * */
-
-
-    cds_static::RePairSLPIndex* idx_slp;
-    std::string filename = file_index+"-q"+std::to_string(sampling);
-    char* _f = (char *)filename.c_str();
-    int q = cds_static::RePairSLPIndex::load(_f, &idx_slp);
-
-
-//    std::cout<<"slp-index loaded"<<std::endl;
-    uint nocc,ptt;
-
-    for (auto _ : st)
-    {
-        nocc = 0;
-        ptt = 0;
-//#ifdef MEM_MONITOR
-//        mm.event("R-INDEX-BUILD");
-//#endif
-        for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
-            std::string query;
-            query.resize(len);
-            std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
-            uint occs;
-            uchar *tt = (uchar * )(query.c_str());
-//            std::cout<<"slp -index query:"<<query<<std::endl;
-            std::vector<uint> *pos = idx_slp->RePairSLPIndex::locate(tt,len, &occs);
-            
-            // std::sort(pos->begin(),pos->end());
-            // auto last = std::unique(pos->begin(),pos->end());
-            // pos->erase(last,pos->end());
-
-            delete pos;
-            // nocc += occs;
-            nocc += occs;
-            ptt++;
-        }
-
-//        std::cout<<nocc<<std::endl;
-//        sleep(2);
-
-    }
-
-    st.counters["pLen"] = len;
-    st.counters["queries"] = ptt;
-    st.counters["nOcc"] = nocc;
-
-    st.counters["size"] = idx_slp->size();
-
-    delete idx_slp;
-
-};
-
+//
+//auto slplocate = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling
+////#ifdef MEM_MONITOR
+////        , const std::string file_mem_monitor
+////#endif
+//){
+//    /**
+//     * load slpindex
+//     * */
+//
+//
+//    cds_static::RePairSLPIndex* idx_slp;
+//    std::string filename = file_index+"-q"+std::to_string(sampling);
+//    char* _f = (char *)filename.c_str();
+//    int q = cds_static::RePairSLPIndex::load(_f, &idx_slp);
+//
+//
+////    std::cout<<"slp-index loaded"<<std::endl;
+//    uint nocc,ptt;
+//
+//    for (auto _ : st)
+//    {
+//        nocc = 0;
+//        ptt = 0;
+////#ifdef MEM_MONITOR
+////        mm.event("R-INDEX-BUILD");
+////#endif
+//        for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
+//            std::string query;
+//            query.resize(len);
+//            std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
+//            uint occs;
+//            uchar *tt = (uchar * )(query.c_str());
+////            std::cout<<"slp -index query:"<<query<<std::endl;
+//            std::vector<uint> *pos = idx_slp->RePairSLPIndex::locate(tt,len, &occs);
+//
+//            // std::sort(pos->begin(),pos->end());
+//            // auto last = std::unique(pos->begin(),pos->end());
+//            // pos->erase(last,pos->end());
+//
+//            delete pos;
+//            // nocc += occs;
+//            nocc += occs;
+//            ptt++;
+//        }
+//
+////        std::cout<<nocc<<std::endl;
+////        sleep(2);
+//
+//    }
+//
+//    st.counters["pLen"] = len;
+//    st.counters["queries"] = ptt;
+//    st.counters["nOcc"] = nocc;
+//
+//    st.counters["size"] = idx_slp->size();
+//
+//    delete idx_slp;
+//
+//};
+//
 
 
 

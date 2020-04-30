@@ -761,11 +761,11 @@ void SelfGrammarIndexBS::locate( std::string & pattern, std::vector<uint> & occ)
 }
 void SelfGrammarIndexBS::locateNoTrie( std::string & pattern, std::vector<uint> & occ){
 
-    if(pattern.size() == 1)
-    {
-        locate_ch(pattern[0],occ);
-        return;
-    }
+//    if(pattern.size() == 1)
+//    {
+//        locate_ch(pattern[0],occ);
+//        return;
+//    }
 
 
     size_t p_n = pattern.size();
@@ -775,16 +775,20 @@ void SelfGrammarIndexBS::locateNoTrie( std::string & pattern, std::vector<uint> 
     for (size_t  i = 1; i <= p_n ; ++i)
     {
 
-        auto itera = pattern.begin() + i-1;
+        std::string::iterator itera = pattern.begin() + i-1;
         grammar_representation::g_long lr = 1,hr = n_xj;
 
         bool found = false;
 
         lower_bound(found,lr,hr,[&itera,&pattern,this](const grammar_representation::g_long & a)->int
         {
-            auto begin = pattern.begin();
-            auto end = itera;
+            std::string::iterator begin = pattern.begin();
+            std::string::iterator end = itera;
             auto r =  dfs_cmp_suffix(a,end,begin);
+//            int r =1;
+//            uint64_t t =_g.m_tree[_g.select_occ(a,1)];
+//            int r = dfs_cmp_suffix_node( t,end,begin);
+
 //            begin = pattern.begin();
 //            end = itera;
 //            auto r2 =  cmp_suffix(a,end,begin);

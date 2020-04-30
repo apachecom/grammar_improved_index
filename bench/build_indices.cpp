@@ -6,9 +6,9 @@
 #include <fstream>
 #include <benchmark/benchmark.h>
 
-#include <slp/RePairSLPIndex.h>
+//#include <slp/RePairSLPIndex.h>
 #include "../SelfGrammarIndexBS.h"
-#include <ri/r_index.hpp>
+//#include <ri/r_index.hpp>
 #include "../SelfGrammarIndexPTS.h"
 #include "../SelfGrammarIndexBSQ.h"
 
@@ -18,7 +18,7 @@
 #include "../utils/memory/mem_monitor/mem_monitor.hpp"
 //#endif
 
-using namespace cds_static;
+//using namespace cds_static;
 
 std::string data = "";
 
@@ -64,167 +64,167 @@ auto first_test = [](benchmark::State &st){
 
 
 
-
-
-auto ribuild = [](benchmark::State &st, const string &file_collection, const std::string& file_out
-
-#ifdef MEM_MONITOR
-, const std::string file_mem_monitor
-#endif
-        ){
-    fstream f_ridx(file_out+".ri", std::ios::out | std::ios::binary);
-
-    bool fast = false;
-    bool sais = false;
-    f_ridx.write((char*)&fast,sizeof(fast));
-
-
-    string input;
-    {
-
-        std::ifstream fs(file_collection);
-//        std::ifstream fs("temp_collection");
-        std::stringstream buffer;
-        buffer << fs.rdbuf();
-        input = buffer.str();
-
-    }
-
-
-
-    ri::r_index<> idx;
-
-
-#ifdef MEM_MONITOR
-//    std::cout<<file_mem_monitor<<std::endl;
-    mem_monitor mm(file_mem_monitor+"-ri.csv");
-#endif
-
-    for (auto _ : st)
-    {
-#ifdef MEM_MONITOR
-        mm.event("R-INDEX-BUILD");
-#endif
-        idx = ri::r_index<>(input,sais);
-    }
-    idx.serialize(f_ridx);
-
-    st.counters["size"] = idx.print_space();
-
-};
-
-auto slpbuild = [](benchmark::State &st, const string &file_collection, const std::string& file_out, const int& qgram
-
-#ifdef MEM_MONITOR
-        , const std::string file_mem_monitor
-#endif
-){
-
-
-    std::string filename = file_out+"-q"+std::to_string(qgram);
-    char* _f = (char *)filename.c_str();
-    RePairSLPIndex *indexer = new RePairSLPIndex();
-
-#ifdef MEM_MONITOR
-    mem_monitor mm(file_mem_monitor+"-slp.csv");
-#endif
-
-    ifstream in(file_collection, ifstream::in);
-    in.seekg(0,ios_base::end);
-    uint tsize = in.tellg();
-    in.seekg(0,ios_base::beg);
-    uchar *text = nullptr;
-
-    if (in.good())
-    {
-        text = loadValue<uchar>(in, tsize);
-        text[tsize] = 0;
-        std::cout<<tsize<<std::endl;
-        in.close();
-
-    } else {
-        std::cout<<"File Error\n";
-        return;
-    }
-
-    for (auto _ : st)
-    {
-#ifdef MEM_MONITOR
-        mm.event("SLP-INDEX-BAL-BUILD");
-#endif
-        indexer->build(text, tsize, qgram, _f);
-        sleep(3);
-    }
-
-    indexer->save();
-    st.counters["Size"] = indexer->size();
-
-    delete indexer;
-
-};
-
-auto slpbalbuild = [](benchmark::State &st, const string &file_collection, const std::string& file_out, const int& qgram, bool bal
-
-#ifdef MEM_MONITOR
-        , const std::string file_mem_monitor
-#endif
-){
-
-
-    std::string filename = (bal)?file_out+"-bal-q"+std::to_string(qgram):file_out+"-q"+std::to_string(qgram);
-    char* _f = (char *)filename.c_str();
-    RePairSLPIndex *indexer = new RePairSLPIndex();
-
-#ifdef MEM_MONITOR
-    mem_monitor mm(file_mem_monitor+"-balspl.csv");
-#endif
-    std::cout<<"File collection: "<<file_collection<<std::endl;
-    ifstream in(file_collection, ifstream::in);
-    in.seekg(0,ios_base::end);
-    uint tsize = in.tellg();
-    in.seekg(0,ios_base::beg);
-    uchar *text = nullptr;
-
-    std::string prefix = (bal)? file_collection+"-bal":file_collection;
-
-    std::cout<<"prefix grammar: "<<prefix<<std::endl;
-    std::fstream R(prefix+".R",std::ios::in|std::ios::binary);
-    if(!R.is_open()){
-        std::cout<<"[ERROR]:file " +file_collection+".R"<<std::endl;
-        return;
-    }
-
-    std::fstream C(prefix+".C",std::ios::in|std::ios::binary);
-    if(!C.is_open()){
-        std::cout<<"[ERROR]:file " +file_collection+".C"<<std::endl;
-        return;
-    }
-
-    if (in.good())
-    {
-        text = loadValue<uchar>(in, tsize);
-        text[tsize] = 0;
-        in.close();
-    } else {
-        std::cout<<"File Error\n";
-        return;
-    }
-
-    for (auto _ : st)
-    {
-#ifdef MEM_MONITOR
-        mm.event("SLP-INDEX-BAL-BUILD");
-#endif
-        indexer->build(text, tsize, qgram, _f,R,C);
-        sleep(3);
-    }
-
-    indexer->save();
-    st.counters["Size"] = indexer->size();
-
-    delete indexer;
-
-};
+//
+//
+//auto ribuild = [](benchmark::State &st, const string &file_collection, const std::string& file_out
+//
+//#ifdef MEM_MONITOR
+//, const std::string file_mem_monitor
+//#endif
+//        ){
+//    fstream f_ridx(file_out+".ri", std::ios::out | std::ios::binary);
+//
+//    bool fast = false;
+//    bool sais = false;
+//    f_ridx.write((char*)&fast,sizeof(fast));
+//
+//
+//    string input;
+//    {
+//
+//        std::ifstream fs(file_collection);
+////        std::ifstream fs("temp_collection");
+//        std::stringstream buffer;
+//        buffer << fs.rdbuf();
+//        input = buffer.str();
+//
+//    }
+//
+//
+//
+//    ri::r_index<> idx;
+//
+//
+//#ifdef MEM_MONITOR
+////    std::cout<<file_mem_monitor<<std::endl;
+//    mem_monitor mm(file_mem_monitor+"-ri.csv");
+//#endif
+//
+//    for (auto _ : st)
+//    {
+//#ifdef MEM_MONITOR
+//        mm.event("R-INDEX-BUILD");
+//#endif
+//        idx = ri::r_index<>(input,sais);
+//    }
+//    idx.serialize(f_ridx);
+//
+//    st.counters["size"] = idx.print_space();
+//
+//};
+////
+////auto slpbuild = [](benchmark::State &st, const string &file_collection, const std::string& file_out, const int& qgram
+////
+////#ifdef MEM_MONITOR
+////        , const std::string file_mem_monitor
+////#endif
+////){
+////
+////
+////    std::string filename = file_out+"-q"+std::to_string(qgram);
+////    char* _f = (char *)filename.c_str();
+////    RePairSLPIndex *indexer = new RePairSLPIndex();
+////
+////#ifdef MEM_MONITOR
+////    mem_monitor mm(file_mem_monitor+"-slp.csv");
+////#endif
+////
+////    ifstream in(file_collection, ifstream::in);
+////    in.seekg(0,ios_base::end);
+////    uint tsize = in.tellg();
+////    in.seekg(0,ios_base::beg);
+////    uchar *text = nullptr;
+////
+////    if (in.good())
+////    {
+////        text = loadValue<uchar>(in, tsize);
+////        text[tsize] = 0;
+////        std::cout<<tsize<<std::endl;
+////        in.close();
+////
+////    } else {
+////        std::cout<<"File Error\n";
+////        return;
+////    }
+////
+////    for (auto _ : st)
+////    {
+////#ifdef MEM_MONITOR
+////        mm.event("SLP-INDEX-BAL-BUILD");
+////#endif
+////        indexer->build(text, tsize, qgram, _f);
+////        sleep(3);
+////    }
+////
+////    indexer->save();
+////    st.counters["Size"] = indexer->size();
+////
+////    delete indexer;
+////
+////};
+//
+//auto slpbalbuild = [](benchmark::State &st, const string &file_collection, const std::string& file_out, const int& qgram, bool bal
+//
+//#ifdef MEM_MONITOR
+//        , const std::string file_mem_monitor
+//#endif
+//){
+//
+//
+//    std::string filename = (bal)?file_out+"-bal-q"+std::to_string(qgram):file_out+"-q"+std::to_string(qgram);
+//    char* _f = (char *)filename.c_str();
+//    RePairSLPIndex *indexer = new RePairSLPIndex();
+//
+//#ifdef MEM_MONITOR
+//    mem_monitor mm(file_mem_monitor+"-balspl.csv");
+//#endif
+//    std::cout<<"File collection: "<<file_collection<<std::endl;
+//    ifstream in(file_collection, ifstream::in);
+//    in.seekg(0,ios_base::end);
+//    uint tsize = in.tellg();
+//    in.seekg(0,ios_base::beg);
+//    uchar *text = nullptr;
+//
+//    std::string prefix = (bal)? file_collection+"-bal":file_collection;
+//
+//    std::cout<<"prefix grammar: "<<prefix<<std::endl;
+//    std::fstream R(prefix+".R",std::ios::in|std::ios::binary);
+//    if(!R.is_open()){
+//        std::cout<<"[ERROR]:file " +file_collection+".R"<<std::endl;
+//        return;
+//    }
+//
+//    std::fstream C(prefix+".C",std::ios::in|std::ios::binary);
+//    if(!C.is_open()){
+//        std::cout<<"[ERROR]:file " +file_collection+".C"<<std::endl;
+//        return;
+//    }
+//
+//    if (in.good())
+//    {
+//        text = loadValue<uchar>(in, tsize);
+//        text[tsize] = 0;
+//        in.close();
+//    } else {
+//        std::cout<<"File Error\n";
+//        return;
+//    }
+//
+//    for (auto _ : st)
+//    {
+//#ifdef MEM_MONITOR
+//        mm.event("SLP-INDEX-BAL-BUILD");
+//#endif
+//        indexer->build(text, tsize, qgram, _f,R,C);
+//        sleep(3);
+//    }
+//
+//    indexer->save();
+//    st.counters["Size"] = indexer->size();
+//
+//    delete indexer;
+//
+//};
 
 auto g_imp_build_basics = [](benchmark::State &st, const string &file_collection, const std::string& file_out
 
@@ -395,11 +395,11 @@ int main (int argc, char *argv[] ){
 ////            ,mem_out
 ////#endif
 //   );
-     benchmark::RegisterBenchmark("R-INDEX",  ribuild,collection,path_out
- #ifdef MEM_MONITOR
-             ,mem_out
- #endif
-     );
+//     benchmark::RegisterBenchmark("R-INDEX",  ribuild,collection,path_out
+// #ifdef MEM_MONITOR
+//             ,mem_out
+// #endif
+//     );
 ////
 ////    benchmark::RegisterBenchmark("SLP-BAL-INDEX<4>",  slpbalbuild,collection,path_out, 4,false
 ////#ifdef MEM_MONITOR
@@ -448,65 +448,65 @@ int main (int argc, char *argv[] ){
 //    );
 //
 //
-//         benchmark::RegisterBenchmark("G-INDEX",  g_imp_build_basics ,collection,path_out
-//     #ifdef MEM_MONITOR
-//                 ,mem_out
-//     #endif
-//         );
-////
-//    benchmark::RegisterBenchmark("G-INDEX-PTS<2>",  g_imp_pts_build ,collection,path_out,2
-//#ifdef MEM_MONITOR
-//            ,mem_out
-//#endif
-//    );
-//
-//     benchmark::RegisterBenchmark("G-INDEX-PTS<4>",  g_imp_pts_build ,collection,path_out,4
-// #ifdef MEM_MONITOR
-//             ,mem_out
-// #endif
-//     );
-//
-//     benchmark::RegisterBenchmark("G-INDEX-PTS<8>",  g_imp_pts_build ,collection,path_out,8
-// #ifdef MEM_MONITOR
-//             ,mem_out
-// #endif
-//     );
-//     benchmark::RegisterBenchmark("G-INDEX-PTS<16>",  g_imp_pts_build ,collection,path_out,16
-// #ifdef MEM_MONITOR
-//             ,mem_out
-// #endif
-//     );
-//     benchmark::RegisterBenchmark("G-INDEX-PTS<32>",  g_imp_pts_build ,collection,path_out,32
-// #ifdef MEM_MONITOR
-//             ,mem_out
-// #endif
-//     );
-//
-//     benchmark::RegisterBenchmark("G-INDEX-PTS<64>",  g_imp_pts_build ,collection,path_out,64
-// #ifdef MEM_MONITOR
-//             ,mem_out
-// #endif
-//     );
-//     benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>",  g_imp_qgram_build ,collection,path_out,4
-// #ifdef MEM_MONITOR
-//             ,mem_out
-// #endif
-//     );
-//     benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>",  g_imp_qgram_build ,collection,path_out,8
-// #ifdef MEM_MONITOR
-//             ,mem_out
-// #endif
-//     );
-//     benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>",  g_imp_qgram_build ,collection,path_out,12
-// #ifdef MEM_MONITOR
-//             ,mem_out
-// #endif
-//     );
-//     benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>",  g_imp_qgram_build ,collection,path_out,16
-// #ifdef MEM_MONITOR
-//             ,mem_out
-// #endif
-//     );
+benchmark::RegisterBenchmark("G-INDEX",  g_imp_build_basics ,collection,path_out
+     #ifdef MEM_MONITOR
+                 ,mem_out
+     #endif
+         );
+
+    benchmark::RegisterBenchmark("G-INDEX-PTS<2>",  g_imp_pts_build ,collection,path_out,2
+#ifdef MEM_MONITOR
+            ,mem_out
+#endif
+    );
+
+     benchmark::RegisterBenchmark("G-INDEX-PTS<4>",  g_imp_pts_build ,collection,path_out,4
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
+
+     benchmark::RegisterBenchmark("G-INDEX-PTS<8>",  g_imp_pts_build ,collection,path_out,8
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
+     benchmark::RegisterBenchmark("G-INDEX-PTS<16>",  g_imp_pts_build ,collection,path_out,16
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
+     benchmark::RegisterBenchmark("G-INDEX-PTS<32>",  g_imp_pts_build ,collection,path_out,32
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
+
+     benchmark::RegisterBenchmark("G-INDEX-PTS<64>",  g_imp_pts_build ,collection,path_out,64
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
+     benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>",  g_imp_qgram_build ,collection,path_out,4
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
+     benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>",  g_imp_qgram_build ,collection,path_out,8
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
+     benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>",  g_imp_qgram_build ,collection,path_out,12
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
+     benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>",  g_imp_qgram_build ,collection,path_out,16
+ #ifdef MEM_MONITOR
+             ,mem_out
+ #endif
+     );
 
 
 
