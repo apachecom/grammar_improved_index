@@ -99,7 +99,7 @@ set(SLP_SAMPLING
         trees/trie/compact_trie.cpp trees/trie/compact_trie.h
         trees/trie/Trie.cpp trees/trie/Trie.h
         utils/grammar.cpp utils/grammar.h
-        tests/collections.cpp
+#        tests/collections.cpp
         bench/repetitive_collections.h
         SelfGrammarIndexBSQ.cpp SelfGrammarIndexBSQ.h
         )
@@ -137,7 +137,7 @@ set(SOURCE_FILES
 
         utils/grammar.cpp utils/grammar.h
         utils/memory/mem_monitor/mem_monitor.hpp
-        tests/collections.cpp
+#        tests/collections.cpp
         bench/repetitive_collections.h
 
         SelfGrammarIndexBSQ.cpp SelfGrammarIndexBSQ.h simple_grid.cpp simple_grid.h
@@ -219,7 +219,7 @@ include(internal_utils)
 #cxx_executable_with_flags(locate_other "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_locate.cpp ${SOURCE_FILES})
 #cxx_executable_with_flags(idx_build "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/idx_build.cpp ${SOURCE_FILES})
 cxx_executable_with_flags(build_indices "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/build_indices.cpp ${SLP_SAMPLING})
-cxx_executable_with_flags(process_coll "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/bench_collections.cpp ${SLP_SAMPLING})
+cxx_executable_with_flags(process_coll "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/processing_collections.cpp ${SLP_SAMPLING})
 cxx_executable_with_flags(locate_indices "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/locate_indices.cpp ${SLP_SAMPLING})
 cxx_executable_with_flags(display_indices "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/display_indices.cpp ${SLP_SAMPLING})
 
