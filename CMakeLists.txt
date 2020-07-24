@@ -219,7 +219,7 @@ include(internal_utils)
 #cxx_executable_with_flags(locate_other "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_locate.cpp ${SOURCE_FILES})
 #cxx_executable_with_flags(idx_build "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/idx_build.cpp ${SOURCE_FILES})
 cxx_executable_with_flags(build_indices "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/build_indices.cpp ${SLP_SAMPLING})
-cxx_executable_with_flags(process_coll "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/processing_collections.cpp ${SLP_SAMPLING})
+cxx_executable_with_flags(process_coll "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/bench_collections.cpp ${SLP_SAMPLING})
 cxx_executable_with_flags(locate_indices "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/locate_indices.cpp ${SLP_SAMPLING})
 cxx_executable_with_flags(display_indices "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/display_indices.cpp ${SLP_SAMPLING})
 
