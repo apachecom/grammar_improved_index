@@ -141,7 +141,7 @@ set(SOURCE_FILES
         bench/repetitive_collections.h
 
         SelfGrammarIndexBSQ.cpp SelfGrammarIndexBSQ.h simple_grid.cpp simple_grid.h
-        bench/bench_space.cpp)
+        )
 
 option(USE_MEM_MONITOR "Enter mem-monitor mode" OFF)
 
