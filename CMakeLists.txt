@@ -141,7 +141,7 @@ set(SOURCE_FILES
         bench/repetitive_collections.h
 
         SelfGrammarIndexBSQ.cpp SelfGrammarIndexBSQ.h simple_grid.cpp simple_grid.h
-        )
+        bench/bench_space.cpp)
 
 option(USE_MEM_MONITOR "Enter mem-monitor mode" OFF)
 
@@ -222,6 +222,7 @@ cxx_executable_with_flags(build_indices "" "${LIBS};benchmark;sdsl;divsufsort;di
 cxx_executable_with_flags(process_coll "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/bench_collections.cpp ${SLP_SAMPLING})
 cxx_executable_with_flags(locate_indices "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/locate_indices.cpp ${SLP_SAMPLING})
 cxx_executable_with_flags(display_indices "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/display_indices.cpp ${SLP_SAMPLING})
+cxx_executable_with_flags(space "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/bench_space.cpp ${SLP_SAMPLING})
 
 
 target_link_libraries(improved_grammar_index sdsl)
