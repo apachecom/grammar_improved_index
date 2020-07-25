@@ -27,6 +27,7 @@ auto patricia_bench = [](benchmark::State &st,const std::string &file,uint32_t s
 
     st.counters["Text-len"] = idx_gipts.get_grammar().get_size_text();
     st.counters["Total"] = idx_gipts.size_in_bytes();
+
     st.counters["G"] = idx_gipts.get_grammar().size_in_bytes();
     st.counters["G-X"] = idx_gipts.get_grammar().get_X_size();
     st.counters["G-Pi"] = idx_gipts.get_grammar().get_F_size();
@@ -34,6 +35,9 @@ auto patricia_bench = [](benchmark::State &st,const std::string &file,uint32_t s
     st.counters["G-Y"] = idx_gipts.get_grammar().get_Y_size();
     st.counters["G-L"] = idx_gipts.get_grammar().get_L_size();
     st.counters["G-Tree"] = idx_gipts.get_grammar().get_tree_size();
+    st.counters["G-Tree+Z"] = idx_gipts.get_grammar().get_tree_size() + idx_gipts.get_grammar().get_Z_size();;
+
+
     st.counters["G-Tries"] = idx_gipts.get_grammar().get_compact_trie_left_size() + idx_gipts.get_grammar().get_compact_trie_right_size();
     st.counters["G-Tries-Tree"] = idx_gipts.get_grammar().get_left_trie().get_tree().size_in_bytes() + idx_gipts.get_grammar().get_right_trie().get_tree().size_in_bytes();
     st.counters["G-Tries-Pi"] = sdsl::size_in_bytes(idx_gipts.get_grammar().get_left_trie().get_seq()) +
@@ -41,7 +45,13 @@ auto patricia_bench = [](benchmark::State &st,const std::string &file,uint32_t s
                                 sdsl::size_in_bytes(idx_gipts.get_grammar().get_right_trie().get_seq()) +
                                 sdsl::size_in_bytes(idx_gipts.get_grammar().get_right_trie().get_seq_inv());
 
-    st.counters["Grid size"] = idx_gipts.get_grid().size_in_bytes();
+
+    st.counters["Grid"] = idx_gipts.get_grid().size_in_bytes();
+    st.counters["Grid - L"] = idx_gipts.get_grid().size_in_bytes();
+    st.counters["Grid:SL"] = idx_gipts.get_grid().get_SL_size();
+    st.counters["Grid:SB"] = idx_gipts.get_grid().get_SB_size();
+    st.counters["Grid:XA"] = idx_gipts.get_grid().get_XA_size();
+    st.counters["Grid:XB"] = idx_gipts.get_grid().get_XB_size();
 
     st.counters["Text-len"] = idx_gipts.get_grammar().get_size_text();
     st.counters["Patricia-Trees"] =idx_gipts.get_pt_rules().size_in_bytes() + idx_gipts.get_pt_suffixes().size_in_bytes();;
@@ -76,6 +86,7 @@ auto basic_bench = [](benchmark::State &st,const std::string &file) {
     st.counters["G-Z"] = bs.get_grammar().get_Z_size();
     st.counters["G-Y"] = bs.get_grammar().get_Y_size();
     st.counters["G-L"] = bs.get_grammar().get_L_size();
+    st.counters["G-Tree-Z"] = bs.get_grammar().get_tree_size()+bs.get_grammar().get_Z_size();;
     st.counters["G-Tree"] = bs.get_grammar().get_tree_size();
     st.counters["G-Tries"] = bs.get_grammar().get_compact_trie_left_size() + bs.get_grammar().get_compact_trie_right_size();
     st.counters["G-Tries-Tree"] = bs.get_grammar().get_left_trie().get_tree().size_in_bytes() + bs.get_grammar().get_right_trie().get_tree().size_in_bytes();
@@ -85,6 +96,10 @@ auto basic_bench = [](benchmark::State &st,const std::string &file) {
                                     sdsl::size_in_bytes(bs.get_grammar().get_right_trie().get_seq_inv());
 
     st.counters["Grid size"] = bs.get_grid().size_in_bytes();
+    st.counters["Grid size"] = bs.get_grid().get_SL_size();
+    st.counters["Grid size"] = bs.get_grid().get_SB_size();
+    st.counters["Grid size"] = bs.get_grid().get_XA_size();
+    st.counters["Grid size"] = bs.get_grid().get_XB_size();
 
 
 
