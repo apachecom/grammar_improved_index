@@ -47,7 +47,7 @@ auto patricia_bench = [](benchmark::State &st,const std::string &file,uint32_t s
 
 
     st.counters["Grid"] = idx_gipts.get_grid().size_in_bytes();
-    st.counters["Grid - L"] = idx_gipts.get_grid().size_in_bytes();
+    st.counters["Grid - L"] = idx_gipts.get_grid().size_in_bytes() - idx_gipts.get_grid().get_SL_size(); ;
     st.counters["Grid:SL"] = idx_gipts.get_grid().get_SL_size();
     st.counters["Grid:SB"] = idx_gipts.get_grid().get_SB_size();
     st.counters["Grid:XA"] = idx_gipts.get_grid().get_XA_size();
