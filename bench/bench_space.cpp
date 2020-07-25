@@ -44,10 +44,18 @@ auto patricia_bench = [](benchmark::State &st,const std::string &file,uint32_t s
     st.counters["Grid size"] = idx_gipts.get_grid().size_in_bytes();
 
     st.counters["Text-len"] = idx_gipts.get_grammar().get_size_text();
+    st.counters["Patricia-Trees"] =idx_gipts.get_pt_rules().size_in_bytes() + idx_gipts.get_pt_suffixes().size_in_bytes();;
     st.counters["Patricia-Tree-Rules"] = idx_gipts.get_pt_rules().size_in_bytes();
     st.counters["Patricia-Tree-Rules-Tree"] = idx_gipts.get_pt_rules().get_tree().size_in_bytes();
     st.counters["Patricia-Tree-Rules-Seq"] = sdsl::size_in_bytes(idx_gipts.get_pt_rules().get_seq());
     st.counters["Patricia-Tree-Rules-Jmp"] = sdsl::size_in_bytes(idx_gipts.get_pt_rules().get_jumps());
+
+    st.counters["Patricia-Tree-Sfx"] = idx_gipts.get_pt_suffixes().size_in_bytes();
+    st.counters["Patricia-Tree-Sfx-Tree"] = idx_gipts.get_pt_suffixes().get_tree().size_in_bytes();
+    st.counters["Patricia-Tree-Sfx-Seq"] = sdsl::size_in_bytes(idx_gipts.get_pt_suffixes().get_seq());
+    st.counters["Patricia-Tree-Sfx-Jmp"] = sdsl::size_in_bytes(idx_gipts.get_pt_suffixes().get_jumps());
+
+
 };
 auto basic_bench = [](benchmark::State &st,const std::string &file) {
 
