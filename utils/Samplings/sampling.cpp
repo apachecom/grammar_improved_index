@@ -84,12 +84,19 @@ void
 Sampling::locatePrefix(uchar *pattern, uint len, uint *left, uint *right, uint *bleft, uint *bright)
 {
     dictionary->locateByPrefix(pattern, len, left, right, bleft, bright);
-
     if (*left > 0)
     {
       *left = ptrRules->select(*left)+1;
-      if (*right != prefixes) *right = ptrRules->select(*right+1);
-      else *right = ptrRules->select(*right);
+      if (*right != prefixes) {
+//          std::cout<<"*right = ptrRules->select(*right+1);\n";
+          *right = ptrRules->select(*right+1);
+
+      }
+      else {
+//          std::cout<<"*right = ptrRules->select(*right);\n";
+          *right = ptrRules->select(*right);
+
+      }
     }
     else
     {

@@ -122,7 +122,7 @@ size_t bp_tree::size_in_bytes() const {
             sdsl::size_in_bytes(select_10)  +
             sdsl::size_in_bytes(select_0)   +
             sdsl::size_in_bytes(rank_10)
-            ;;
+            ;
 }
 
 double bp_tree::size_in_mega_bytes() const {

@@ -57,35 +57,35 @@ void binary_relation::build( std::vector<point>::iterator begin,std::vector<poin
          * */
 
         {
-            sdsl::bit_vector _XB(n_points + n_rows + 1, 0);
-            _XB[0] = true;
+            sdsl::bit_vector xb(n_points + n_rows + 1, false);
+            xb[0] = true;
             /*
              * Put a 0 in XB for each element in the ith row
              * then add 1
              * */
             size_t p = 1;
             for (uint j = 0; j < n_rows; ++j) {
-                _XB[p + card_rows[j]] = true;
+                xb[p + card_rows[j]] = true;
                 p += card_rows[j] + 1;
             }
 
-            XB = bin_bit_vector_xb(_XB);
+            XB = bin_bit_vector_xb(xb);
         }
 
         {
-            sdsl::bit_vector _XA(n_points + n_cols + 1, 0);
-            _XA[0] = true;
+            sdsl::bit_vector xa(n_points + n_cols + 1, 0);
+            xa[0] = true;
             /*
              * Put a 0 in XA for each element in the ith column
              * then add 1
              * */
             size_t p = 1;
             for (uint j = 0; j < n_cols; ++j) {
-                _XA[p + card_cols[j]] = true;
+                xa[p + card_cols[j]] = true;
                 p += card_cols[j] + 1;
             }
 
-            XA = bin_bit_vector_xa(_XA);
+            XA = bin_bit_vector_xa(xa);
         }
     }
     /*
@@ -225,7 +225,7 @@ void binary_relation::load(std::fstream & fout) {
     xa_rank1  = bin_bit_vector_xa::rank_1_type(&XA);
     xb_rank1  = bin_bit_vector_xb::rank_1_type(&XB);
 }
-
+#ifdef DEBUG
 void binary_relation::print_size() {
     std::cout<<"SB "<<sdsl::size_in_mega_bytes(SB) << std::endl;
     std::cout<<"\t SB length"<<SB.size()<< std::endl;
@@ -240,6 +240,7 @@ void binary_relation::print_size() {
     std::cout<<"XA rank 1 "<<sdsl::size_in_mega_bytes(xa_rank1)  << std::endl;
     std::cout<<"total size of grid 2d range search************"<<size_in_bytes()*1.0/1024*1024<< std::endl;
 }
+#endif
 
 binary_relation::bin_long binary_relation::n_columns() const {
     return xa_rank1(XA.size())-1;

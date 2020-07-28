@@ -10,8 +10,6 @@
 #include "utils/Samplings/sampling.h"
 #include <sdsl/lcp_bitcompressed.hpp>
 #include <sdsl/rmq_succinct_sada.hpp>
-//#include "/home/alejandro/libCSD/StringDictionaryHTFC.h"
-
 
 
 class SelfGrammarIndexBSQ : public SelfGrammarIndexBS {
@@ -25,7 +23,7 @@ public:
 
 
     sdsl::int_vector<> pi;
-    sdsl::inv_perm_support<> inv_pi;
+    sdsl::inv_perm_support<INV_PI_T_QGRAM> inv_pi;
 
     sdsl::bit_vector C;
     sdsl::bit_vector::rank_1_type c_rank1;
@@ -36,14 +34,24 @@ public:
     Sampling* sequenceSamp;
 
 
-    SelfGrammarIndexBSQ() {}
+    SelfGrammarIndexBSQ() {
 
-    SelfGrammarIndexBSQ(SelfGrammarIndex *base_indx) {
-        this->grid = base_indx->get_grid();
-        this->_g = base_indx->get_grammar();
+        grammarSamp = nullptr;
+        reverseSamp= nullptr;
+        sequenceSamp= nullptr;
     }
 
-    ~SelfGrammarIndexBSQ() {
+    explicit SelfGrammarIndexBSQ(SelfGrammarIndex *base_indx) {
+        this->grid = base_indx->get_grid();
+        this->_g = base_indx->get_grammar();
+
+        grammarSamp = nullptr;
+        reverseSamp= nullptr;
+        sequenceSamp= nullptr;
+
+    }
+
+    ~SelfGrammarIndexBSQ() override {
 
         delete grammarSamp;
         delete reverseSamp;
@@ -53,448 +61,94 @@ public:
 
     size_t n_rules() { return _g.n_rules(); }
 
-    void build_basics(const std::string &text) {
-        std::cout<<"SelfGrammarIndexBSQ()"<<std::endl;
-        /*
-     * Building grammar by repair algorithm
-     *
-     * */
-        std::cout << "Building grammar by repair algorithm" << std::endl;
-
+    void build_basics(
+            const std::string &text
+#ifdef MEM_MONITOR
+            , mem_monitor& mm
+#endif
+            ) {
 
         grammar not_compressed_grammar;
-        not_compressed_grammar.buildRepair(text);
+        std::vector< std::pair< std::pair<size_t ,size_t >,std::pair<size_t ,size_t > > > grammar_sfx;
+        SelfGrammarIndex::build_basics(text,not_compressed_grammar,grammar_sfx
+#ifdef MEM_MONITOR
+                ,   mm
+#endif
+                );
 
+#ifdef PRINT_LOGS
+        std::cout<<BUILD_QGRAMS_PI<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    auto start = timer::now();
+#endif
+        not_compressed_grammar.permutationSortRules(text, pi);
+        inv_pi = sdsl::inv_perm_support<INV_PI_T_QGRAM>(&pi);
 
-        /*std::cout<<"\t number of rules "<<not_compressed_grammar.n_rules()<<std::endl;
-        std::cout<<"\t total size of rules "<<not_compressed_grammar.get_size()<<std::endl;
-        std::cout<<"\t size of the representation "<<not_compressed_grammar.size_in_bytes()*1/(1024*1024)<<"(mb)"<<std::endl;
-    */
-        //not_compressed_grammar.print(text);
+        C = sdsl::bit_vector(256, false);
 
-
-        /*
-         * Building compressed grammar
-         *
-        * */
-        //std::cout<<"Building compressed grammar"<<std::endl;
-
-//    not_compressed_grammar.print(text);
-        _g.code = code;
-        _g.build(not_compressed_grammar);
-
-        //  _g.print_size_in_bytes();
-        //std::cout<<"total size of compressed grammar*******************"<<_g.size_in_bytes()*1.0/1024/1024<<std::endl;
-        /*
-         * Build sufix of grammar
-         *
-         * */
-
-
-        //std::cout<<"Compute suffix grammar"<<std::endl;
-
-        std::vector<std::pair<std::pair<size_t, size_t>, std::pair<size_t, size_t> > > grammar_sfx;
-        const auto &gtree = _g.get_parser_tree();
-        unsigned long num_sfx = 0;
-
-        for (auto r_begin = not_compressed_grammar.begin(); r_begin != not_compressed_grammar.end(); ++r_begin) {
-
-            rule r = r_begin->second;
-            rule::r_long r_id = r_begin->first;
-            size_t node = gtree[_g.select_occ(r_id, 1)];
-
-            rule::r_long off = 0;
-
-            for (auto j = r._rule.size() - 1; j >= 1; --j) {
-                off += not_compressed_grammar[r._rule[j]].len();
-
-                size_t left = r.r - off + 1;
-                size_t right = r.r;
-
-                size_t tag = gtree.pre_order(gtree.child(node, j + 1));
-                grammar_sfx.emplace_back(
-                        std::make_pair(std::make_pair(left, right), std::make_pair(r._rule[j - 1], tag)));
-                num_sfx++;
-            }
-        }
-        size_t cc = 0;
-//    sdsl::sd_vector<>::rank_1_type rrr(&(_g.L));
-
-        //std::cout<<"L size: "<<_g.L.size()<<std::endl;
-        //std::cout<<"Number of boundaries: "<<rrr.rank(_g.L.size())-1<<std::endl;
-
-
-        //std::cout<<"\t number of suffixes "<<num_sfx<<std::endl;
-
-        /*
-         * Sorting suffixes
-         *
-         * */
-
-        //std::cout<<"Building structures for sorting"<<std::endl;
-        sdsl::int_vector<> SA(text.size(), 0);
-        sdsl::algorithm::calculate_sa((unsigned char *) text.c_str(), text.size(), SA);
-        sdsl::inv_perm_support<> SA_1(&SA);
-        sdsl::lcp_wt<> LCP;
-        sdsl::construct_im(LCP, text.c_str(), sizeof(char));
-        sdsl::rmq_succinct_sada<true, sdsl::bp_support_sada<>> rmq(&LCP);
-
-//    std::cout<<"sorting suffixes ........."<<std::endl;
-        std::sort(grammar_sfx.begin(), grammar_sfx.end(),
-                  [this, &text, &SA_1, &LCP, &rmq](
-                          const std::pair<std::pair<size_t, size_t>, std::pair<size_t, size_t> > &a,
-                          const std::pair<std::pair<size_t, size_t>, std::pair<size_t, size_t> > &b) -> bool {
-                      /*
-                       * offset of suffix in the text
-                       * */
-                      ulong a_pos = a.first.first;
-                      ulong b_pos = b.first.first;
-
-                      ulong size_a = a.first.second - a.first.first + 1;
-                      ulong size_b = b.first.second - b.first.first + 1;
-
-                      /*
-                       * is start at the same position return the shortest
-                       * */
-                      if (a_pos == b_pos)
-                          return size_a < size_b;
-
-                      auto sa_1_a = SA_1[a_pos];
-                      auto sa_1_b = SA_1[b_pos];
-
-                      int min = LCP[rmq(std::min(sa_1_a, sa_1_b) + 2, std::max(sa_1_a, sa_1_b) + 1)];
-
-                      /*
-                       * Check if one is prefix of the other
-                       * return the shortest
-                       * */
-
-                      if (std::min(size_a, size_b) <= min) {
-                          return size_a < size_b;
-                      }
-
-                      /*
-                       * then return the lowest lexicographical
-                       * */
-
-                      return sa_1_a < sa_1_b;
-
-                  });
-
-
-//    std::cout<<"end sorting suffixes "<<std::endl;
-
-/*
-    uint i = 0;
-    for (auto && sf  : grammar_sfx) {
-
-        std::string sfs;
-        sfs.resize(sf.first.second - sf.first.first + 1);
-        std::copy(text.begin()+sf.first.first,text.begin()+sf.first.second+1,sfs.begin());
-        std::cout<<++i<<"-|"<<sfs<<std::endl;
-
-    }
-*/
-
-
-        /*
-         *
-         * Building grid for 2d range search first occ
-         *
-         * */
-
-//    std::cout<<"Building grid for 2d range search first occ"<<std::endl;
-
-        std::vector<std::pair<std::pair<range_search2d::bin_long, range_search2d::bin_long>, range_search2d::bin_long>> grid_points(
-                num_sfx);
-        size_t bpair = 0;
-        for (auto &&s  :grammar_sfx) {
-            grid_points[bpair] = make_pair(make_pair(s.second.first, bpair + 1), s.second.second);
-            ++bpair;
-        }
-
-
-        grid.code = code;
-        grid.build(grid_points.begin(), grid_points.end(), not_compressed_grammar.n_rules(), num_sfx);
-//    std::cout<<"Number of columns in the grid: "<<grid.n_columns()<<std::endl;
-        //std::cout<<"***************************grid size "<<grid.size_in_bytes()*1.0/1024/1024<<std::endl;
-        ///grid.print_size();
-        ////grid.print();
-
-        /*
-         * Building Sampled Patricia Trees for suffixes.
-         *
-         * Sampling by log(u)log(log(n))/log(n)
-         * where n is the number of symbols in the repair grammar and u is the length of the original text
-         * */
-
-
-
-        uint n_rules;
-        not_compressed_grammar.permutationSortRules(text, pi, n_rules);
-        inv_pi = sdsl::inv_perm_support<>(&pi);
-        std::cout << "inv_pi: ";
-//        for (int k = 0; k < pi.size(); ++k) {
-//            std::cout << inv_pi[k] << " ";
-//        }
-//        std::cout << "\n";
-
-        C = sdsl::bit_vector(256, 0);
-        for (int i = 0; i < _g.alp.size(); ++i) {
-            uint c = (uint) _g.alp[i];
-            C[c] = 1;
+        for (unsigned char i : _g.alp) {
+            uint c = (uint) i;
+            C[c] = true;
         }
 
         c_rank1 = sdsl::bit_vector::rank_1_type(&C);
         c_sel1 = sdsl::bit_vector::select_1_type(&C);
 
-    }
-
-    void build(const std::string &text, const uint qsampling) {
-
-
-        /*
-     * Building grammar by repair algorithm
-     *
-     * */
-        std::cout << "Building grammar by repair algorithm" << std::endl;
-
-
-        grammar not_compressed_grammar;
-        not_compressed_grammar.buildRepair(text);
-
-
-        /*std::cout<<"\t number of rules "<<not_compressed_grammar.n_rules()<<std::endl;
-        std::cout<<"\t total size of rules "<<not_compressed_grammar.get_size()<<std::endl;
-        std::cout<<"\t size of the representation "<<not_compressed_grammar.size_in_bytes()*1/(1024*1024)<<"(mb)"<<std::endl;
-    */
-        //not_compressed_grammar.print(text);
-
-
-        /*
-         * Building compressed grammar
-         *
-        * */
-        //std::cout<<"Building compressed grammar"<<std::endl;
-
-//    not_compressed_grammar.print(text);
-        _g.code = code;
-        _g.build(not_compressed_grammar);
-
-        //  _g.print_size_in_bytes();
-        //std::cout<<"total size of compressed grammar*******************"<<_g.size_in_bytes()*1.0/1024/1024<<std::endl;
-        /*
-         * Build sufix of grammar
-         *
-         * */
-
-
-        //std::cout<<"Compute suffix grammar"<<std::endl;
-
-        std::vector<std::pair<std::pair<size_t, size_t>, std::pair<size_t, size_t> > > grammar_sfx;
-        const auto &gtree = _g.get_parser_tree();
-        unsigned long num_sfx = 0;
-
-        for (auto r_begin = not_compressed_grammar.begin(); r_begin != not_compressed_grammar.end(); ++r_begin) {
-
-            rule r = r_begin->second;
-            rule::r_long r_id = r_begin->first;
-            size_t node = gtree[_g.select_occ(r_id, 1)];
-
-            rule::r_long off = 0;
-
-            for (auto j = r._rule.size() - 1; j >= 1; --j) {
-                off += not_compressed_grammar[r._rule[j]].len();
-
-                size_t left = r.r - off + 1;
-                size_t right = r.r;
-
-                size_t tag = gtree.pre_order(gtree.child(node, j + 1));
-                grammar_sfx.emplace_back(
-                        std::make_pair(std::make_pair(left, right), std::make_pair(r._rule[j - 1], tag)));
-                num_sfx++;
-            }
-        }
-        size_t cc = 0;
-//    sdsl::sd_vector<>::rank_1_type rrr(&(_g.L));
-
-        //std::cout<<"L size: "<<_g.L.size()<<std::endl;
-        //std::cout<<"Number of boundaries: "<<rrr.rank(_g.L.size())-1<<std::endl;
-
-
-        //std::cout<<"\t number of suffixes "<<num_sfx<<std::endl;
-
-        /*
-         * Sorting suffixes
-         *
-         * */
-
-        //std::cout<<"Building structures for sorting"<<std::endl;
-        sdsl::int_vector<> SA(text.size(), 0);
-        sdsl::algorithm::calculate_sa((unsigned char *) text.c_str(), text.size(), SA);
-        sdsl::inv_perm_support<> SA_1(&SA);
-        sdsl::lcp_wt<> LCP;
-        sdsl::construct_im(LCP, text.c_str(), sizeof(char));
-        sdsl::rmq_succinct_sada<true, sdsl::bp_support_sada<>> rmq(&LCP);
-
-//    std::cout<<"sorting suffixes ........."<<std::endl;
-        std::sort(grammar_sfx.begin(), grammar_sfx.end(),
-                  [this, &text, &SA_1, &LCP, &rmq](
-                          const std::pair<std::pair<size_t, size_t>, std::pair<size_t, size_t> > &a,
-                          const std::pair<std::pair<size_t, size_t>, std::pair<size_t, size_t> > &b) -> bool {
-                      /*
-                       * offset of suffix in the text
-                       * */
-                      ulong a_pos = a.first.first;
-                      ulong b_pos = b.first.first;
-
-                      ulong size_a = a.first.second - a.first.first + 1;
-                      ulong size_b = b.first.second - b.first.first + 1;
-
-                      /*
-                       * is start at the same position return the shortest
-                       * */
-                      if (a_pos == b_pos)
-                          return size_a < size_b;
-
-                      auto sa_1_a = SA_1[a_pos];
-                      auto sa_1_b = SA_1[b_pos];
-
-                      int min = LCP[rmq(std::min(sa_1_a, sa_1_b) + 2, std::max(sa_1_a, sa_1_b) + 1)];
-
-                      /*
-                       * Check if one is prefix of the other
-                       * return the shortest
-                       * */
-
-                      if (std::min(size_a, size_b) <= min) {
-                          return size_a < size_b;
-                      }
-
-                      /*
-                       * then return the lowest lexicographical
-                       * */
-
-                      return sa_1_a < sa_1_b;
-
-                  });
-
-
-//    std::cout<<"end sorting suffixes "<<std::endl;
-
-//
-//    uint i = 0;
-//    for (auto && sf  : grammar_sfx) {
-//
-//        std::string sfs;
-//        sfs.resize(sf.first.second - sf.first.first + 1);
-//        std::copy(text.begin()+sf.first.first,text.begin()+sf.first.second+1,sfs.begin());
-//        std::cout<<++i<<"-|"<<sfs<<std::endl;
-//
-//    }
-
-
-
-        /*
-         *
-         * Building grid for 2d range search first occ
-         *
-         * */
-
-//    std::cout<<"Building grid for 2d range search first occ"<<std::endl;
-
-        std::vector<std::pair<std::pair<range_search2d::bin_long, range_search2d::bin_long>, range_search2d::bin_long>> grid_points(
-                num_sfx);
-        size_t bpair = 0;
-        for (auto &&s  :grammar_sfx) {
-            grid_points[bpair] = make_pair(make_pair(s.second.first, bpair + 1), s.second.second);
-            ++bpair;
-        }
-        grid.code = code;
-        grid.build(grid_points.begin(), grid_points.end(), not_compressed_grammar.n_rules(), num_sfx);
-//    std::cout<<"Number of columns in the grid: "<<grid.n_columns()<<std::endl;
-        //std::cout<<"***************************grid size "<<grid.size_in_bytes()*1.0/1024/1024<<std::endl;
-        ///grid.print_size();
-//        grid.print();
-        /*
-         * Building Sampled Patricia Trees for suffixes.
-         *
-         * Sampling by log(u)log(log(n))/log(n)
-         * where n is the number of symbols in the repair grammar and u is the length of the original text
-         * */
-
-
-
-        uint n_rules;
-        not_compressed_grammar.permutationSortRules(text, pi, n_rules);
-        inv_pi = sdsl::inv_perm_support<>(&pi);
-//        std::cout << "inv_pi: ";
-//        for (int k = 0; k < pi.size(); ++k) {
-//            std::cout << inv_pi[k] << " ";
-//        }
-//        std::cout << "\n";
-
-        C = sdsl::bit_vector(256, 0);
-        for (int i = 0; i < _g.alp.size(); ++i) {
-            uint c = (uint) _g.alp[i];
-            C[c] = 1;
-        }
-
-        c_rank1 = sdsl::bit_vector::rank_1_type(&C);
-        c_sel1 = sdsl::bit_vector::select_1_type(&C);
-
-        std::cout<<"SelfGrammarIndexBS: "<<SelfGrammarIndexBS::size_in_bytes()<<std::endl;
-
-
-//        buildSamplings(qsampling);
-//
-//        {
-//            std::ofstream fout("qgram");
-//            if (!fout.is_open())
-//                std::cout << "Error con fout\n";
-//            grammarSamp->save(fout);
-//
-//        }
-//        {
-//            std::ifstream fin("qgram");
-//            if (!fin.is_open())
-//                std::cout << "Error con fin\n";
-//            grammarSamp = Sampling::load(fin);
-//
-//        }
-//
-//        {
-//            std::ofstream fout("qgram");
-//            if (!fout.is_open())
-//                std::cout << "Error con fout\n";
-//            reverseSamp->save(fout);
-//
-//        }
-//        {
-//            std::ifstream fin("qgram");
-//            if (!fin.is_open())
-//                std::cout << "Error con fin\n";
-//            reverseSamp = Sampling::load(fin);
-//
-//        }
+#ifdef MEM_MONITOR
+    auto stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_QGRAMS_PI] = duration_cast<microseconds>(stop-start).count();;
+#endif
 
     }
 
-    void buildSamplings(uint qsampling) {
 
-        std::cout << "building GRAMMAR REVERSE SAMPLING\n";
+    void build(const std::string &text, const uint qsampling
+#ifdef MEM_MONITOR
+            , mem_monitor& mm
+#endif
+    ) {
+        build_basics(text
+#ifdef MEM_MONITOR
+                , mm
+#endif
+        );
+        buildSamplings(qsampling
+#ifdef MEM_MONITOR
+                , mm
+#endif
+                );
+    }
+
+
+
+    void buildSamplings(uint qsampling
+#ifdef MEM_MONITOR
+            , mem_monitor& mm
+#endif
+    )
+    {
+
+#ifdef PRINT_LOGS
+        std::cout<<BUILD_QGRAMS_SAMPING_RULES_REV<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+        auto start = timer::now();
+        mm.event(BUILD_QGRAMS_SAMPING_RULES_REV);
+#endif
+
         {
             // *** GRAMMAR REVERSE SAMPLING
             // *******************
             uint DELTA_SAMP = 4;
             uint rules = _g.n_rules();
-            uchar *prefix = new uchar[qsampling + 1];
-            uchar *current = new uchar[qsampling + 1];
+            auto *prefix = new uchar[qsampling + 1];
+            auto *current = new uchar[qsampling + 1];
             current[0] = '\0';
 
             uint csamp = 0;
-            uint *pointers = new uint[rules + 1];
-            uchar *samples = new uchar[rules * (qsampling + 1)];
+            auto *pointers = new uint[rules + 1];
+            auto *samples = new uchar[rules * (qsampling + 1)];
             pointers[csamp] = 0;
             csamp++;
             uchar *ptr = samples;
@@ -507,7 +161,7 @@ public:
                 uint plen = _g.len_rule(_g.m_tree[_g.select_occ(i, 1)]);
 
 
-                std::string temp = "";
+                std::string temp;
                 size_t pos = 0;
                 temp.resize(qsampling);
                 this->bp_expand_suffix(i, temp, qsampling, pos);
@@ -552,39 +206,42 @@ public:
             delete[] current;
         }
 
-        std::cout << "building GRAMMAR SAMPLING\n";
+#ifdef MEM_MONITOR
+        auto stop = timer::now();
+        CLogger::GetLogger()->model[BUILD_QGRAMS_SAMPING_RULES_REV] = duration_cast<microseconds>(stop-start).count();;
+#endif
+
+#ifdef PRINT_LOGS
+        std::cout<<BUILD_QGRAMS_SAMPING_RULES<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+        start = timer::now();
+        mm.event(BUILD_QGRAMS_SAMPING_RULES);
+#endif
+
         {
             // *** GRAMMAR SAMPLING
             // ********************
             uint DELTA_SAMP = 4;
-//            uint rules = slp->getNColumns();
             uint rules = _g.n_rules();
-            uchar *prefix = new uchar[qsampling + 1];
-            uchar *suffix = new uchar[qsampling + 1];
-            uchar *current = new uchar[qsampling + 1];
+            auto *prefix = new uchar[qsampling + 1];
+            auto *suffix = new uchar[qsampling + 1];
+            auto *current = new uchar[qsampling + 1];
             current[0] = '\0';
 
             uint csamp = 0;
-            uint *pointers = new uint[rules + 1];
-            uchar *samples = new uchar[rules * (qsampling + 1)];
+            auto *pointers = new uint[rules + 1];
+            auto *samples = new uchar[rules * (qsampling + 1)];
             pointers[csamp] = 0;
             csamp++;
             uchar *ptr = samples;
-
-//            uint terminals = C->rank1(256);
             uint terminals = _g.rank_Y(rules);
-            uint *posterms = new uint[terminals + 1];
+            auto *posterms = new uint[terminals + 1];
             terminals = 0;
-            std::cout << "rules " << rules << std::endl;
-            std::cout << "pi " << pi.size() << std::endl;
-            std::cout << "start extracting rules\n";
             for (uint i = 1; i < rules; i++) {
-//                uint crule = permutation->pi(i);
-//                uint plen = lenrules->access(crule);
                 uint crule = pi[i];
-//                std::cout << "rule " << crule << std::endl;
                 uint plen = _g.len_rule(_g.m_tree[_g.select_occ(i, 1)]);
-                std::string temp = "";
+                std::string temp;
                 size_t pos = 0;
                 temp.resize(qsampling);
                 this->bp_expand_prefix(crule, temp, qsampling, pos);
@@ -592,21 +249,6 @@ public:
                 std::copy(temp.begin(), temp.end(), prefix);
                 prefix[qsampling] = '\0';
 
-//                if (plen > qsampling)
-//                {
-//                    extractCharsReverseNoSamples(crule, plen, qsampling, suffix);
-//                    suffix[qsampling] = '\0';
-//                    for (int k=qsampling-1; k>=0; k--) { prefix[qsampling-k-1] = suffix[k]; }
-//                    prefix[qsampling] = '\0';
-//                }
-//                else
-//                {
-//                    extractCharsReverseNoSamples(crule, plen, plen, suffix);
-//                    suffix[plen] = '\0';
-//                    for (int k=plen-1; k>=0; k--) { prefix[plen-k-1] = suffix[k]; }
-//                    prefix[plen] = '\0';
-//                }
-//                std::cout << "extracted rule" + temp + "\n";
                 if (strcmp((char *) current, (char *) prefix) != 0) {
                     strcpy((char *) ptr, (char *) prefix);
                     ptr += strlen((char *) prefix);
@@ -622,10 +264,9 @@ public:
                     csamp++;
 
                     strcpy((char *) current, (char *) prefix);
-//                    std::cout << "constructed structure " + temp + "\n";
                 }
             }
-//            std::cout << "end extracting rules\n";
+
             pointers[csamp] = rules + 1;
             pointers[csamp + 1] = rules + 2;
 
@@ -641,27 +282,37 @@ public:
             delete[] suffix;
             delete[] current;
         }
-        std::cout << "building GRID SFX SAMPLING\n";
+
+#ifdef MEM_MONITOR
+        stop = timer::now();
+        CLogger::GetLogger()->model[BUILD_QGRAMS_SAMPING_RULES] = duration_cast<microseconds>(stop-start).count();;
+#endif
+
+#ifdef PRINT_LOGS
+        std::cout<<BUILD_QGRAMS_SAMPING_SEQ<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+        start = timer::now();
+        mm.event(BUILD_QGRAMS_SAMPING_SEQ);
+#endif
         {
 
 
             // *** SEQUENCE SAMPLING
             // ********************
             uint DELTA_SAMP = 4;
-//            uint lenseq = seqR->getNRows();
             uint lenseq = get_grid().n_columns();
 
-            uchar *prefix = new uchar[qsampling+1];
-            uchar *current = new uchar[qsampling+1];
+            auto *prefix = new uchar[qsampling+1];
+            auto *current = new uchar[qsampling+1];
             current[0] = '\0';
 
             uint csamp = 0;
             uint *pointers = new uint[lenseq+1];
-            uchar *samples = new uchar[lenseq*(qsampling+1)];
+            auto *samples = new uchar[lenseq*(qsampling+1)];
             pointers[csamp] = 0; csamp++;
             uchar *ptr = samples;
 
-//            uint terminals = C->rank1(256);
             uint terminals = _g.rank_Y(_g.n_rules());
             uint *posterms = new uint[terminals+1];
             terminals = 0;
@@ -671,7 +322,6 @@ public:
                 std::string ss;
                 ss.resize(qsampling);
                 this->expand_grammar_sfx(i,ss,qsampling);
-//                ss[pos] = '\0';
                 std::copy(ss.begin(), ss.end(), prefix);
                 prefix[ss.size()] = '\0';
 
@@ -720,64 +370,57 @@ public:
             delete [] prefix; delete [] current;
         }
 
-
-        std::cout<<"SelfGrammarIndexBSQ: "<<size_in_bytes()<<std::endl;
-
+#ifdef MEM_MONITOR
+    stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_QGRAMS_SAMPING_SEQ] = duration_cast<microseconds>(stop-start).count();;
+#endif
 
     }
 
-    void buildSamplingsFromGrammar(std::fstream &repair_g, const string &text,const uint &samplings) {
 
-        grammar g;
-        g.load(repair_g);
+    void buildSamplings(const std::string &text, std::fstream &repair_g, const uint& qsampling
+#ifdef MEM_MONITOR
+            , mem_monitor& mm
+#endif
+    ){
 
-        uint n_rules;
+        grammar not_compressed_grammar;
+        not_compressed_grammar.load(repair_g);
 
-        g.preprocess(text);
+#ifdef PRINT_LOGS
+        std::cout<<BUILD_QGRAMS_PI<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+        auto start = timer::now();
+        mm.event(BUILD_QGRAMS_PI);
+#endif
+        not_compressed_grammar.permutationSortRules(text, pi);
+        inv_pi = sdsl::inv_perm_support<INV_PI_T_QGRAM>(&pi);
 
-        std::cout << "sorting rules (" << g.n_rules() << ")\n";
+        C = sdsl::bit_vector(256, false);
 
-
-        g.permutationSortRules(text, pi, n_rules);
-        inv_pi = sdsl::inv_perm_support<>(&pi);
-
-        C = sdsl::bit_vector(256, 0);
-        for (int i = 0; i < _g.alp.size(); ++i) {
-            uint c = (uint) _g.alp[i];
-            C[c] = 1;
+        for (unsigned char i : _g.alp) {
+            uint c = (uint) i;
+            C[c] = true;
         }
 
         c_rank1 = sdsl::bit_vector::rank_1_type(&C);
         c_sel1 = sdsl::bit_vector::select_1_type(&C);
 
-        buildSamplings(samplings);
+#ifdef MEM_MONITOR
+        auto stop = timer::now();
+        CLogger::GetLogger()->model[BUILD_QGRAMS_PI] = duration_cast<microseconds>(stop-start).count();;
+#endif
+
+        buildSamplings(qsampling
+#ifdef MEM_MONITOR
+                ,mm
+#endif
+                );
 
 
     }
-    void buildSamplingsFromGrammar(grammar &g, const string &text) {
 
-
-        uint n_rules;
-
-        g.preprocess(text);
-
-        std::cout << "sorting rules (" << g.n_rules() << ")\n";
-
-
-        g.permutationSortRules(text, pi, n_rules);
-        inv_pi = sdsl::inv_perm_support<>(&pi);
-
-        C = sdsl::bit_vector(256, 0);
-        for (int i = 0; i < _g.alp.size(); ++i) {
-            uint c = (uint) _g.alp[i];
-            C[c] = 1;
-        }
-
-        c_rank1 = sdsl::bit_vector::rank_1_type(&C);
-        c_sel1 = sdsl::bit_vector::select_1_type(&C);
-
-
-    }
 
     void dfs_expand_suffix2(const grammar_representation::g_long &X, std::string &s, const size_t &l, size_t &pos) const {
 
@@ -792,15 +435,12 @@ public:
         uint off = 0;
         dfs_expand_prefix_aux2(node,X, s, off, l, pos);
     }
-
-
-    /*
+    /**
      *
      * node in dfuds representation to expand
      * X the label corresponding to the rule to expand
      * off number of symbols already expanded
      * l
-     *
      * */
     void dfs_expand_suffix_aux2( uint &node,const uint& X, std::string &s,uint &off,const size_t &l,size_t &pos) const {
 
@@ -853,7 +493,7 @@ public:
              * */
 
 
-            uchar *ss = new uchar[qs];
+            auto *ss = new uchar[qs];
 
             grammarSamp->extract(X, ss);
 
@@ -876,7 +516,7 @@ public:
             off += diff;
             pos += diff;
 
-            delete ss;
+            delete[] ss;
 
             if(pos == l || min_len == len_rule) return ;
 
@@ -954,7 +594,7 @@ public:
             /*
              * if we get a node where there are new sampled symbols that we need to expand
              * */
-            uchar *ss = new uchar[qs];
+            auto *ss = new uchar[qs];
             uint rev_rules = inv_pi[X];
             reverseSamp->extract(rev_rules, ss);
             uint min_len = (qs < len_rule) ? qs : len_rule;
@@ -974,7 +614,7 @@ public:
             pos += diff;
 
 
-            delete ss;
+            delete[] ss;
 
             if(pos == l || min_len == len_rule ) return ;
 
@@ -1071,7 +711,7 @@ public:
             /*
              * if we get a node where there are new sampled symbols that we need to expand
              * */
-            uchar *ss = new uchar[qs];
+            auto *ss = new uchar[qs];
             grammarSamp->extract(X, ss);
             uint min_len = (qs < len_rule) ? qs : len_rule;
             ss[min_len] = '\0';
@@ -1079,7 +719,7 @@ public:
             for (int i = off; i < min_len; ++i)
             {
                 if(itera == end){
-                    delete ss;
+                    delete[] ss;
                     return 0;
                 }
 
@@ -1089,7 +729,7 @@ public:
                 ++pos;++off;
             }
 
-            delete ss;
+            delete[] ss;
 
             if(itera == end||min_len == len_rule)
             {
@@ -1240,7 +880,7 @@ public:
             /*
              * if we get a node where there are new sampled symbols that we need to expand
              * */
-            uchar *ss = new uchar[qs];
+            auto *ss = new uchar[qs];
             reverseSamp->extract(inv_pi[X], ss);
             uint min_len = (qs < len_rule) ? qs : len_rule;
             ss[min_len] = '\0';
@@ -1248,7 +888,7 @@ public:
             for (int i = off; i < min_len; ++i)
             {
                 if(itera == end){
-                    delete ss;
+                    delete[] ss;
                     return 0;
                 }
 
@@ -1259,7 +899,7 @@ public:
                 ++pos;++off;
             }
 
-            delete ss;
+            delete[] ss;
 
             if(itera == end||min_len == len_rule)
             {
@@ -1360,7 +1000,7 @@ public:
 
 
 }
-
+#ifdef DEBUG
     void printSampling() {
 
 
@@ -1371,7 +1011,7 @@ public:
 
 
         for (uint i = 1; i < _g.n_rules(); ++i) {
-            uchar *s = new uchar[100];
+            auto *s = new uchar[100];
 
             grammarSamp->extract(i, s);
 
@@ -1387,7 +1027,7 @@ public:
 
 
         for (uint i = 1; i < _g.n_rules(); ++i) {
-            uchar *s = new uchar[100];
+            auto *s = new uchar[100];
 
             reverseSamp->extract(i, s);
 
@@ -1396,39 +1036,35 @@ public:
         }
 
     }
-
-    void load(fstream &f) {
+#endif
+    void load(fstream &f) override {
 
         SelfGrammarIndexBS::load(f);
         sdsl::load(pi, f);
         sdsl::load(C, f);
         c_rank1 = sdsl::bit_vector::rank_1_type(&C);
         c_sel1 = sdsl::bit_vector::select_1_type(&C);
-        inv_pi = sdsl::inv_perm_support<>(&pi);
+        inv_pi = sdsl::inv_perm_support<INV_PI_T_QGRAM>(&pi);
 
     }
 
-    void load_basics(fstream &f) {
-//        std::cout<<"loading.."<<std::endl;
+    void load_basics(fstream &f) override {
         SelfGrammarIndexBS::load_basics(f);
-
-//        std::cout<<"loaded.."<<std::endl;
     }
 
-    void save(fstream &f) {
+    void save(fstream &f) override {
         SelfGrammarIndexBS::save(f);
         sdsl::serialize(pi, f);
         sdsl::serialize(C, f);
-
     }
 
-    void saveSampling(std::ofstream &G, std::ofstream &GR,std::ofstream &GS) {
+    void saveSampling(std::ofstream &G, std::ofstream &GR,std::ofstream &GS) const {
         grammarSamp->save(G);
         reverseSamp->save(GR);
         sequenceSamp->save(GS);
     }
 
-    void saveSampling(std::ofstream &f, std::ofstream &G, std::ofstream &GR,std::ofstream &GS) {
+    void saveSampling(std::ofstream &f, std::ofstream &G, std::ofstream &GR,std::ofstream &GS) const {
 
         sdsl::serialize(pi, f);
         sdsl::serialize(C, f);
@@ -1444,7 +1080,7 @@ public:
         sdsl::load(C, f);
         c_rank1 = sdsl::bit_vector::rank_1_type(&C);
         c_sel1 = sdsl::bit_vector::select_1_type(&C);
-        inv_pi = sdsl::inv_perm_support<>(&pi);
+        inv_pi = sdsl::inv_perm_support<INV_PI_T_QGRAM>(&pi);
 
 
         grammarSamp = Sampling::load(G);
@@ -1452,6 +1088,7 @@ public:
         sequenceSamp= Sampling::load(GS);
 
     }
+
     void loadSampling(std::ifstream &G, std::ifstream &GR, std::ifstream &GS) {
 
         grammarSamp = Sampling::load(G);
@@ -1461,7 +1098,8 @@ public:
     }
 
     size_t size_in_bytes() {
-        return SelfGrammarIndexBS::size_in_bytes() + grammarSamp->getSize() + reverseSamp->getSize() + sequenceSamp->getSize() +
+        return SelfGrammarIndexBS::size_in_bytes()
+                + grammarSamp->getSize() + reverseSamp->getSize() + sequenceSamp->getSize() +
                sdsl::size_in_bytes(pi) + sdsl::size_in_bytes(inv_pi) + sdsl::size_in_bytes(C) +
                sdsl::size_in_bytes(c_sel1) + sdsl::size_in_bytes(c_rank1);
     }
@@ -1592,6 +1230,7 @@ public:
 
 
     }
+
     virtual void qgram_locate_prefix_search( std::string & pattern, std::vector<uint> & occ){
 
         if(pattern.size() == 1)
@@ -1741,7 +1380,7 @@ public:
             if(!found)
                 continue;
             binary_relation::bin_long c1 = ls;
-            hs = right > n_sj?n_sj:right;;
+            hs = right > n_sj?n_sj:right;
 
             found = false;
 
@@ -1784,6 +1423,7 @@ public:
 
 
     }
+
     virtual void qgram_trie_locate(std::string & pattern, std::vector<uint> & occ){
 
 
@@ -1930,7 +1570,7 @@ public:
             if(!found)
                 continue;
             binary_relation::bin_long c1 = ls;
-            hs = right > n_sj?n_sj:right;;
+            hs = right > n_sj?n_sj:right;
 
             found = false;
 
@@ -1970,6 +1610,7 @@ public:
         }
 
     }
+
     virtual void qgram_dfs_locate(std::string & pattern, std::vector<uint> & occ){
 
         if(pattern.size() == 1)
@@ -1992,7 +1633,7 @@ public:
          * */
         for (size_t  i = 1; i <= p_n ; ++i)
         {
-
+//            std::cout<<"partition start i:"<<i<<"- pn:"<<p_n<<std::endl;
             auto itera = pattern.begin() + i-1;
 
             uint _len_p = itera-pattern.begin()+1;
@@ -2090,9 +1731,10 @@ public:
 //            std::cout<<"lb:"<<lb<<std::endl;
 //            std::cout<<"rb:"<<rb<<std::endl;
 //            std::cout<<"first:"<<first<<std::endl;
-//            std::cout<<"////////////////////\n";
+//            std::cout<<strlen(ss)<<"////////////////////\n";
             if(_len_p!=0)
                 sequenceSamp->locatePrefix((uchar*)ss,strlen(ss),&left,&right,&lb,&rb);
+//            std::cout<<"sequenceSamp->locatePrefix((uchar*)ss,strlen(ss),&left,&right,&lb,&rb)"<<std::endl;
 
             if(left > right) std::swap(left,right);
 
@@ -2102,6 +1744,7 @@ public:
                 continue;
 
             grammar_representation::g_long ls = left,hs = right > n_sj?n_sj:right;
+
 
             found = false;
             lower_bound(found, ls,hs,[&itera,&pattern,this](const grammar_representation::g_long & a)->int
@@ -2115,7 +1758,7 @@ public:
             if(!found)
                 continue;
             binary_relation::bin_long c1 = ls;
-            hs = right > n_sj?n_sj:right;;
+            hs = right > n_sj?n_sj:right;
 
             found = false;
 
@@ -2135,9 +1778,10 @@ public:
 
             long len = itera-pattern.begin() +1;
 
-
             find_second_occ(r1,r2,c1,c2,len,occ);
-//            const auto& g_tree = _g.get_parser_tree();
+//            std::cout<<"partition end\n";
+
+            //            const auto& g_tree = _g.get_parser_tree();
 //            std::vector< std::pair<size_t,size_t> > pairs;
 //            grid.range2(r1,r2,c1,c2,pairs);
 //
@@ -2192,21 +1836,25 @@ public:
 
         return r;
     }
-    virtual void display(const std::size_t& i, const std::size_t& j, std::string & s){
+
+    void display(const std::size_t& i, const std::size_t& j, std::string & s) override{
 //        s.resize(j - i + 1);
 //        size_t p = 0;
-        SelfGrammarIndex::display(i,j,s);
+        SelfGrammarIndexBS::display(i,j,s);
     }
+
     virtual void display_qgram(const std::size_t& i, const std::size_t& j, std::string & s){
         s.resize(j - i + 1);
         size_t p = 0;
         expand_interval_qgram(_g.m_tree.root(), make_pair(i, j), s, p);
     }
+
     virtual void display_qgram_rec(const std::size_t& i, const std::size_t& j, std::string & s){
         s.resize(j - i + 1);
         size_t p = 0;s.resize(j - i + 1);
         expand_interval_qgram_rec(_g.m_tree.root(), make_pair(i, j), s, p);
     }
+
     void expand_interval_qgram_rec(const size_t &node, const std::pair<size_t, size_t> &range, std::string &s, std::size_t &pos){
 
 
@@ -2337,6 +1985,7 @@ public:
         }
 
     }
+
     void expand_interval_qgram(const size_t &node, const std::pair<size_t, size_t> &range, std::string &s, std::size_t &pos){
 
         auto llb = _g.rank_L(range.first) + _g.L[range.first]; //left leaf begin
@@ -2485,6 +2134,7 @@ public:
         }
 
     }
+
     virtual int match_suffix(const uint &X, std::string::iterator &itera,std::string::iterator &end){
         uint off = 0, pos = 0;
 
@@ -2500,6 +2150,7 @@ public:
 
         return r;
     }
+
     virtual int match_prefix(const uint &X, std::string::iterator &itera,std::string::iterator &end){
 
         uint off = 0, pos = 0;
@@ -2517,6 +2168,8 @@ public:
         return r;
 
     }
+
+
 };
 
 #endif //IMPROVED_GRAMMAR_INDEX_SELFGRAMMARINDEXBSQ_H

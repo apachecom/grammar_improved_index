@@ -71,5 +71,5 @@ namespace m_patricia {
 
     };
 
-};
+}
 #endif //IMPROVED_GRAMMAR_INDEX_COMPACT_PATRICIA_TREE_H

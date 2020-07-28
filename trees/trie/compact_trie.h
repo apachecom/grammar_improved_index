@@ -10,25 +10,25 @@
 #include "Trie.h"
 #include "../dfuds_tree.h"
 #include <sdsl/inv_perm_support.hpp>
-
+#include "../../macros.h"
 
 class compact_trie {
 
     public:
         typedef unsigned int c_trie_long;
-        typedef _trie::Trie<std::vector<c_trie_long>> T;
+        typedef trie::Trie<std::vector<c_trie_long>> T;
         typedef bp_tree tree;
         typedef sdsl::int_vector<> permutation_seq;
-        typedef sdsl::inv_perm_support<> inv_permutation_seq;
+        typedef sdsl::inv_perm_support<INV_PI_T_TRIE> inv_permutation_seq;
 
     //protected:
         tree m_tree;
         permutation_seq seq;
         inv_permutation_seq inv_seq;
 
-    ///public:
+    public:
         compact_trie();
-        ~compact_trie();
+        virtual ~compact_trie();
         void build( const T&);
         /*
          * Return de preorder of the node with the label

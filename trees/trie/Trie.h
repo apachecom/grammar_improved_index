@@ -8,10 +8,7 @@
 #include <fstream>
 #include <sdsl/io.hpp>
 
-namespace _trie{
-
-
-
+namespace trie{
 
     struct node{
 
@@ -26,7 +23,7 @@ namespace _trie{
 
         std::map<key,pnode> childs;
 
-        node(uint& _id, bool l = false):id(_id), leaf(l)
+        explicit node(uint& _id, bool l = false):id(_id), leaf(l)
         {
 
         }
@@ -37,8 +34,8 @@ namespace _trie{
             }
         }
 
-        uint size_in_bytes(){
-            return (sizeof(pnode)+sizeof(key))*childs.size() + 1 + sizeof(uint);
+        uint size_in_bytes() const{
+            return (sizeof(uint64_t)+sizeof(key))*childs.size() + 1 + sizeof(uint);
         }
 
         void save(std::fstream& f) const

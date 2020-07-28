@@ -6,9 +6,9 @@
 #include <fstream>
 #include <benchmark/benchmark.h>
 
-//#include <slp/RePairSLPIndex.h>
+#include <slp/RePairSLPIndex.h>
 #include "../SelfGrammarIndexBS.h"
-//#include <ri/r_index.hpp>
+#include <ri/r_index.hpp>
 #include "../SelfGrammarIndexPTS.h"
 #include "../SelfGrammarIndexBSQ.h"
 #include "sdsl/io.hpp"
@@ -37,50 +37,50 @@ void load_ptos(const std::string& pos_file){
     f.close();
 }
 
-//
-//auto slpdisplay = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling
-////#ifdef MEM_MONITOR
-////        , const std::string file_mem_monitor
-////#endif
-//){
-//    /**
-//     * load slpindex
-//     * */
-//
-//
-//    cds_static::RePairSLPIndex* idx_slp;
-//    std::string filename = file_index+"-q"+std::to_string(sampling);
-//    char* _f = (char *)filename.c_str();
-//    int q = cds_static::RePairSLPIndex::load(_f, &idx_slp);
-//
-//
-////    std::cout<<"slp-index loaded"<<std::endl;
-//
-//    uint nocc,ptt;
-//
-//    for (auto _ : st)
-//    {
-//        ptt = 0;
-////#ifdef MEM_MONITOR
-////        mm.event("R-INDEX-BUILD");
-////#endif
-//        for (uint ii=  0; ii < MAX_SAMPLES &&  ii < pos.size();++ii) {
-//           unsigned char * s = idx_slp->RePairSLPIndex::extract(pos[ii],pos[ii]+len);
-//            delete s;
-//            ++ptt;
-//        }
-//
-////        std::cout<<nocc<<std::endl;
-////        sleep(2);
-//
-//    }
-//
-//    st.counters["pLen"] = len;
-//    st.counters["queries"] = ptt;
-//
-//};
 
-auto gibsdisplay = [](benchmark::State &st, const string &file_index, const uint& len
+auto slpdisplay = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling
+//#ifdef MEM_MONITOR
+//        , const std::string file_mem_monitor
+//#endif
+){
+    /**
+     * load slpindex
+     * */
+
+
+    cds_static::RePairSLPIndex* idx_slp;
+    std::string filename = file_index+"-q"+std::to_string(sampling);
+    char* _f = (char *)filename.c_str();
+    int q = cds_static::RePairSLPIndex::load(_f, &idx_slp);
+
+
+//    std::cout<<"slp-index loaded"<<std::endl;
+
+    uint nocc,ptt;
+
+    for (auto _ : st)
+    {
+        ptt = 0;
+//#ifdef MEM_MONITOR
+//        mm.event("R-INDEX-BUILD");
+//#endif
+        for (uint ii=  0; ii < MAX_SAMPLES &&  ii < pos.size();++ii) {
+           unsigned char * s = idx_slp->RePairSLPIndex::extract(pos[ii],pos[ii]+len);
+            delete s;
+            ++ptt;
+        }
+
+//        std::cout<<nocc<<std::endl;
+//        sleep(2);
+
+    }
+
+    st.counters["pLen"] = len;
+    st.counters["queries"] = ptt;
+
+};
+
+auto gibsdisplay = [](benchmark::State &st, const string &file_index, const uint& len, bool trie = false
 //#ifdef MEM_MONITOR
 //        , const std::string file_mem_monitor
 //#endif
@@ -108,7 +108,10 @@ auto gibsdisplay = [](benchmark::State &st, const string &file_index, const uint
 //#endif
         for (uint ii=  0; ii < MAX_SAMPLES &&  ii < pos.size();++ii) {
 
-            idx_gibs.display_L(pos[ii],pos[ii]+len,ss);
+            if(trie)
+                idx_gibs.display_L_trie(pos[ii],pos[ii]+len,ss);
+            else
+                idx_gibs.display_L(pos[ii],pos[ii]+len,ss);
             queries++;
         }
 
@@ -124,7 +127,7 @@ auto gibsdisplay = [](benchmark::State &st, const string &file_index, const uint
 
 
 
-auto gibsdisplaybs = [](benchmark::State &st, const string &file_index, const uint& len
+auto gibsdisplaybs = [](benchmark::State &st, const string &file_index, const uint& len, bool trie = false
 //#ifdef MEM_MONITOR
 //        , const std::string file_mem_monitor
 //#endif
@@ -152,7 +155,10 @@ auto gibsdisplaybs = [](benchmark::State &st, const string &file_index, const ui
 //#endif
         for (uint ii=  0; ii < MAX_SAMPLES &&  ii < pos.size();++ii) {
 
-            idx_gibs.display(pos[ii],pos[ii]+len,ss);
+            if(trie)
+                idx_gibs.display_trie(pos[ii],pos[ii]+len,ss);
+            else
+                idx_gibs.display(pos[ii],pos[ii]+len,ss);
             queries++;
         }
 
@@ -165,7 +171,7 @@ auto gibsdisplaybs = [](benchmark::State &st, const string &file_index, const ui
 
 
 
-auto giqgramdisplay = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling
+auto giqgramdisplay = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling, int op = 0
 //#ifdef MEM_MONITOR
 //        , const std::string file_mem_monitor
 //#endif
@@ -200,7 +206,11 @@ auto giqgramdisplay = [](benchmark::State &st, const string &file_index, const u
 //#endif
         for (uint ii=  0; ii < MAX_SAMPLES &&  ii < pos.size();++ii) {
 
-            idx_giqbs.display_qgram(pos[ii],pos[ii]+len,ss);
+            if(op == 1)
+                idx_giqbs.display_qgram_rec(pos[ii],pos[ii]+len,ss);
+            else
+                idx_giqbs.display_qgram(pos[ii],pos[ii]+len,ss);
+
             queries++;
         }
 
@@ -249,16 +259,30 @@ int main (int argc, char *argv[] ){
 
 //        std::cout<<"Searching patterns len:"<<i<<std::endl;
 
-//        benchmark::RegisterBenchmark("SLP-Index<4>" ,slpdisplay,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
-//        benchmark::RegisterBenchmark("SLP-Index<8>" ,slpdisplay,index_prefix,i,8)->Unit({benchmark::kMicrosecond});;
-//        benchmark::RegisterBenchmark("SLP-Index<12>",slpdisplay,index_prefix,i,12)->Unit({benchmark::kMicrosecond});;
-//        benchmark::RegisterBenchmark("SLP-Index<16>",slpdisplay,index_prefix,i,16)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("G-INDEX-RANK-PHRASES",gibsdisplay,index_prefix,i)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("G-INDEX-BS",gibsdisplaybs,index_prefix,i)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>",giqgramdisplay,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>",giqgramdisplay,index_prefix,i,8)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>",giqgramdisplay,index_prefix,i,12)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>",giqgramdisplay,index_prefix,i,16)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("SLP-Index<4>" ,slpdisplay,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("SLP-Index<8>" ,slpdisplay,index_prefix,i,8)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("SLP-Index<12>",slpdisplay,index_prefix,i,12)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("SLP-Index<16>",slpdisplay,index_prefix,i,16)->Unit({benchmark::kMicrosecond});;
+
+        benchmark::RegisterBenchmark("G-INDEX-RANK-PHRASES-NOTRIE",gibsdisplay,index_prefix,i)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-RANK-PHRASES-TRIE",gibsdisplay,index_prefix,i,true)->Unit({benchmark::kMicrosecond});;
+
+        benchmark::RegisterBenchmark("G_INDEX_BINARY_SEARCH_LEAF-NOTRIE",gibsdisplaybs,index_prefix,i)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G_INDEX_BINARY_SEARCH_LEAF-TRIE",gibsdisplaybs,index_prefix,i,true)->Unit({benchmark::kMicrosecond});;
+
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<2>_RANK_PHRASES-DFS",giqgramdisplay,index_prefix,i,2)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>_RANK_PHRASES-DFS",giqgramdisplay,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<6>_RANK_PHRASES-DFS",giqgramdisplay,index_prefix,i,6)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>_RANK_PHRASES-DFS",giqgramdisplay,index_prefix,i,8)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<10>_RANK_PHRASES-DFS",giqgramdisplay,index_prefix,i,10)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>_RANK_PHRASES-DFS",giqgramdisplay,index_prefix,i,12)->Unit({benchmark::kMicrosecond});;
+
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<2>_RANK_PHRASES-REC",giqgramdisplay,index_prefix,i,2,1)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>_RANK_PHRASES-REC",giqgramdisplay,index_prefix,i,4,1)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<6>_RANK_PHRASES-REC",giqgramdisplay,index_prefix,i,6,1)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>_RANK_PHRASES-REC",giqgramdisplay,index_prefix,i,8,1)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<10>_RANK_PHRASES-REC",giqgramdisplay,index_prefix,i,10,1)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>_RANK_PHRASES-REC",giqgramdisplay,index_prefix,i,12,1)->Unit({benchmark::kMicrosecond});;
 
     }
 

@@ -12,6 +12,16 @@
 #include "trees/dfuds_tree.h"
 #include "utils/grammar.h"
 #include "trees/trie/compact_trie.h"
+#include "macros.h"
+#include <ctime>
+
+#ifdef MEM_MONITOR
+#include "utils/memory/mem_monitor/mem_monitor.hpp"
+#include "utils/CLogger.h"
+using timer = std::chrono::high_resolution_clock;
+using namespace std::chrono;
+#endif
+
 
 class compressed_grammar {
 
@@ -20,61 +30,42 @@ class compressed_grammar {
         typedef unsigned int g_long;
         typedef grammar plain_grammar;
         typedef  dfuds::dfuds_tree parser_tree;
-        //typedef  sdsl::wt_ap<> wavelet_tree;
-        typedef  sdsl::wt_gmr<> wavelet_tree;
-        //typedef  sdsl::wt_gmr_rs<> wavelet_tree;
-        //typedef  sdsl::rrr_vector<> z_vector;
+
+        typedef  sdsl::wt_gmr<
+            sdsl::int_vector<>,
+            sdsl::inv_multi_perm_support<INV_PI_T>
+        > wavelet_tree;
+
         typedef  sdsl::sd_vector<>  l_vector;
         typedef  sdsl::sd_vector<> z_vector;
         typedef  sdsl::sd_vector<> y_vector;
-        //typedef  sdsl::sd_vector<> l_vector;
-        /*typedef  sdsl::bit_vector z_vector;
-        typedef  sdsl::bit_vector y_vector;
-        typedef  sdsl::bit_vector l_vector;*/
 
         typedef  sdsl::int_vector<> compact_perm;
         typedef  sdsl::inv_perm_support<> inv_compact_perm;
 
-
-    //protected:
         parser_tree m_tree;
 
         z_vector Z; // Z bitmap with the first position of symbols in preorder sequence
         z_vector::rank_1_type rank1_Z;
-        //z_vector::rank_0_type rank0_Z;
         z_vector::select_1_type select1_Z;
         z_vector::select_0_type select0_Z;
-
         wavelet_tree X_p;  // X sequence of preorder grammar tree symbols removing first aparation
-
-
         compact_perm F; // is a permutation of Xj such that F[i] = Xj only and only if Xj is the ith diferent symbol in preorder
         inv_compact_perm F_inv; //Inv-Permutation of F
-
         y_vector Y; // marks the rules Xi -> a
         y_vector::rank_1_type rank_Y;
         y_vector::select_1_type select_Y;
-
         l_vector L; // marks the init position of each Xi in T
         l_vector::select_1_type select_L;
         l_vector::rank_1_type rank_L;
-
-
-        /*
-         * last occ of every simbol in X_p
-         * */
-        ///ls_occ_vector l_occ_xp;
         /*
          * Trie store the lefth/right most path of every node in the parser tree that is not a leaf
          */
         compact_trie left_path;
         compact_trie right_path;
-
         /*
          * alphabeth
          * */
-
-
         std::vector<unsigned char> alp;
 
     public:
@@ -82,32 +73,21 @@ class compressed_grammar {
 
         compressed_grammar();
 
-        ~compressed_grammar();
+        virtual ~compressed_grammar();
 
-        void build(plain_grammar&);
-        template <typename Suff>
-        void build(plain_grammar&, Suff & sfx )
-        {
-
-
-        }
-
+        void build(plain_grammar&
+#ifdef MEM_MONITOR
+                ,mem_monitor& mm
+#endif
+        );
         const wavelet_tree & get_Xp() const ;
-        //const sdsl::wt_gmr_rs<> & get_Xp() const{
-        // return Xp;
-        // }
-        //const sdsl::wt_ap<> & get_Xp() const ;
         const compact_perm & get_F() const ;
-
         void set_X_p( const wavelet_tree& );
-
         void set_F(const compact_perm& );
-
         void set_Z( const z_vector &);
-
         void set_Y( const y_vector &);
-
         void set_L( const l_vector &);
+
         /*
          * Return the number of rules
          * */
@@ -206,23 +186,18 @@ class compressed_grammar {
 
         g_long get_size_text() const;
 
-        const l_vector get_L()const {
+        l_vector get_L()const {
             return L;
         }
 
-        size_t  rank_l(const size_t &i){
+        size_t  rank_l(const size_t &i) const{
             return rank_L(i);
         }
 
-        const inv_compact_perm get_F_inv()const{ return F_inv;}
+        inv_compact_perm get_F_inv()const{ return F_inv;}
 
-        const std::vector<unsigned char> get_alp() const;
-        /*
-         *
-         * */
-        bool isLastOcc(const g_long &) const;
-
-        void print_size_in_bytes();
+        std::vector<unsigned char> get_alp() const;
+        void print_size_in_bytes() const;
 
         void save(std::fstream&);
 
@@ -262,8 +237,6 @@ class compressed_grammar {
 
         void left_most_path(const plain_grammar&);
         void right_most_path(const plain_grammar&);
-
-
         void left_most_path();
         void right_most_path();
 

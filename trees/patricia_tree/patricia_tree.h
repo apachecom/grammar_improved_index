@@ -25,13 +25,13 @@ namespace m_patricia {
         ulong id;
         ulong ptr_leaf;
         bool leaf;
-        char ch;
+        char ch{};
 
         std::multimap<unsigned char, edge> childs;
         std::vector<ulong> ids;
 
 
-        node(const ulong &id, const ulong &leaf, bool l = 0, ulong m = 1) : id(id), ptr_leaf(leaf), leaf(l) {
+        node(const ulong &id, const ulong &leaf, bool l = false, ulong m = 1) : id(id), ptr_leaf(leaf), leaf(l) {
             childs.clear();
             ids.clear();
             ids.emplace_back(id);
@@ -242,7 +242,7 @@ namespace m_patricia {
             size_t num = 0;
             dfs(_root, [&num, this](const node *n, const char &a, const ulong &j) {
 
-                if (n->childs.empty() && n->ids.size() > 0) {
+                if (n->childs.empty() && !n->ids.empty()) {
                     num += n->ids.size();
                     return false;
                 }
@@ -287,7 +287,7 @@ namespace m_patricia {
                 for (auto &&item :n->childs) {
                     std::cout<<"\t< "<<item.first<<"("<<uint(item.first)<<"),<"<<item.second.first<<", "<<item.second.second->id<<"> >\n";
                 }
-                if(n->childs.size() == 0)
+                if(n->childs.empty())
                     std::cout<<"("<<n->ids.size()<<")\n";
 
                 return true;
@@ -371,7 +371,7 @@ namespace m_patricia {
     class string_pairs:std::pair<size_t ,size_t >{
         const std::string* text;
         uint id;
-        uint c;
+        uint c{};
 
     public:
         string_pairs():text(nullptr),id(0),c(0){
@@ -385,7 +385,7 @@ namespace m_patricia {
             second = 0;
         }
 
-        string_pairs(const string_pairs& P){
+        string_pairs(const string_pairs& P) : pair(P) {
             text = P.text;
             id = P.id;
             c = P.c;
@@ -402,7 +402,7 @@ namespace m_patricia {
             return *this;
         }
 
-        uint get_id(){ return id;}
+        uint get_id() const{ return id;}
         void set_left(size_t t){ first = t;}
         void set_right(size_t t){ second = t;}
         size_t get_left(){ return first;}
@@ -460,7 +460,7 @@ namespace m_patricia {
     class rev_string_pairs:std::pair<size_t ,size_t >{
         const std::string* text;
         uint id;
-        uint c;
+        uint c{};
 
     public:
         rev_string_pairs():text(nullptr),id(0),c(0){
@@ -474,7 +474,7 @@ namespace m_patricia {
             second = 0;
         }
 
-        rev_string_pairs(const rev_string_pairs& P){
+        rev_string_pairs(const rev_string_pairs& P) : pair(P) {
             text = P.text;
             id = P.id;
             c = P.c;
@@ -491,7 +491,7 @@ namespace m_patricia {
             return *this;
         }
 
-        uint get_id(){ return id;}
+        uint get_id() const{ return id;}
         void set_left(size_t t){ first = t;}
         void set_right(size_t t){ second = t;}
         size_t get_left(){ return first;}
@@ -550,6 +550,6 @@ namespace m_patricia {
 
 
 
-};
+}
 
 #endif //IMPROVED_GRAMMAR_INDEX_PATRICIA_TREE_H

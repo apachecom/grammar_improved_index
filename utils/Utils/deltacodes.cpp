@@ -64,9 +64,11 @@ unsigned int DeltaCodes::select(unsigned int total){
     unsigned int check = total%this->sampling;
     unsigned int s = this->sampled_total[pos];
     unsigned int pointer = this->sampled_pointer[pos];
+
     for(unsigned int i=0;i<check;i++){
         s += decodeDelta(this->deltacodes,&pointer);
     }
+//    std::cout<<"SAAS\n";
     return s-1;
 }
 
@@ -187,7 +189,8 @@ unsigned int DeltaCodes::decodeDelta(unsigned int* deltaCodes, unsigned int* pos
 
     //Compute number of 0's (p) in the left of the code
     unsigned int p = 1;
-    while(!(code & 0x80000000)) {
+
+    while(code != 0 && !(code & 0x80000000)) {
 	    code <<= 1;
 	    p++;
     }

@@ -38,7 +38,7 @@ namespace dfuds {
 
         void build(const sdsl::bit_vector &);
 
-        inline short root()const{ return 3;}
+        static inline short root(){ return 3;}
         /*
          * return the number of nodes in the subtree of the node
          * */

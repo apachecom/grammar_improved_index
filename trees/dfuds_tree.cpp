@@ -169,12 +169,12 @@ void dfuds_tree::load(std::fstream& f){
 
 void dfuds_tree::print() const {
 
-    for (size_t i = 0; i < bit_vector.size() ; ++i) {
-        std::cout<<bit_vector[i];
+    for (unsigned long i : bit_vector) {
+        std::cout<<i;
     }
     std::cout<<std::endl;
-    for (size_t i = 0; i < bit_vector.size() ; ++i) {
-        if(bit_vector[i])
+    for (unsigned long i : bit_vector) {
+        if(i)
             std::cout<<'(';
         else
             std::cout<<')';

@@ -8,9 +8,18 @@
 
 #include <vector>
 #include <map>
-#include <assert.h>
+#include <cassert>
 #include "repair/RePair.h"
 #include <sdsl/io.hpp>
+#include "../macros.h"
+
+#ifdef MEM_MONITOR
+#include <ctime>
+#include "memory/mem_monitor/mem_monitor.hpp"
+#include "CLogger.h"
+using timer = std::chrono::high_resolution_clock;
+using namespace std::chrono;
+#endif
 
 struct rule{
 
@@ -27,20 +36,12 @@ struct rule{
      * */
     rule::r_long l,r;
 
-    rule():id(0),terminal(false),l(0),r(0){
+    rule():id(0),terminal(false),l(0),r(0),node(0){
 
     }
-    rule(const r_long & i, const bool& t):id(i),terminal(t),l(0),r(0){}
+    rule(const r_long & i, const bool& t):id(i),terminal(t),l(0),r(0),node(0) {}
     rule& operator=(const rule& R)
-    {
-        id = R.id;
-        terminal = R.terminal;
-        _rule = R._rule;
-        l = R.l;
-        r = R.r;
-
-        return *this;
-    }
+    = default;
     rule::r_long size_in_bytes()const
     {
         return sizeof(rule::r_long)*3 + 1 + _rule.size()*sizeof(rule::r_long);
@@ -91,26 +92,27 @@ struct rule_trav{
 
     int level;
     uint read;
-    uint discard;
-    unsigned char* extr_seq;
+//    uint discard;
+//    unsigned char* extr_seq;
 
 
-    rule_trav(int max){
-
-        rules = new rule[max];
-        rule_position = new uint[max];
-        last_processed = new uint[max];
-        label_last_processed = new uint[max];
-        len_rule = new uint[max];
-        read = 0;
-
-        for (int i = 0; i < max; ++i) {
-            rule_position[i] = 0;
-            last_processed[i] = 0;
-            len_rule[i] = 0;
-            label_last_processed[i] = 0;
-        }
-    };
+//    rule_trav(int max){
+//
+//        rules = new rule[max];
+//        rule_position = new uint[max];
+//        last_processed = new uint[max];
+//        label_last_processed = new uint[max];
+//        len_rule = new uint[max];
+//        read = 0;
+//        level =0;
+//
+//        for (int i = 0; i < max; ++i) {
+//            rule_position[i] = 0;
+//            last_processed[i] = 0;
+//            len_rule[i] = 0;
+//            label_last_processed[i] = 0;
+//        }
+//    };
 
     rule_trav(uint _id, uint len,uint node, int max){
 
@@ -139,15 +141,18 @@ struct rule_trav{
 
 };
 
-
-
 class grammar {
 
     public:
 
         typedef std::map<rule::r_long ,rule>::iterator grammar_iterator;
 
-        void preprocess(const std::string &);
+        void preprocess(const std::string &
+
+#ifdef MEM_MONITOR
+                ,mem_monitor&
+#endif
+        );
     protected:
         std::map<rule::r_long ,rule> _grammar;
 
@@ -172,8 +177,17 @@ class grammar {
 
         ~grammar();
 
-        void buildRepair(const std::string&);
-        void buildBalRepair( const std::string &,std::fstream&,std::fstream &);
+        void buildRepair(const std::string&
+#ifdef MEM_MONITOR
+                ,mem_monitor& mm
+#endif
+        );
+        void buildBalRepair( const std::string &,std::fstream&,std::fstream &
+#ifdef MEM_MONITOR
+                ,mem_monitor& mm
+#endif
+
+        );
 
         grammar_iterator begin();
 
@@ -183,9 +197,9 @@ class grammar {
 
         const std::map<unsigned int,unsigned char>& get_map() const;
 
-        void permutationSortRules(const std::string& text,sdsl::int_vector<> &Pi, uint n){
+        void permutationSortRules(const std::string& text,sdsl::int_vector<> &Pi){
 
-            n = n_rules();
+//            uint n = n_rules();
             Pi.resize(n_rules()+1);
 
             for(uint i = 0; i < n_rules()+1; i++)

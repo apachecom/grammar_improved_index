@@ -29,7 +29,7 @@ public:
 
     void build( const bv & );
 
-    inline short root()const{ return 0; }
+    static inline short root(){ return 0; }
     /*
      * return the number of nodes in the subtree of the node
      * */

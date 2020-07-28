@@ -13,21 +13,8 @@ class SelfGrammarIndexPT : public SelfGrammarIndex {
 
 
 protected:
-
-///        unsigned int sampling;
-
     m_patricia::compact_patricia_tree sfx_p_tree;
     m_patricia::compact_patricia_tree rules_p_tree;
-
-
-    //void sampling_range_suff(size_t& i, size_t& j, std::string::iterator& , std::string::iterator& )const;
-
-    //void sampling_range_rules(size_t &i, size_t &j, std::string::iterator& , std::string::iterator& )const;
-
-
-    /*size_t _st(const size_t & i)const {
-        return  (i-1)*sampling + 1;
-    } //sampling transform;*/
 
 
 
@@ -35,50 +22,58 @@ protected:
 public:
     SelfGrammarIndexPT() = default;
 
-    virtual ~SelfGrammarIndexPT();
+    ~SelfGrammarIndexPT() override;
 
-    const m_patricia::compact_patricia_tree &get_pt_rules() const { return rules_p_tree; }
+    virtual const m_patricia::compact_patricia_tree &get_pt_rules() const  { return rules_p_tree; }
 
-    const m_patricia::compact_patricia_tree &get_pt_suffixes() const { return sfx_p_tree; }
+    virtual const m_patricia::compact_patricia_tree &get_pt_suffixes() const { return sfx_p_tree; }
 
-    void build(const std::string &) override;
+    void build(const std::string &
+#ifdef MEM_MONITOR
+            , mem_monitor&
+#endif
+    ) override;
 
-    void set_code(const unsigned int &c) { SelfGrammarIndex::set_code(c); }
+    void set_code(const unsigned int &c) override{ SelfGrammarIndex::set_code(c); }
 
 
     void build(const grammar_representation &, const range_search2d &, const m_patricia::compact_patricia_tree &,
                const m_patricia::compact_patricia_tree &);
 
-    compressed_grammar &get_grammar() { return _g; }
+    compressed_grammar &get_grammar() override{ return _g; }
 
     size_t size_in_bytes() const override;
 
     void locate2(std::string &, sdsl::bit_vector &);
 
-    virtual void locate(std::string &, sdsl::bit_vector &) override;
+    void locate(std::string &, sdsl::bit_vector &) override;
 
-    virtual void locate(std::string &, std::vector<uint> &) override;
+    void locate(std::string &, std::vector<uint> &) override;
 
-    virtual void locateNoTrie(std::string &, std::vector<uint> &);
+    void locateNoTrie(std::string &, std::vector<uint> &) override;
 
-    virtual void find_ranges_trie(std::string & s, std::vector<uint> & X){};
-    virtual void find_ranges_trie(std::string & s, std::vector<uint> & X, std::vector<range> & f){};
-    virtual void find_ranges(std::string & s, std::vector<uint> & X){};
-    void find_ranges_dfs(std::string &, std::vector<uint>& ){}
+    void find_ranges_trie(std::string & s, std::vector<uint> & X) override{};
+    void find_ranges_trie(std::string & s, std::vector<uint> & X, std::vector<range> & f) override{};
+    void find_ranges(std::string & s, std::vector<uint> & X) override{};
+    void find_ranges_dfs(std::string &, std::vector<uint>& ) override{}
     void display(const std::size_t &, const std::size_t &, std::string &) override;
 
     void save(std::fstream &) override;
 
     void load(std::fstream &) override;
 
-    void load_basics(std::fstream &f) { SelfGrammarIndex::load_basics(f); }
+    void load_basics(std::fstream &f) override { SelfGrammarIndex::load_basics(f); }
 
-    void build_suffix(const string &, fstream &, fstream &);
+    virtual void build_suffix(const string &, fstream &, fstream &
+#ifdef MEM_MONITOR
+            ,mem_monitor &mm
+#endif
+    );
 
 
-    void load_rules_pt(fstream &f) { rules_p_tree.load(f); }
+    void load_rules_pt(fstream &f) override { rules_p_tree.load(f); }
 
-    void load_sfx_pt(fstream &f) { sfx_p_tree.load(f); }
+    void load_sfx_pt(fstream &f) override { sfx_p_tree.load(f); }
 
 
 };

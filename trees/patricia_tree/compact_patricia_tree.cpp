@@ -6,13 +6,9 @@
 
 using namespace m_patricia;
 
-m_patricia::compact_patricia_tree::compact_patricia_tree() {
+m_patricia::compact_patricia_tree::compact_patricia_tree() = default;
 
-}
-
-m_patricia::compact_patricia_tree::~compact_patricia_tree() {
-
-}
+m_patricia::compact_patricia_tree::~compact_patricia_tree() = default;
 
 void m_patricia::compact_patricia_tree::build(const m_patricia::compact_patricia_tree::T &tree) {
 
@@ -167,40 +163,40 @@ void m_patricia::compact_patricia_tree::build(const m_patricia::patricia_tree<m_
 }
 
 compact_patricia_tree::ulong m_patricia::compact_patricia_tree::node_match(const m_patricia::compact_patricia_tree::K &str) const {
-    ulong node = m_tree.root();
+    ulong node = m_patricia::compact_patricia_tree::tree::root();
     compact_patricia_tree::ulong p = 0;
     path(node,str,p);
     return node;
 }
 
 compact_patricia_tree::ulong m_patricia::compact_patricia_tree::node_match(const m_patricia::compact_patricia_tree::revK &str) const {
-    ulong node = m_tree.root();
+    ulong node = m_patricia::compact_patricia_tree::tree::root();
     compact_patricia_tree::ulong p = 0;
     path(node,str,p);
     return node;
 }
 
 compact_patricia_tree::ulong m_patricia::compact_patricia_tree::node_locus(const m_patricia::compact_patricia_tree::K & str, const compact_patricia_tree::ulong & limit, compact_patricia_tree::ulong& pos_locus)const {
-    compact_patricia_tree::ulong node = m_tree.root();
+    compact_patricia_tree::ulong node = m_patricia::compact_patricia_tree::tree::root();
     pos_locus = 0;
     path(node,str,pos_locus,limit);
     return node;
 }
 compact_patricia_tree::ulong m_patricia::compact_patricia_tree::node_locus(const m_patricia::compact_patricia_tree::revK & str, const compact_patricia_tree::ulong & limit, compact_patricia_tree::ulong& pos_locus)const
 {
-    compact_patricia_tree::ulong node = m_tree.root();
+    compact_patricia_tree::ulong node = m_patricia::compact_patricia_tree::tree::root();
     pos_locus = 0;
     path(node,str,pos_locus,limit);
     return node;
 }
 
 void m_patricia::compact_patricia_tree::save(std::fstream & f) const {
-    std::cout<<"saving cpatricia_tree"<<std::endl;
-    std::cout<<"\t sdsl::serialize(seq,f);"<<std::endl;
+//    std::cout<<"saving cpatricia_tree"<<std::endl;
+//    std::cout<<"\t sdsl::serialize(seq,f);"<<std::endl;
     sdsl::serialize(seq,f);
-    std::cout<<"\t sdsl::serialize(jumps,f);"<<std::endl;
+//    std::cout<<"\t sdsl::serialize(jumps,f);"<<std::endl;
     sdsl::serialize(jumps,f);
-    std::cout<<"\t m_tree.save(f);"<<std::endl;
+//    std::cout<<"\t m_tree.save(f);"<<std::endl;
     m_tree.save(f);
 
 }
@@ -222,7 +218,7 @@ bool m_patricia::compact_patricia_tree::path(compact_patricia_tree::ulong & node
     compact_patricia_tree::ulong r = l + childrens ;
 
     auto t = std::find(seq.begin()+l-1,seq.begin()+r,(unsigned char)str[p]);
-    auto iii = *t;
+//    auto iii = *t;
     if(t > seq.begin()+r)
         return true;
     auto ppp = (compact_patricia_tree::ulong)(t-(seq.begin()+l-1)+1);
@@ -260,7 +256,7 @@ bool m_patricia::compact_patricia_tree::path(compact_patricia_tree::ulong & node
 
     auto t = std::find(seq.begin()+l-1,seq.begin()+r,(unsigned char)str[p]);
 
-    char iii = *t;
+//    char iii = *t;
 
     if(t > seq.begin()+r)
         return true;
@@ -297,7 +293,7 @@ void m_patricia::compact_patricia_tree::path(compact_patricia_tree::ulong & node
     compact_patricia_tree::ulong r = l + childrens ;
 
     auto t = std::find(seq.begin()+l-1,seq.begin()+r,(unsigned char)str[p]);
-    char iii = *t;
+//    char iii = *t;
     if(t > seq.begin()+r)
         return;
 
@@ -389,12 +385,7 @@ void m_patricia::compact_patricia_tree::print_size_in_bytes() const {
 
 }
 
-compact_patricia_tree &compact_patricia_tree::operator=(const m_patricia::compact_patricia_tree& T) {
-    m_tree = T.m_tree;
-    seq = T.seq;
-    jumps = T.jumps;
-    return (*this);
-}
+compact_patricia_tree &compact_patricia_tree::operator=(const m_patricia::compact_patricia_tree& T) = default;
 
 const compact_patricia_tree::seq_alf &compact_patricia_tree::get_seq() const {
     return seq;
@@ -413,7 +404,7 @@ compact_patricia_tree::find_child_range(const compact_patricia_tree::ulong & nod
     auto childrens = m_tree.children(node);
     compact_patricia_tree::ulong l = m_tree.rank_1(node)-1;
     compact_patricia_tree::ulong r = l + childrens;
-    unsigned char mm2 = (unsigned char)str[p];
+    auto mm2 = (unsigned char)str[p];
     auto t = std::lower_bound(seq.begin()+l,seq.begin()+r,mm2);
     unsigned char mm1 = (unsigned char)*t;
 
@@ -424,8 +415,12 @@ compact_patricia_tree::find_child_range(const compact_patricia_tree::ulong & nod
         if(cp > 0){// patron mayor que indice
             return m_tree.leafrank(pchild)+m_tree.leafnum(pchild) -1;
         }else{
-            auto l = m_tree.leafrank(pchild);
-            return l == 1 ? 1: l - 1;
+            auto _l = m_tree.leafrank(pchild);
+            if (_l == 1) {
+                return 1;
+            } else {
+                return _l - 1;
+            }
         }
 
     }
@@ -435,8 +430,12 @@ compact_patricia_tree::find_child_range(const compact_patricia_tree::ulong & nod
     }
 
     if(t == seq.begin()+l){ // all the elements are greater than str[p]
-        auto l = m_tree.leafrank(node);
-        return l == 1 ? 1: l - 1;
+        auto _l = m_tree.leafrank(node);
+        if (_l == 1) {
+            return 1;
+        } else {
+            return _l - 1;
+        }
     }
 
     auto ppp = (compact_patricia_tree::ulong)(t-(seq.begin()+l)+1);
@@ -453,7 +452,7 @@ compact_patricia_tree::find_child_range(const compact_patricia_tree::ulong & nod
 
     compact_patricia_tree::ulong l = m_tree.rank_1(node)-1;
     compact_patricia_tree::ulong r = l + childrens;
-    unsigned char mm2 = (unsigned char)str[p];
+    auto mm2 = (unsigned char)str[p];
     auto t = std::lower_bound(seq.begin()+l,seq.begin()+r,mm2);
 
     unsigned char mm1 = (unsigned char)*t;
@@ -465,8 +464,12 @@ compact_patricia_tree::find_child_range(const compact_patricia_tree::ulong & nod
         if(cp > 0){// patron mayor que indice
             return m_tree.leafrank(pchild)+m_tree.leafnum(pchild) -1;
         }else{
-            auto l = m_tree.leafrank(pchild);
-            return l == 1 ? 1: l - 1;
+            auto _l = m_tree.leafrank(pchild);
+            if (1 == _l) {
+                return 1;
+            } else {
+                return _l - 1;
+            }
         }
 
     }
@@ -476,8 +479,12 @@ compact_patricia_tree::find_child_range(const compact_patricia_tree::ulong & nod
     }
 
     if(t == seq.begin()+l){ // all the elements are greater than str[p]
-        auto l = m_tree.leafrank(node);
-        return l == 1 ? 1: l - 1;
+        auto _l = m_tree.leafrank(node);
+        if (1 == _l) {
+            return 1;
+        } else {
+            return _l - 1;
+        }
     }
 
     auto ppp = (compact_patricia_tree::ulong)(t-(seq.begin()+l)+1);

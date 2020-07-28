@@ -102,6 +102,7 @@ set(SLP_SAMPLING
 #        tests/collections.cpp
         bench/repetitive_collections.h
         SelfGrammarIndexBSQ.cpp SelfGrammarIndexBSQ.h
+        utils/CLogger.cpp utils/CLogger.h
         )
 
 set(SOURCE_FILES
@@ -137,11 +138,13 @@ set(SOURCE_FILES
 
         utils/grammar.cpp utils/grammar.h
         utils/memory/mem_monitor/mem_monitor.hpp
+        utils/CLogger.cpp utils/CLogger.h
 #        tests/collections.cpp
         bench/repetitive_collections.h
 
-        SelfGrammarIndexBSQ.cpp SelfGrammarIndexBSQ.h simple_grid.cpp simple_grid.h
-        )
+        SelfGrammarIndexBSQ.cpp SelfGrammarIndexBSQ.h
+        simple_grid.cpp simple_grid.h
+        macros.h)
 
 option(USE_MEM_MONITOR "Enter mem-monitor mode" OFF)
 
@@ -149,9 +152,17 @@ if (USE_MEM_MONITOR STREQUAL ON)
     add_definitions(-DMEM_MONITOR)
 endif()
 
+
+option(USE_PRINT_MODE "Enter print mode" OFF)
+
+if (USE_PRINT_MODE STREQUAL ON)
+    add_definitions(-DPRINT_LOGS)
+endif()
+
 add_executable(improved_grammar_index main.cpp ${SOURCE_FILES} )
 
 include(internal_utils)
+
 
 #cxx_executable_with_flags(binary_relation_performance "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64" tests/binary_relation_test.cpp ${SOURCE_FILES})
 #cxx_executable_with_flags(grammar_test "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64" tests/utils/grammar_test.cpp ${SOURCE_FILES})
@@ -218,11 +229,41 @@ include(internal_utils)
 #cxx_executable_with_flags(bench_qgram_display_pattern_len    "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_qgram_display_pattern_len.cpp ${SLP_SAMPLING} )
 #cxx_executable_with_flags(locate_other "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_locate.cpp ${SOURCE_FILES})
 #cxx_executable_with_flags(idx_build "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/idx_build.cpp ${SOURCE_FILES})
-cxx_executable_with_flags(build_indices "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/build_indices.cpp ${SLP_SAMPLING})
-cxx_executable_with_flags(process_coll "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/bench_collections.cpp ${SLP_SAMPLING})
-cxx_executable_with_flags(locate_indices "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/locate_indices.cpp ${SLP_SAMPLING})
-cxx_executable_with_flags(display_indices "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/display_indices.cpp ${SLP_SAMPLING})
-cxx_executable_with_flags(space "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;cds" bench/bench_space.cpp ${SLP_SAMPLING})
+
+
+
+
+cxx_executable_with_flags(bench_locate_pattern_len    "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_qgram_locate_pattern_len.cpp ${SLP_SAMPLING})
+cxx_executable_with_flags(bench_display_pattern_len    "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_qgram_display_pattern_len.cpp ${SLP_SAMPLING} )
+cxx_executable_with_flags(build_indices "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/build_indices.cpp ${SLP_SAMPLING})
+cxx_executable_with_flags(process_coll "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_collections.cpp ${SLP_SAMPLING})
+cxx_executable_with_flags(locate_indices "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/locate_indices.cpp ${SLP_SAMPLING})
+cxx_executable_with_flags(display_indices "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/display_indices.cpp ${SLP_SAMPLING})
+cxx_executable_with_flags(space "" "${LIBS};benchmark;sdsl;slp;divsufsort;divsufsort64;cds" bench/bench_space.cpp ${SLP_SAMPLING})
+
+
+
+if (NOT INV_PI_T)
+    set(INV_PI_T 8)
+endif()
+message("INV_PI_T ${INV_PI_T}")
+
+if (NOT INV_PI_T_TRIE)
+    set(INV_PI_T_TRIE 8)
+endif()
+message("INV_PI_T_TRIE ${INV_PI_T_TRIE}")
+
+if (NOT INV_PI_T_QGRAM)
+    set(INV_PI_T_QGRAM 8)
+endif()
+message("INV_PI_T_QGRAM ${INV_PI_T_QGRAM}")
+
+message("INV_PI_T_QGRAM ${PROJECT_SOURCE_DIR}/config_macros.h.in")
+
+configure_file(
+        "${PROJECT_SOURCE_DIR}/config_macros.h.in"
+        "${PROJECT_SOURCE_DIR}/macros.h"
+)
 
 
 target_link_libraries(improved_grammar_index sdsl)

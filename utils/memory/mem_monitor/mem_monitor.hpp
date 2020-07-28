@@ -158,7 +158,7 @@ class mem_monitor
             m_os.close();
         }
 
-        void event(const std::string& ev) {
+        void event(const std::string& ev)  {
             m_event_names.push_back(ev);
             m_cur_event_id++;
         }

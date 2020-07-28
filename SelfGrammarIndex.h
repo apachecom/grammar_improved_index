@@ -14,6 +14,14 @@
 #include "trees/patricia_tree/compact_patricia_tree.h"
 
 
+#ifdef MEM_MONITOR
+#include <ctime>
+#include "utils/memory/mem_monitor/mem_monitor.hpp"
+#include "utils/CLogger.h"
+using timer = std::chrono::high_resolution_clock;
+using namespace std::chrono;
+#endif
+
 struct range{
     uint x1,x2,y1,y2,len;
     range(){};
@@ -46,17 +54,44 @@ public:
     virtual void find_ranges_dfs(std::string &, std::vector<uint>& )  = 0;
     virtual void locate(std::string &, sdsl::bit_vector &) = 0;
     virtual void locate(std::string &, std::vector<uint> &) = 0;
-    virtual const m_patricia::compact_patricia_tree &get_pt_rules() const = 0;
-    virtual const m_patricia::compact_patricia_tree &get_pt_suffixes() const = 0;
+//    virtual const m_patricia::compact_patricia_tree &get_pt_rules() const = 0;
+//    virtual const m_patricia::compact_patricia_tree &get_pt_suffixes() const = 0;
     virtual void locateNoTrie(std::string &, std::vector<uint> &) = 0;
 
     void build_bitvector_occ(sdsl::bit_vector& B) const;
 
     virtual void set_code(const unsigned int &c) { code = c; }
-    virtual void build(const std::string &);
-    virtual void buildSamplings(const int &){}
-    virtual void build_basics(const std::string &, fstream &, fstream &, fstream &);
-    virtual void build_basics_bal(const std::string &, fstream &,  fstream &,fstream &, fstream &, fstream &);
+    virtual void build(const std::string &
+#ifdef MEM_MONITOR
+            , mem_monitor& mm
+#endif
+    );
+
+    virtual void build_basics(const std::string &, fstream &, fstream &, fstream &
+#ifdef MEM_MONITOR
+    ,mem_monitor &mm
+#endif
+    );
+    virtual void build_basics(const std::string &, fstream &, fstream &, fstream &,
+            grammar &not_compressed_grammar,
+            std::vector< std::pair< std::pair<size_t ,size_t >,std::pair<size_t ,size_t > > >& grammar_sfx
+#ifdef MEM_MONITOR
+            , mem_monitor& mm
+#endif
+    );
+    virtual void build_basics(const std::string &,grammar &not_compressed_grammar,
+                              std::vector< std::pair< std::pair<size_t ,size_t >,std::pair<size_t ,size_t > > >& grammar_sfx
+#ifdef MEM_MONITOR
+            , mem_monitor&
+#endif
+    );
+
+
+    virtual void build_basics_bal(const std::string &, fstream &,  fstream &,fstream &, fstream &, fstream &
+#ifdef MEM_MONITOR
+            ,mem_monitor&
+#endif
+    );
     virtual void load_basics(fstream &);
     virtual void save(std::fstream &);
     virtual void load(std::fstream &);
@@ -100,10 +135,12 @@ public:
 
     bool expand_prefix_slp(const grammar_representation::g_long &, std::string &, const size_t &, size_t &pos) const;
     bool expand_suffix_slp(const grammar_representation::g_long &, std::string &, const size_t &, size_t &pos) const;
-    bool bp_expand_prefix(const grammar_representation::g_long &, std::string &, const size_t &, size_t &pos) const;
-    bool bp_expand_suffix(const grammar_representation::g_long &, std::string &, const size_t &, size_t &pos) const;
+
+    virtual bool bp_expand_prefix(const grammar_representation::g_long &, std::string &, const size_t &, size_t &pos) const;
+    bool virtual bp_expand_suffix(const grammar_representation::g_long &, std::string &, const size_t &, size_t &pos) const;
     bool expand_prefix2(const size_t &, std::string &, const size_t &, size_t &pos) const;
-    bool expand_prefix(const grammar_representation::g_long &, std::string &, const size_t &, size_t &pos) const;
+
+    virtual bool expand_prefix(const grammar_representation::g_long &, std::string &, const size_t &, size_t &pos) const;
     bool expand_suffix(const grammar_representation::g_long &, std::string &, const size_t &, size_t &) const;
 
     void expand_grammar_sfx(const size_t &, std::string &, const size_t &) const;
@@ -112,19 +149,19 @@ public:
 
     void find_second_occ(uint r1,uint r2,uint c1,uint c2, long len, std::vector<uint> &occ){
 
-        
         const auto& g_tree = _g.get_parser_tree();
 
         std::vector< std::pair<size_t,size_t> > pairs;
 
-        grid.range2(r1,r2,c1,c2,pairs);
 
+        grid.range2(r1,r2,c1,c2,pairs);
 
         for (auto &pair : pairs) {
             size_t p = grid.first_label_col(pair.second);
             size_t pos_p = _g.offsetText(g_tree[p]);
+
             unsigned int parent = g_tree.parent(g_tree[p]);
-            long int  l = (- len + pos_p) - _g.offsetText(parent);
+            long  l = long (- len + pos_p) - _g.offsetText(parent);
             find_second_occ(l,parent,occ);
         }
 
@@ -169,42 +206,6 @@ public:
         }
 
         return false;
-
-
-//        if (lr >= hr) {
-//            if(found)
-//                return true;
-//
-//            int p = f(hr);
-//            found = p == 0;
-//            return found;
-//        }
-//
-//        size_t m = (lr + hr) / 2;
-//
-//        int res = f(m);
-//        if (res < 0) {
-//            /*
-//             * If value < value(node) f must return
-//             * */
-//            hr = m - 1;
-//        } else {
-//            if (res > 0) {
-//                /*
-//                 * If value > value(node) f must return true
-//                 * */
-//                lr = m + 1;
-//            } else {
-//                /*
-//                 * If value == value(node) f must return true
-//                 * */
-//                hr = m;
-//                found = true;
-//            }
-//        }
-//
-//
-//        return lower_bound(found,lr, hr, f);
     }
 
     template<typename K>
@@ -239,44 +240,6 @@ public:
 
         return false;
 
-
-
-//        if (lr >= hr ) {
-//            if(found)
-//                return true;
-//            int p = f(hr);
-//            found = p == 0;
-//            return found;
-//        }
-//
-//        size_t m = (size_t)ceil((lr + hr)/2.0);
-//
-//        int res = f(m);
-//
-//        if (res < 0) {
-//            /*
-//             * If value < value(node) f must return true
-//             * */
-//            hr = m - 1;
-//        } else {
-//
-//            if (res > 0) {
-//                /*
-//                 * If value > value(node) f must return true
-//                 * */
-//                lr = m + 1;
-//            } else {
-//                /*
-//                * If value == value(node) f must return true
-//                * */
-//                lr = m;
-//                found = true;
-//            }
-//
-//
-//        }
-//
-//        return upper_bound(found,lr, hr, f);
     }
 
 
@@ -360,9 +323,9 @@ public:
         return upper_bound(lr, hr, f);
     }
 
-    int cmp_prefix(const grammar_representation::g_long &, std::string::iterator &, std::string::iterator &) const;
+    virtual int cmp_prefix(const grammar_representation::g_long &, std::string::iterator &, std::string::iterator &) const;
 
-    int cmp_suffix(const grammar_representation::g_long &, std::string::iterator &, std::string::iterator &) const;
+    virtual int cmp_suffix(const grammar_representation::g_long &, std::string::iterator &, std::string::iterator &) const;
 
     int cmp_suffix_grammar(const size_t &, std::string::iterator &, std::string::iterator &);
 
@@ -799,7 +762,7 @@ public:
             auto t = llb + 1;
 
             while (t < lle) {
-                auto off = _g.select_L(t + 1) - _g.select_L(t) + pos;
+//                auto off = _g.select_L(t + 1) - _g.select_L(t) + pos;
                 expand_interval_rec(_g.m_tree.leafselect(t), make_pair(_g.select_L(t),_g.select_L(t + 1)-1),s,pos);
                 ///expand_prefix(_g[_g.m_tree.pre_order(_g.m_tree.leafselect(t))], s, off, pos);
                 ++t;
@@ -898,9 +861,9 @@ public:
         int r = cmp_suffix_L(X_i,itera,end);
 
         while (r == 0 && itera != end  && leaf <= --l_leaf ){
-            size_t l_node = _g.m_tree.leafselect(l_leaf);
-            size_t X_i = _g[_g.m_tree.pre_order(l_node)];
-            r = cmp_suffix_L(X_i,itera,end);
+            size_t _l_node = _g.m_tree.leafselect(l_leaf);
+            size_t Y_i = _g[_g.m_tree.pre_order(_l_node)];
+            r = cmp_suffix_L(Y_i,itera,end);
         }
 
 
@@ -930,7 +893,6 @@ public:
             if(l == pos ) return ;
         }
 
-        return ;
 
         
 //        if(_g.isTerminal(X) && pos < l){
@@ -1216,7 +1178,7 @@ public:
             uint V = _g[_g.m_tree.pre_order(child)];
             int r = dfs_cmp_suffix(V,itera,end);
             if(r != 0) return r;
-            if(r == 0 && itera == end-1)
+            if(itera == end - 1)
                 return 0;
         }
 
@@ -1255,7 +1217,7 @@ public:
 
             if(r != 0) return r;
 
-            if(r == 0 && itera == end-1)
+            if(itera == end-1)
                 return 0;
         }
 
@@ -1292,8 +1254,8 @@ public:
     }
 
 
-    typedef std::vector<std::pair<uint, uint>> rvect;
-    typedef std::vector<uint> lvect;
+//    typedef std::vector<std::pair<uint, uint>> rvect;
+//    typedef std::vector<uint> lvect;
 
     /*uint calc_len(const uint &X, rvect &D, lvect &L, const int & t) {
 

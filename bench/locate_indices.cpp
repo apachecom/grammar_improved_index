@@ -6,9 +6,9 @@
 #include <fstream>
 #include <benchmark/benchmark.h>
 
-//#include <slp/RePairSLPIndex.h>
+#include <slp/RePairSLPIndex.h>
 #include "../SelfGrammarIndexBS.h"
-//#include <ri/r_index.hpp>
+#include <ri/r_index.hpp>
 #include "../SelfGrammarIndexPTS.h"
 #include "../SelfGrammarIndexBSQ.h"
 #include "sdsl/io.hpp"
@@ -72,126 +72,126 @@ void load_patterns(const std::string& pattern_file,uint max_len, uint samples){
     f.close();
 }
 
-//
-//auto rilocate = [](benchmark::State &st, const string &file_index, const uint& len
-////#ifdef MEM_MONITOR
-////        , const std::string file_mem_monitor
-////#endif
-//){
-//    /**
-//     * load rindex
-//     * */
-//
-//    ri::r_index<> *idx_r;
-//
-//    fstream rf(file_index + ".ri",std::ios::in|std::ios::binary);
-//
-//    bool fast;
-//    rf.read((char*)&fast,sizeof(fast));
-//    idx_r = new ri::r_index<>();
-//    idx_r->load(rf);
-//
-//
-////    std::cout<<"r -index loaded"<<std::endl;
-//    uint nocc,ptt;
-//    for (auto _ : st)
-//    {
-//        nocc = 0;
-//        ptt = 0;
-////#ifdef MEM_MONITOR
-////        mm.event("R-INDEX-BUILD");
-////#endif
-//        for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
-//            std::string query;
-//            query.resize(len);
-//            std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
-//
-////            std::cout<<"r -index query:"<<query<<std::endl;
-//            auto occ = idx_r->locate_all(query);
-//            nocc += occ.size(); ptt++;
-//        }
-//
-////        std::cout<<nocc<<std::endl;
-////        sleep(2);
-//
-//      }
-//
-//    st.counters["pLen"] = len;
-//    st.counters["queries"] = ptt;
-//    st.counters["nOcc"] = nocc;
-//
-//    st.counters["size"] = idx_r->print_space();
-//
-//    delete idx_r;
-//
-//};
-//
 
-//
-//auto slplocate = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling
-////#ifdef MEM_MONITOR
-////        , const std::string file_mem_monitor
-////#endif
-//){
-//    /**
-//     * load slpindex
-//     * */
-//
-//
-//    cds_static::RePairSLPIndex* idx_slp;
-//    std::string filename = file_index+"-q"+std::to_string(sampling);
-//    char* _f = (char *)filename.c_str();
-//    int q = cds_static::RePairSLPIndex::load(_f, &idx_slp);
-//
-//
-////    std::cout<<"slp-index loaded"<<std::endl;
-//    uint nocc,ptt;
-//
-//    for (auto _ : st)
-//    {
-//        nocc = 0;
-//        ptt = 0;
-////#ifdef MEM_MONITOR
-////        mm.event("R-INDEX-BUILD");
-////#endif
-//        for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
-//            std::string query;
-//            query.resize(len);
-//            std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
-//            uint occs;
-//            uchar *tt = (uchar * )(query.c_str());
-////            std::cout<<"slp -index query:"<<query<<std::endl;
-//            std::vector<uint> *pos = idx_slp->RePairSLPIndex::locate(tt,len, &occs);
-//
-//            // std::sort(pos->begin(),pos->end());
-//            // auto last = std::unique(pos->begin(),pos->end());
-//            // pos->erase(last,pos->end());
-//
-//            delete pos;
-//            // nocc += occs;
-//            nocc += occs;
-//            ptt++;
-//        }
-//
-////        std::cout<<nocc<<std::endl;
-////        sleep(2);
-//
-//    }
-//
-//    st.counters["pLen"] = len;
-//    st.counters["queries"] = ptt;
-//    st.counters["nOcc"] = nocc;
-//
-//    st.counters["size"] = idx_slp->size();
-//
-//    delete idx_slp;
-//
-//};
-//
+auto rilocate = [](benchmark::State &st, const string &file_index, const uint& len
+//#ifdef MEM_MONITOR
+//        , const std::string file_mem_monitor
+//#endif
+){
+    /**
+     * load rindex
+     * */
+
+    ri::r_index<> *idx_r;
+
+    fstream rf(file_index + ".ri",std::ios::in|std::ios::binary);
+
+    bool fast;
+    rf.read((char*)&fast,sizeof(fast));
+    idx_r = new ri::r_index<>();
+    idx_r->load(rf);
+
+
+//    std::cout<<"r -index loaded"<<std::endl;
+    uint nocc,ptt;
+    for (auto _ : st)
+    {
+        nocc = 0;
+        ptt = 0;
+//#ifdef MEM_MONITOR
+//        mm.event("R-INDEX-BUILD");
+//#endif
+        for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
+            std::string query;
+            query.resize(len);
+            std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
+
+//            std::cout<<"r -index query:"<<query<<std::endl;
+            auto occ = idx_r->locate_all(query);
+            nocc += occ.size(); ptt++;
+        }
+
+//        std::cout<<nocc<<std::endl;
+//        sleep(2);
+
+      }
+
+    st.counters["pLen"] = len;
+    st.counters["queries"] = ptt;
+    st.counters["nOcc"] = nocc;
+
+    st.counters["size"] = idx_r->print_space();
+
+    delete idx_r;
+
+};
 
 
 
-auto gibslocate = [](benchmark::State &st, const string &file_index, const uint& len
+auto slplocate = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling
+//#ifdef MEM_MONITOR
+//        , const std::string file_mem_monitor
+//#endif
+){
+    /**
+     * load slpindex
+     * */
+
+
+    cds_static::RePairSLPIndex* idx_slp;
+    std::string filename = file_index+"-q"+std::to_string(sampling);
+    char* _f = (char *)filename.c_str();
+    int q = cds_static::RePairSLPIndex::load(_f, &idx_slp);
+
+
+//    std::cout<<"slp-index loaded"<<std::endl;
+    uint nocc,ptt;
+
+    for (auto _ : st)
+    {
+        nocc = 0;
+        ptt = 0;
+//#ifdef MEM_MONITOR
+//        mm.event("R-INDEX-BUILD");
+//#endif
+        for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
+            std::string query;
+            query.resize(len);
+            std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
+            uint occs;
+            uchar *tt = (uchar * )(query.c_str());
+//            std::cout<<"slp -index query:"<<query<<std::endl;
+            std::vector<uint> *pos = idx_slp->RePairSLPIndex::locate(tt,len, &occs);
+
+            // std::sort(pos->begin(),pos->end());
+            // auto last = std::unique(pos->begin(),pos->end());
+            // pos->erase(last,pos->end());
+
+            delete pos;
+            // nocc += occs;
+            nocc += occs;
+            ptt++;
+        }
+
+//        std::cout<<nocc<<std::endl;
+//        sleep(2);
+
+    }
+
+    st.counters["pLen"] = len;
+    st.counters["queries"] = ptt;
+    st.counters["nOcc"] = nocc;
+
+    st.counters["size"] = idx_slp->size();
+
+    delete idx_slp;
+
+};
+
+
+
+
+auto gibslocate = [](benchmark::State &st, const string &file_index, const uint& len, bool trie
 //#ifdef MEM_MONITOR
 //        , const std::string file_mem_monitor
 //#endif
@@ -221,11 +221,14 @@ auto gibslocate = [](benchmark::State &st, const string &file_index, const uint&
             query.resize(len);
             std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
             std::vector<uint> X;
-            idx_gibs.locateNoTrie(query,X);
+            if(trie)
+                idx_gibs.locate(query,X);
+            else
+                idx_gibs.locateNoTrie(query,X);
 //
-//            std::sort(X.begin(),X.end());
-//            auto last = std::unique(X.begin(),X.end());
-//            X.erase(last,X.end());
+            std::sort(X.begin(),X.end());
+            auto last = std::unique(X.begin(),X.end());
+            X.erase(last,X.end());
 
             nocc += X.size();
             ptt++;
@@ -237,15 +240,21 @@ auto gibslocate = [](benchmark::State &st, const string &file_index, const uint&
 
     }
 
-    st.counters["size"] = idx_gibs.size_in_bytes();
     st.counters["pLen"] = len;
     st.counters["queries"] = ptt;
     st.counters["nOcc"] = nocc;
+
+    if(trie){
+        st.counters["size"] = idx_gibs.size_in_bytes();
+    }else{
+        st.counters["size"] = idx_gibs.size_in_bytes() - idx_gibs.get_grammar().get_right_trie().size_in_bytes() - idx_gibs.get_grammar().get_left_trie().size_in_bytes();
+    }
+
 };
 
 
 
-auto giptslocate = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling
+auto giptslocate = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling,bool trie
 //#ifdef MEM_MONITOR
 //        , const std::string file_mem_monitor
 //#endif
@@ -277,11 +286,15 @@ auto giptslocate = [](benchmark::State &st, const string &file_index, const uint
             query.resize(len);
             std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
             std::vector<uint> X;
-            idx_gipts.locateNoTrie(query,X);
+
+            if(trie)
+                idx_gipts.locate(query,X);
+            else
+                idx_gipts.locateNoTrie(query,X);
             
-//            std::sort(X.begin(),X.end());
-//            auto last = std::unique(X.begin(),X.end());
-//            X.erase(last,X.end());
+            std::sort(X.begin(),X.end());
+            auto last = std::unique(X.begin(),X.end());
+            X.erase(last,X.end());
 
             nocc += X.size();
             ptt++;
@@ -297,13 +310,18 @@ auto giptslocate = [](benchmark::State &st, const string &file_index, const uint
     st.counters["pLen"] = len;
     st.counters["queries"] = ptt;
     st.counters["nOcc"] = nocc;
+    if(trie){
+        st.counters["size"] = idx_gipts.size_in_bytes();
+    }else{
+        st.counters["size"] = idx_gipts.size_in_bytes() - idx_gipts.get_grammar().get_right_trie().size_in_bytes() - idx_gipts.get_grammar().get_left_trie().size_in_bytes();
+    }
 
-    st.counters["size"] = idx_gipts.size_in_bytes();
+//    st.counters["size"] = idx_gipts.size_in_bytes();
 
 };
 
 
-auto giqgramlocate = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling
+auto giqgramlocate = [](benchmark::State &st, const string &file_index, const uint& len, const uint& sampling,int op = 0
 //#ifdef MEM_MONITOR
 //        , const std::string file_mem_monitor
 //#endif
@@ -327,7 +345,7 @@ auto giqgramlocate = [](benchmark::State &st, const string &file_index, const ui
 //    std::cout<<"bsgi-index loaded"<<std::endl;
     uint queries,nocc;
 
-    std::string ss = "";
+    std::string ss;
 //    ss.resize(len);
 
     for (auto _ : st)
@@ -339,18 +357,32 @@ auto giqgramlocate = [](benchmark::State &st, const string &file_index, const ui
 //#endif
         for (uint ii=  0; ii < MAX_SAMPLES &&  ii < patterns.size();++ii) {
 
+//            std::cout<<"start query\n";
             std::string query;
             query.resize(len);
             std::copy(patterns[ii].begin(),patterns[ii].begin()+len,query.begin());
             std::vector<uint> X;
-            idx_giqbs.qgram_dfs_locate(query,X);
+
+//            std::cout <<query<<"-"<< queries << std::endl;
+            if(op == 2){
+                idx_giqbs.qgram_trie_locate(query,X);
+            }else{
+                if(op == 3){
+                    idx_giqbs.qgram_locate_prefix_search(query,X);
+                } else{
+                    idx_giqbs.qgram_dfs_locate(query,X);
+                }
+            }
+
             
 //            std::sort(X.begin(),X.end());
 //            auto last = std::unique(X.begin(),X.end());
 //            X.erase(last,X.end());
 
+
             nocc += X.size();
             queries++;
+//            std::cout<<"end query\n";
 
         }
 
@@ -364,6 +396,13 @@ auto giqgramlocate = [](benchmark::State &st, const string &file_index, const ui
     st.counters["pLen"] = len;
     st.counters["queries"] = queries;
     st.counters["nOcc"] = nocc;
+    if(op == 2){
+        st.counters["size"] = idx_giqbs.size_in_bytes();
+    }else{
+        st.counters["size"] = idx_giqbs.size_in_bytes() - idx_giqbs.get_grammar().get_right_trie().size_in_bytes() - idx_giqbs.get_grammar().get_left_trie().size_in_bytes();
+    }
+
+//
 };
 
 
@@ -401,22 +440,47 @@ int main (int argc, char *argv[] ){
     {
 
         // std::cout<<"Searching patterns len:"<<i<<std::endl;
-//        benchmark::RegisterBenchmark("R-Index",rilocate,index_prefix,i)->Unit({benchmark::kMicrosecond});;
-//        benchmark::RegisterBenchmark("SLP-Index<4>" ,slplocate,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
-//        benchmark::RegisterBenchmark("SLP-Index<8>" ,slplocate,index_prefix,i,8)->Unit({benchmark::kMicrosecond});;
-//        benchmark::RegisterBenchmark("SLP-Index<12>",slplocate,index_prefix,i,12)->Unit({benchmark::kMicrosecond});;
-//        benchmark::RegisterBenchmark("SLP-Index<16>",slplocate,index_prefix,i,16)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("G-INDEX-BS",gibslocate,index_prefix,i)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("G-INDEX-PTS<2>",giptslocate,index_prefix,i,2)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("G-INDEX-PTS<4>",giptslocate,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("G-INDEX-PTS<8>",giptslocate,index_prefix,i,8)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("G-INDEX-PTS<16>",giptslocate,index_prefix,i,16)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("G-INDEX-PTS<32>",giptslocate,index_prefix,i,32)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("G-INDEX-PTS<64>",giptslocate,index_prefix,i,64)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>" ,giqgramlocate,index_prefix,i,4);
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>" ,giqgramlocate,index_prefix,i,8);
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>",giqgramlocate,index_prefix,i,12);
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>",giqgramlocate,index_prefix,i,16);
+        benchmark::RegisterBenchmark("R-Index",rilocate,index_prefix,i)->Unit({benchmark::kMicrosecond});
+
+        benchmark::RegisterBenchmark("SLP-Index<4>" ,slplocate,index_prefix,i,4)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("SLP-Index<8>" ,slplocate,index_prefix,i,8)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("SLP-Index<12>",slplocate,index_prefix,i,12)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("SLP-Index<16>",slplocate,index_prefix,i,16)->Unit({benchmark::kMicrosecond});
+
+        benchmark::RegisterBenchmark("G-INDEX-BINARY_SEARCH-TRIE",gibslocate,index_prefix,i,1)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-BINARY_SEARCH-NOTRIE",gibslocate,index_prefix,i,0)->Unit({benchmark::kMicrosecond});
+
+
+        benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<2>-TRIE",giptslocate,index_prefix,i,2,1)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<4>-TRIE",giptslocate,index_prefix,i,4,1)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<8>-TRIE",giptslocate,index_prefix,i,8,1)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<16>-TRIE",giptslocate,index_prefix,i,16,1)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<32>-TRIE",giptslocate,index_prefix,i,32,1)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<64>-TRIE",giptslocate,index_prefix,i,64,1)->Unit({benchmark::kMicrosecond});
+
+        benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<2>-NOTRIE",giptslocate,index_prefix,i,2,0)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<4>-NOTRIE",giptslocate,index_prefix,i,4,0)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<8>-NOTRIE",giptslocate,index_prefix,i,8,0)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<16>-NOTRIE",giptslocate,index_prefix,i,16,0)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<32>-NOTRIE",giptslocate,index_prefix,i,32,0)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<64>-NOTRIE",giptslocate,index_prefix,i,64,0)->Unit({benchmark::kMicrosecond});
+
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>-CMP_DFS" ,giqgramlocate,index_prefix,i,4,1)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>-CMP_DFS" ,giqgramlocate,index_prefix,i,8,1)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>-CMP_DFS",giqgramlocate,index_prefix,i,12,1)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>-CMP_DFS",giqgramlocate,index_prefix,i,16,1)->Unit({benchmark::kMicrosecond});
+
+
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>-CMP_TRIE" ,giqgramlocate,index_prefix,i,4,2)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>-CMP_TRIE" ,giqgramlocate,index_prefix,i,8,2)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>-CMP_TRIE",giqgramlocate,index_prefix,i,12,2)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>-CMP_TRIE",giqgramlocate,index_prefix,i,16,2)->Unit({benchmark::kMicrosecond});
+
+
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>-CMP_SMP" ,giqgramlocate,index_prefix,i,4,3)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>-CMP_SMP" ,giqgramlocate,index_prefix,i,8,3)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>-CMP_SMP",giqgramlocate,index_prefix,i,12,3)->Unit({benchmark::kMicrosecond});
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>-CMP_SMP",giqgramlocate,index_prefix,i,16,3)->Unit({benchmark::kMicrosecond});
 
     }
 

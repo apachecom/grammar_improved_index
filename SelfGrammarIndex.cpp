@@ -5,7 +5,7 @@
 #include <sdsl/lcp_bitcompressed.hpp>
 #include <sdsl/rmq_succinct_sada.hpp>
 #include "SelfGrammarIndex.h"
-#include <time.h>
+
 #define _MAX_PROOF 1000
 
 //std::fstream frules("rules_to_extract",std::ios::out|std::ios::binary);
@@ -13,12 +13,19 @@
 using namespace std::chrono;
 using timer = std::chrono::high_resolution_clock;
 
-void SelfGrammarIndex::build(const std::string& text)
+void SelfGrammarIndex::build(const std::string& text
+#ifdef MEM_MONITOR
+        , mem_monitor& mm
+#endif
+)
 {
-
-
-
-
+    grammar not_compressed_grammar;
+    std::vector< std::pair< std::pair<size_t ,size_t >,std::pair<size_t ,size_t > > > grammar_sfx;
+    build_basics(text,not_compressed_grammar,grammar_sfx
+#ifdef MEM_MONITOR
+            , mm
+#endif
+                         );
 
 }
 void SelfGrammarIndex::save(std::fstream &fstream1) {
@@ -92,12 +99,12 @@ bool SelfGrammarIndex::expand_suffix(const grammar_representation::g_long  &X_i,
     while(current_leaf >= first_leaf )
     {
         // current leaf is a Terminal rule?
-        auto X_i = _g[Tg.pre_order(Tg.leafselect(current_leaf))];
+        auto X = _g[Tg.pre_order(Tg.leafselect(current_leaf))];
 
-        if(_g.isTerminal(X_i))
+        if(_g.isTerminal(X))
         {
 
-            unsigned char a_th = _g.terminal_simbol(X_i); // a_th symbol in the sorted alphabet
+            unsigned char a_th = _g.terminal_simbol(X); // a_th symbol in the sorted alphabet
             s[pos] = a_th;
             if(l == ++pos)
                 return true;
@@ -114,7 +121,7 @@ bool SelfGrammarIndex::expand_suffix(const grammar_representation::g_long  &X_i,
             //Save actua state;
             Q.emplace_front(std::make_pair(node,std::make_pair(current_leaf,first_leaf)));
             // Jump to first occ
-            auto node_first_occ = Tg[_g.select_occ(X_i,1)];
+            auto node_first_occ = Tg[_g.select_occ(X,1)];
             first_leaf= Tg.leafrank(node_first_occ);
             current_leaf = first_leaf+Tg.leafnum(node_first_occ)-1;
         }
@@ -165,7 +172,7 @@ void SelfGrammarIndex::expand_grammar_sfx(const size_t & sfx, std::string & s, c
     s[pos] = '\0';
 }
 void SelfGrammarIndex::find_second_occ(long int & offset, unsigned int & node, std::vector<uint> & occ) const{
-
+;
     const auto& Tg = _g.get_parser_tree();
     std::deque<std::pair< uint, long int >> S;
 
@@ -191,16 +198,17 @@ void SelfGrammarIndex::find_second_occ(long int & offset, unsigned int & node, s
         }
         else
         {
-            auto node = Tg[S.front().first];
-            size_t parent = Tg.parent(node);
+            auto _node = Tg[S.front().first];
+            size_t parent = Tg.parent(_node);
             size_t pre_parent = Tg.pre_order(parent);
             size_t Xi = _g[pre_parent];
             size_t n_s_occ = _g.n_occ(Xi);
-            long int p_offset = S.front().second + _g.offsetText(node) - _g.offsetText(parent);
+            long int p_offset = S.front().second + _g.offsetText(_node) - _g.offsetText(parent);
             for (size_t i = 1; i <= n_s_occ; ++i)
             {
-                size_t pre_parent = _g.select_occ(Xi,i);
-                S.emplace_back(pre_parent,p_offset);
+                size_t i_pre_parent;
+                i_pre_parent = _g.select_occ(Xi, i);
+                S.emplace_back(i_pre_parent,p_offset);
             }
         }
 
@@ -236,16 +244,16 @@ void SelfGrammarIndex::find_second_occ(long int & offset, unsigned int & node, s
         }
         else
         {
-            auto node = Tg[S.front().first];
-            size_t parent = Tg.parent(node);
+            auto _node = Tg[S.front().first];
+            size_t parent = Tg.parent(_node);
             size_t pre_parent = Tg.pre_order(parent);
             size_t Xi = _g[pre_parent];
             size_t n_s_occ = _g.n_occ(Xi);
-            long int p_offset = S.front().second + _g.offsetText(node) - _g.offsetText(parent);
+            long int p_offset = S.front().second + _g.offsetText(_node) - _g.offsetText(parent);
             for (size_t i = 1; i <= n_s_occ; ++i)
             {
-                size_t pre_parent = _g.select_occ(Xi,i);
-                S.emplace_back(pre_parent,p_offset);
+                size_t i_pre_parent = _g.select_occ(Xi,i);
+                S.emplace_back(i_pre_parent,p_offset);
             }
         }
 
@@ -291,12 +299,12 @@ void SelfGrammarIndex::display(const std::size_t & i, const std::size_t & j, std
         if(notend)
         {
             auto X_j = _g[Tg.pre_order(current_node)];
-            p -= _g.select_L(l);
+            p -= (long long int)_g.select_L(l);
             auto occ_p = _g.select_occ(X_j,1);
             current_node = Tg[occ_p];
             size_t l2_r = Tg.leafrank(current_node);
 
-            p += _g.select_L(l2_r);
+            p += (long long int)_g.select_L(l2_r);
             s_path.push(make_pair(l,l2_r + Tg.leafnum(current_node)));
         }
 
@@ -304,7 +312,7 @@ void SelfGrammarIndex::display(const std::size_t & i, const std::size_t & j, std
 
     }
 
-    long long int off = j-i+1;
+    auto off = (long long int)(j-i+1);
     str.resize(off);
     size_t pos = 0;
     expand_prefix(_g[Tg.pre_order(current_node)],str,(size_t)off,pos);
@@ -328,78 +336,6 @@ void SelfGrammarIndex::display(const std::size_t & i, const std::size_t & j, std
 }
 
 void SelfGrammarIndex::display_trie(const std::size_t & i , const std::size_t & j, std::string & str) {
-
-
-//    const auto& Tg = _g.get_parser_tree();
-//    long long int p = i;
-//
-//    std::stack<std::pair<size_t ,size_t >> s_path;
-//    dfuds::dfuds_tree::dfuds_long root = Tg.root();
-//
-//    s_path.push(make_pair(0,Tg.leafnum(root)+1));
-//    // auto start = timer::now();
-//
-//    auto current_node = root;
-//    bool notend = true;
-//
-//    while(notend)
-//    {
-//
-//        dfuds::dfuds_tree::dfuds_long ls = Tg.leafrank(current_node);
-//        dfuds::dfuds_tree::dfuds_long hs = ls + Tg.leafnum(current_node)-1;
-//
-//
-//        dfuds::dfuds_tree::dfuds_long  l = Tg.find_child(current_node,ls,hs,[&p,&notend,this](const dfuds::dfuds_tree::dfuds_long &child)->bool{
-//
-//            //size_t pos_m = _g.offsetText(child);
-//            size_t pos_m = _g.select_L(child);
-//
-//            if(pos_m == p)  notend = false;
-//
-//            return p < pos_m;
-//            return true;
-//
-//        });
-//
-//
-//
-//        current_node = Tg.leafselect(l);
-//        if(notend)
-//        {
-//            auto X_j = _g[Tg.pre_order(current_node)];
-//            p -= _g.select_L(l);
-//            auto occ_p = _g.select_occ(X_j,1);
-//            current_node = Tg[occ_p];
-//            size_t l2_r = Tg.leafrank(current_node);
-//
-//            p += _g.select_L(l2_r);
-//            s_path.push(make_pair(l,l2_r + Tg.leafnum(current_node)));
-//        }
-//
-//
-//
-//    }
-//
-//    long long int off = j-i+1;
-//    str.resize(off);
-//    size_t pos = 0;
-//    bp_expand_prefix(_g[Tg.pre_order(current_node)],str,(size_t)off,pos);
-//    size_t current_leaf = Tg.leafrank(current_node)+1;
-//
-//    while(!s_path.empty() && pos < off  ){
-//
-//        if(current_leaf == s_path.top().second )
-//        {
-//            if(s_path.top().first == 0)
-//                break;
-//
-//            current_leaf = s_path.top().first+1;
-//            s_path.pop();
-//        }else{
-//            bp_expand_prefix(_g[Tg.pre_order(Tg.leafselect(current_leaf))],str,(size_t)off,pos);
-//            ++current_leaf;
-//        }
-//     }
 
     const auto& Tg = _g.get_parser_tree();
     long long int p = i;
@@ -436,12 +372,12 @@ void SelfGrammarIndex::display_trie(const std::size_t & i , const std::size_t & 
         if(notend)
         {
             auto X_j = _g[Tg.pre_order(current_node)];
-            p -= _g.select_L(l);
+            p -= (long long int)_g.select_L(l);
             auto occ_p = _g.select_occ(X_j,1);
             current_node = Tg[occ_p];
             size_t l2_r = Tg.leafrank(current_node);
 
-            p += _g.select_L(l2_r);
+            p += (long long int)_g.select_L(l2_r);
             s_path.push(make_pair(l,l2_r + Tg.leafnum(current_node)));
         }
 
@@ -502,11 +438,11 @@ int SelfGrammarIndex::cmp_prefix(const compressed_grammar::g_long & X_i, std::st
     while(current_leaf <= last_leaf)
     {
         // current leaf is a Terminal rule?
-        auto X_i = _g[Tg.pre_order(Tg.leafselect(current_leaf))];
+        auto X = _g[Tg.pre_order(Tg.leafselect(current_leaf))];
 
-        if(_g.isTerminal(X_i))
+        if(_g.isTerminal(X))
         {
-            unsigned char a_th = _g.terminal_simbol(X_i); // a_th symbol in the sorted alphabet
+            unsigned char a_th = _g.terminal_simbol(X); // a_th symbol in the sorted alphabet
             if(a_th < (unsigned char)(*itera)) return 1;
             if(a_th > (unsigned char)(*itera)) return -1;
             ++itera;
@@ -525,7 +461,7 @@ int SelfGrammarIndex::cmp_prefix(const compressed_grammar::g_long & X_i, std::st
             //Save actua state;
             Q.emplace_front(std::make_pair(node,std::make_pair(current_leaf,last_leaf)));
             // Jump to first occ
-            auto node_first_occ = Tg[_g.select_occ(X_i,1)];
+            auto node_first_occ = Tg[_g.select_occ(X,1)];
             current_leaf = Tg.leafrank(node_first_occ);
             last_leaf = current_leaf+Tg.leafnum(node_first_occ)-1;
         }
@@ -593,11 +529,11 @@ int SelfGrammarIndex::cmp_suffix(const compressed_grammar::g_long & X_i, std::st
     while(current_leaf >= last_leaf)
     {
         // current leaf is a Terminal rule?
-        auto X_i = _g[Tg.pre_order(Tg.leafselect(current_leaf))];
+        auto X = _g[Tg.pre_order(Tg.leafselect(current_leaf))];
 
-        if(_g.isTerminal(X_i))
+        if(_g.isTerminal(X))
         {
-            unsigned char a_th = _g.terminal_simbol(X_i); // a_th symbol in the sorted alphabet
+            unsigned char a_th = _g.terminal_simbol(X); // a_th symbol in the sorted alphabet
             if(a_th < (unsigned char)(*itera)) return  1;
             if(a_th > (unsigned char)(*itera)) return -1;
             --itera;
@@ -615,7 +551,7 @@ int SelfGrammarIndex::cmp_suffix(const compressed_grammar::g_long & X_i, std::st
             //Save actua state;
             Q.emplace_front(std::make_pair(node,std::make_pair(current_leaf,last_leaf)));
             // Jump to first occ
-            auto node_first_occ = Tg[_g.select_occ(X_i,1)];
+            auto node_first_occ = Tg[_g.select_occ(X,1)];
             current_leaf = Tg.leafrank(node_first_occ);
             last_leaf = current_leaf+Tg.leafnum(node_first_occ)-1;
             swap(current_leaf,last_leaf);
@@ -1061,8 +997,6 @@ void SelfGrammarIndex::locate_ch(const char & ch, std::vector<uint> & occ) const
         find_second_occ(p_offset,current_parent,occ);
 
     }
-
-    return;
 }
 
 void SelfGrammarIndex::locate_ch(const char & ch, sdsl::bit_vector & occ) const {
@@ -1087,8 +1021,6 @@ void SelfGrammarIndex::locate_ch(const char & ch, sdsl::bit_vector & occ) const 
         find_second_occ(p_offset,current_parent,occ);
 
     }
-
-    return;
 }
 
 bool SelfGrammarIndex::expand_prefix2(const size_t & node, std::string & s, const size_t & l, size_t &pos) const {
@@ -1138,166 +1070,20 @@ bool SelfGrammarIndex::expand_prefix2(const size_t & node, std::string & s, cons
 
 }
 
-void SelfGrammarIndex::build_basics(const std::string & text, fstream& suffixes, fstream& basics, fstream& repair_g) {
-
-
-
-    /*
- * Building grammar by repair algorithm
- *
- * */
-    std::cout<<"Building grammar by repair algorithm (SGI)"<<std::endl;
-
-
+void SelfGrammarIndex::build_basics(const std::string & text, fstream& suffixes, fstream& basics, fstream& repair_g
+#ifdef MEM_MONITOR
+                                    ,mem_monitor &mm
+#endif
+) {
     grammar not_compressed_grammar;
-    not_compressed_grammar.buildRepair(text);
-
-
-    std::cout<<"\t number of rules "<<not_compressed_grammar.n_rules()<<std::endl;
-    std::cout<<"\t total size of rules "<<not_compressed_grammar.get_size()<<std::endl;
-    //std::cout<<"\t size of the representation "<<not_compressed_grammar.size_in_bytes()*1/(1024*1024)<<"(mb)"<<std::endl;
-
-    //  not_compressed_grammar.print(text);
-
-
-    /*
-     * Building compressed grammar
-     *
-    * */
-    std::cout<<"Building compressed grammar"<<std::endl;
-
-    ///not_compressed_grammar.print(text);
-    _g.code = code;
-    _g.build(not_compressed_grammar);
-    //  _g.print_size_in_bytes();
-    std::cout<<"total size of compressed grammar*******************"<<_g.size_in_bytes()*1.0/1024/1024<<std::endl;
-    /*
-     * Build sufix of grammar
-     *
-     * */
-    std::cout<<"Compute suffix grammar"<<std::endl;
-
     std::vector< std::pair< std::pair<size_t ,size_t >,std::pair<size_t ,size_t > > > grammar_sfx;
-    const auto &gtree = _g.get_parser_tree();
-    unsigned long num_sfx = 0;
 
-    for (auto r_begin = not_compressed_grammar.begin(); r_begin != not_compressed_grammar.end(); ++r_begin) {
-
-        rule r = r_begin->second;
-        rule::r_long r_id = r_begin->first;
-        size_t node = gtree[ _g.select_occ(r_id,1)];
-
-        rule::r_long off = 0;
-
-        for (auto j = r._rule.size()-1; j >= 1 ; --j) {
-            off += not_compressed_grammar[r._rule[j]].len();
-
-            size_t  left =  r.r - off + 1;
-            size_t  right = r.r;
-
-            size_t tag = gtree.pre_order(gtree.child(node,j+1));
-            grammar_sfx.emplace_back(std::make_pair(std::make_pair(left,right),std::make_pair(r._rule[j-1],tag)));
-            num_sfx++;
-        }
-    }
-    std::cout<<"\t number of suffixes "<<num_sfx<<std::endl;
-
-    /*
-     * Sorting suffixes
-     *
-     * */
-
-    std::cout<<"Building structures for sorting"<<std::endl;
-    sdsl::int_vector<> SA(text.size(),0);
-    sdsl::algorithm::calculate_sa( (unsigned char*)text.c_str(),text.size(),SA);
-    sdsl::inv_perm_support<> SA_1(&SA);
-    sdsl::lcp_wt<> LCP;
-    sdsl::construct_im(LCP,text.c_str(),sizeof(char));
-    sdsl::rmq_succinct_sada<true,sdsl::bp_support_sada<>> rmq(&LCP);
-
-    std::cout<<"sorting suffixes ........."<<std::endl;
-    std::sort(grammar_sfx.begin(),grammar_sfx.end(),
-              [this,&text,&SA_1,&LCP,&rmq](const std::pair< std::pair<size_t ,size_t >,std::pair<size_t ,size_t > > & a,
-                                           const std::pair< std::pair<size_t ,size_t >,std::pair<size_t ,size_t > > &b )->bool{
-                  /*
-                   * offset of suffix in the text
-                   * */
-                  ulong a_pos = a.first.first;
-                  ulong b_pos = b.first.first;
-
-                  ulong size_a = a.first.second - a.first.first +1;
-                  ulong size_b = b.first.second - b.first.first +1;
-
-                  /*
-                   * is start at the same position return the shortest
-                   * */
-                  if(a_pos == b_pos)
-                      return size_a < size_b;
-
-                  auto sa_1_a = SA_1[a_pos];
-                  auto sa_1_b = SA_1[b_pos];
-
-                  int min= LCP[rmq(std::min(sa_1_a,sa_1_b)+2,std::max(sa_1_a,sa_1_b)+1)];
-
-                  /*
-                   * Check if one is prefix of the other
-                   * return the shortest
-                   * */
-
-                  if(std::min(size_a,size_b) <= min){
-                      return size_a < size_b;
-                  }
-
-                  /*
-                   * then return the lowest lexicographical
-                   * */
-
-                  return sa_1_a < sa_1_b;
-
-              });
-
-
-    std::cout<<"end sorting suffixes "<<std::endl;
-
-/*
-    uint i = 0;
-    for (auto && sf  : grammar_sfx) {
-
-        std::string sfs;
-        sfs.resize(sf.first.second - sf.first.first + 1);
-        std::copy(text.begin()+sf.first.first,text.begin()+sf.first.second+1,sfs.begin());
-        std::cout<<++i<<"-|"<<sfs<<std::endl;
-
-    }
-*/
-
-
-    /*
-     *
-     * Building grid for 2d range search first occ
-     *
-     * */
-
-    std::cout<<"Building grid for 2d range search first occ"<<std::endl;
-
-    std::vector<std::pair<std::pair<range_search2d::bin_long ,range_search2d::bin_long >,range_search2d::bin_long>> grid_points(num_sfx);
-    size_t bpair = 0;
-    for (auto && s  :grammar_sfx ) {
-        grid_points[bpair] = make_pair(make_pair(s.second.first,bpair+1),s.second.second);
-        ++bpair;
-    }
-    grid.code = code;
-    grid.build(grid_points.begin(),grid_points.end(),not_compressed_grammar.n_rules(),num_sfx);
-    //std::cout<<"***************************grid size "<<grid.size_in_bytes()*1.0/1024/1024<<std::endl;
-    ///grid.print_size();
-    ////grid.print();
-
-    /*
-     * Building Sampled Patricia Trees for suffixes.
-     *
-     * Sampling by log(u)log(log(n))/log(n)
-     * where n is the number of symbols in the repair grammar and u is the length of the original text
-     * */
+    build_basics(text,not_compressed_grammar,grammar_sfx
+#ifdef MEM_MONITOR
+    ,mm
+#endif
+    );
+    unsigned long num_sfx = grammar_sfx.size();
 
     if(!basics.is_open()){ std::cout<<"ERROR OPENING BASIC FILE"<<std::endl;}
     if(!suffixes.is_open()){ std::cout<<"ERROR OPENING SUFFIX FILE"<<std::endl;}
@@ -1326,7 +1112,11 @@ void SelfGrammarIndex::build_basics(const std::string & text, fstream& suffixes,
 
 }
 
-void SelfGrammarIndex::build_basics_bal(const std::string & text, fstream& R, fstream&C, fstream& suffixes, fstream& basics, fstream& repair_g) {
+void SelfGrammarIndex::build_basics_bal(const std::string & text, fstream& R, fstream&C, fstream& suffixes, fstream& basics, fstream& repair_g
+#ifdef MEM_MONITOR
+        ,mem_monitor& mm
+#endif
+) {
 
     /*
 * Building grammar by repair algorithm
@@ -1336,7 +1126,11 @@ void SelfGrammarIndex::build_basics_bal(const std::string & text, fstream& R, fs
 
 
     grammar not_compressed_grammar;
-    not_compressed_grammar.buildBalRepair(text,R,C);
+    not_compressed_grammar.buildBalRepair(text,R,C
+#ifdef MEM_MONITOR
+            ,mm
+#endif
+    );
 
 
     std::cout<<"\t number of rules "<<not_compressed_grammar.n_rules()<<std::endl;
@@ -1354,7 +1148,11 @@ void SelfGrammarIndex::build_basics_bal(const std::string & text, fstream& R, fs
 
     ///not_compressed_grammar.print(text);
     _g.code = code;
-    _g.build(not_compressed_grammar);
+    _g.build(not_compressed_grammar
+#ifdef MEM_MONITOR
+            ,mm
+#endif
+    );
     //  _g.print_size_in_bytes();
     std::cout<<"total size of compressed grammar*******************"<<_g.size_in_bytes()*1.0/1024/1024<<std::endl;
     /*
@@ -1691,7 +1489,7 @@ void SelfGrammarIndex::track_occ(uint &pnode, sdsl::bit_vector& B, const uint& b
     uint preorder_parent = _g.m_tree.pre_order(parent);
 
     if(_g.m_tree.isleaf(pos_node) == 1)
-        B[ begin + preorder_parent - 1 ] = 1;
+        B[ begin + preorder_parent - 1 ] = true;
 
     uint label = _g[preorder_parent];
 
@@ -1705,4 +1503,249 @@ void SelfGrammarIndex::track_occ(uint &pnode, sdsl::bit_vector& B, const uint& b
 
     track_occ(preorder_parent,B,begin);
 }
+
+void SelfGrammarIndex::build_basics(
+        const std::string & text,
+        fstream& suffixes,
+        fstream& basics,
+        fstream& repair_g,
+        grammar &not_compressed_grammar,
+        std::vector< std::pair< std::pair<size_t ,size_t >,std::pair<size_t ,size_t > > >& grammar_sfx
+#ifdef MEM_MONITOR
+        , mem_monitor& mm
+#endif
+        ) {
+    build_basics(text,not_compressed_grammar,grammar_sfx
+#ifdef MEM_MONITOR
+            ,mm
+#endif
+    );
+
+    if(!basics.is_open()){ std::cout<<"ERROR OPENING BASIC FILE"<<std::endl;}
+    if(!suffixes.is_open()){ std::cout<<"ERROR OPENING SUFFIX FILE"<<std::endl;}
+    if(!repair_g.is_open()){ std::cout<<"ERROR OPENING GRAMMAR FILE"<<std::endl;}
+    unsigned long num_sfx = grammar_sfx.size();
+
+    sdsl::serialize(num_sfx,suffixes);
+
+
+    for (auto && e : grammar_sfx ) {
+
+        size_t p = e.first.first;
+        sdsl::serialize(p,suffixes);
+        p = e.first.second;
+        sdsl::serialize(p,suffixes);
+        p = e.second.first;
+        sdsl::serialize(p,suffixes);
+        p = e.second.second;
+        sdsl::serialize(p,suffixes);
+
+    }
+
+    save(basics);
+
+    not_compressed_grammar.save(repair_g);
+
+}
+
+
+void SelfGrammarIndex::build_basics(
+        const std::string & text,
+        grammar &not_compressed_grammar,
+        std::vector< std::pair< std::pair<size_t ,size_t >,std::pair<size_t ,size_t > > >& grammar_sfx
+#ifdef MEM_MONITOR
+        ,  mem_monitor& mm
+#endif
+){
+
+
+    /*
+ * Building grammar by repair algorithm
+ *
+ * */
+
+#ifdef PRINT_LOGS
+    std::cout<<BUILD_CFG_GRAMMAR<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    auto start = timer::now();
+    mm.event(BUILD_CFG_GRAMMAR);
+#endif
+    not_compressed_grammar.buildRepair(text
+#ifdef MEM_MONITOR
+            ,mm
+#endif
+    );
+#ifdef MEM_MONITOR
+    auto stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_CFG_GRAMMAR] = duration_cast<microseconds>(stop-start).count();
+
+#endif
+    /*
+     * Building compressed grammar
+     *
+    * */
+
+#ifdef PRINT_LOGS
+    std::cout<<BUILD_COMPRESSED_GRAMMAR<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    start = timer::now();
+    mm.event(BUILD_COMPRESSED_GRAMMAR);
+#endif
+    _g.code = code;
+    _g.build(not_compressed_grammar
+#ifdef MEM_MONITOR
+            , mm
+#endif
+    );
+#ifdef MEM_MONITOR
+    stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_COMPRESSED_GRAMMAR] = duration_cast<microseconds>(stop-start).count();;
+#endif
+    /*
+     * Build sufix of grammar
+     *
+     * */
+
+#ifdef PRINT_LOGS
+    std::cout<<BUILD_COMPUTE_GRAMMAR_SFX<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    mm.event(BUILD_COMPUTE_GRAMMAR_SFX);
+    start = timer::now();
+#endif
+
+    if(!grammar_sfx.empty()) grammar_sfx.clear();
+    const auto &gtree = _g.get_parser_tree();
+    unsigned long num_sfx = 0;
+
+    for (auto r_begin = not_compressed_grammar.begin(); r_begin != not_compressed_grammar.end(); ++r_begin) {
+
+        rule r = r_begin->second;
+        rule::r_long r_id = r_begin->first;
+        size_t node = gtree[ _g.select_occ(r_id,1)];
+
+        rule::r_long off = 0;
+
+        for (auto j = r._rule.size()-1; j >= 1 ; --j) {
+            off += not_compressed_grammar[r._rule[j]].len();
+
+            size_t  left =  r.r - off + 1;
+            size_t  right = r.r;
+
+            size_t tag = gtree.pre_order(gtree.child(node,j+1));
+            grammar_sfx.emplace_back(std::make_pair(std::make_pair(left,right),std::make_pair(r._rule[j-1],tag)));
+            num_sfx++;
+        }
+    }
+#ifdef MEM_MONITOR
+    stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_COMPUTE_GRAMMAR_SFX] = duration_cast<microseconds>(stop-start).count();;
+#endif
+
+    /*
+     * Sorting suffixes
+     *
+     * */
+
+#ifdef PRINT_LOGS
+    std::cout<<BUILD_COMPUTE_SORT_EDA_SA_LCP_RMQ<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    mm.event(BUILD_COMPUTE_SORT_EDA_SA_LCP_RMQ);
+    start = timer::now();
+#endif
+
+    sdsl::int_vector<> SA(text.size(),0);
+    sdsl::algorithm::calculate_sa( (unsigned char*)text.c_str(),text.size(),SA);
+    sdsl::inv_perm_support<> SA_1(&SA);
+    sdsl::lcp_wt<> LCP;
+    sdsl::construct_im(LCP,text.c_str(),sizeof(char));
+    sdsl::rmq_succinct_sada<true,sdsl::bp_support_sada<>> rmq(&LCP);
+
+#ifdef MEM_MONITOR
+    stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_COMPUTE_SORT_EDA_SA_LCP_RMQ] = duration_cast<microseconds>(stop-start).count();;
+#endif
+
+#ifdef PRINT_LOGS
+    std::cout<<BUILD_SORT_GRAMMAR_SFX<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    start = timer::now();
+    mm.event(BUILD_SORT_GRAMMAR_SFX);
+#endif
+    std::sort(grammar_sfx.begin(),grammar_sfx.end(),
+              [this,&text,&SA_1,&LCP,&rmq](const std::pair< std::pair<size_t ,size_t >,std::pair<size_t ,size_t > > & a,
+                                           const std::pair< std::pair<size_t ,size_t >,std::pair<size_t ,size_t > > &b )->bool{
+                  /*
+                   * offset of suffix in the text
+                   * */
+                  ulong a_pos = a.first.first;
+                  ulong b_pos = b.first.first;
+
+                  ulong size_a = a.first.second - a.first.first +1;
+                  ulong size_b = b.first.second - b.first.first +1;
+
+                  /*
+                   * is start at the same position return the shortest
+                   * */
+                  if(a_pos == b_pos)
+                      return size_a < size_b;
+
+                  auto sa_1_a = SA_1[a_pos];
+                  auto sa_1_b = SA_1[b_pos];
+
+                  int min= LCP[rmq(std::min(sa_1_a,sa_1_b)+2,std::max(sa_1_a,sa_1_b)+1)];
+
+                  /*
+                   * Check if one is prefix of the other
+                   * return the shortest
+                   * */
+
+                  if(std::min(size_a,size_b) <= min){
+                      return size_a < size_b;
+                  }
+
+                  /*
+                   * then return the lowest lexicographical
+                   * */
+
+                  return sa_1_a < sa_1_b;
+
+              });
+
+
+#ifdef MEM_MONITOR
+    stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_SORT_GRAMMAR_SFX] = duration_cast<microseconds>(stop-start).count();;
+#endif
+
+#ifdef PRINT_LOGS
+    std::cout<<BUILD_GRID<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    start = timer::now();
+    mm.event(BUILD_GRID);
+#endif
+
+    std::vector<std::pair<std::pair<range_search2d::bin_long ,range_search2d::bin_long >,range_search2d::bin_long>> grid_points(num_sfx);
+    size_t bpair = 0;
+    for (auto && s  :grammar_sfx ) {
+        grid_points[bpair] = make_pair(make_pair(s.second.first,bpair+1),s.second.second);
+        ++bpair;
+    }
+
+
+    grid.code = code;
+    grid.build(grid_points.begin(),grid_points.end(),not_compressed_grammar.n_rules(),num_sfx);
+#ifdef MEM_MONITOR
+    stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_GRID] = duration_cast<microseconds>(stop-start).count();;
+#endif
+
+
+}
+
 

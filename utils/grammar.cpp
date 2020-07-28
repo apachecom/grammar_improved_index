@@ -11,6 +11,7 @@
 
 #include "grammar.h"
 
+
 typedef std::vector<std::pair<uint, uint>> rvect;
 typedef std::vector<uint> lvect;
 
@@ -22,7 +23,22 @@ grammar::~grammar() {
 
 }
 
-void grammar::buildRepair(const std::string &text) {
+void grammar::buildRepair(const std::string &text
+#ifdef MEM_MONITOR
+    ,mem_monitor& mm
+#endif
+
+) {
+
+
+#ifdef PRINT_LOGS
+    std::cout<<"BUILD_CFG_GRAMMAR_1_RE_PAIR"<<std::endl;
+#endif
+
+#ifdef MEM_MONITOR
+    auto start = timer::now();
+    mm.event(BUILD_CFG_GRAMMAR_1_RE_PAIR);
+#endif
 
     unsigned int max_key;
     auto  utext = (u_char *)text.c_str();
@@ -44,11 +60,8 @@ void grammar::buildRepair(const std::string &text) {
 
     for (int k = 0; k < terminals; ++k) {
         alp[k] = symbols[k];
-//        std::cout<<symbols[k]<<" ";
         inv_alp[symbols[k]] = k;
     }
-//    std::cout<<std::endl;
-
     _size = 0;
 
     for (rule::r_long i=0 ; i < terminals ; i++){
@@ -87,10 +100,30 @@ void grammar::buildRepair(const std::string &text) {
     initial_rule = rules;
     free(ctext);
 
-   preprocess(text);
+#ifdef MEM_MONITOR
+    auto stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_CFG_GRAMMAR_1_RE_PAIR] = duration_cast<microseconds>(stop-start).count();;
+#endif
+
+   preprocess(text
+
+#ifdef MEM_MONITOR
+           , mm
+#endif
+   );
 }
 
-void grammar::buildBalRepair( const std::string &text,std::fstream & in_grammar,  std::fstream & in_first_rule) {
+void grammar::buildBalRepair( const std::string &text,std::fstream & in_grammar,  std::fstream & in_first_rule
+#ifdef MEM_MONITOR
+        ,mem_monitor& mm
+#endif
+
+) {
+
+#ifdef MEM_MONITOR
+    auto start = timer::now();
+    mm.event(BUILD_CFG_GRAMMAR_1_RE_PAIR);
+#endif
 
     unsigned int max_key;
     auto  utext = (u_char *)text.c_str();
@@ -228,8 +261,17 @@ void grammar::buildBalRepair( const std::string &text,std::fstream & in_grammar,
     _grammar[rules]._rule = S;
     initial_rule = rules;
     free(ctext);
+#ifdef MEM_MONITOR
+    auto stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_CFG_GRAMMAR_1_RE_PAIR] = duration_cast<microseconds>(stop-start).count();;
 
-    preprocess(text);
+#endif
+
+    preprocess(text
+#ifdef MEM_MONITOR
+            , mm
+#endif
+    );
 
 }
 grammar::grammar_iterator grammar::begin() {
@@ -240,12 +282,26 @@ grammar::grammar_iterator grammar::end() {
     return _grammar.end();
 }
 
-void grammar::preprocess(const std::string & text) {
+void grammar::preprocess(const std::string & text
+
+#ifdef MEM_MONITOR
+                         ,mem_monitor& mm
+#endif
+) {
 
     /*
      * check for every terminal symbol that exist a rule for it
      *
      * */
+
+
+#ifdef PRINT_LOGS
+    std::cout<<"BUILD_CFG_GRAMMAR_2_PREP_1_TERMINAL_RULE"<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    auto start = timer::now();
+    mm.event(BUILD_CFG_GRAMMAR_2_PREP_1_TERMINAL_RULE);
+#endif
     rule::r_long max_rule = initial_rule;
     {
         sdsl::bit_vector mark(alp.size(),0);
@@ -270,12 +326,27 @@ void grammar::preprocess(const std::string & text) {
         }
     }
 
+
+#ifdef PRINT_LOGS
+    std::cout<<BUILD_CFG_GRAMMAR_2_PREP_1_TERMINAL_RULE<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    auto stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_CFG_GRAMMAR_2_PREP_1_TERMINAL_RULE] = duration_cast<microseconds>(stop-start).count();;
+
+    #endif
     /*
      * REMOVE EVERY RULE WITH LENGHT EQUAL TO 1 WHIT A NO TERMINAL SIMBOL ON THE RIGHT HAND
      * AND ITS OCCURRENCY ARE REPLACED WHIT THE RULE FOR THE TERMINAL GENERATED
      *
      * */
-
+#ifdef PRINT_LOGS
+    std::cout<<BUILD_CFG_GRAMMAR_2_PREP_2_REMOVE_RULE_LEN_1<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    start = timer::now();
+    mm.event(BUILD_CFG_GRAMMAR_2_PREP_2_REMOVE_RULE_LEN_1);
+#endif
     {
         sdsl::bit_vector mark(max_rule+1,0);
         for (auto &&iter : _grammar)
@@ -305,6 +376,20 @@ void grammar::preprocess(const std::string & text) {
                 _grammar.erase(iter.first);
         }
     }
+
+#ifdef MEM_MONITOR
+    stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_CFG_GRAMMAR_2_PREP_2_REMOVE_RULE_LEN_1] = duration_cast<microseconds>(stop-start).count();;
+
+    #endif
+
+#ifdef PRINT_LOGS
+    std::cout<<BUILD_CFG_GRAMMAR_2_PREP_3_GRAMMAR_REPLACE_RULE_OCC_1<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    start = timer::now();
+    mm.event(BUILD_CFG_GRAMMAR_2_PREP_3_GRAMMAR_REPLACE_RULE_OCC_1);
+#endif
     /*
      * DELETE EVERY RULE WHERE ITS LEFT HAND NO-TERMINAL ITS METIONED ONLY ONE TIME IN THE GRAMMAR
      * */
@@ -330,6 +415,11 @@ void grammar::preprocess(const std::string & text) {
 
     }
 
+#ifdef MEM_MONITOR
+    stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_CFG_GRAMMAR_2_PREP_3_GRAMMAR_REPLACE_RULE_OCC_1] = duration_cast<microseconds>(stop-start).count();;
+
+#endif
 
     /*
      * Sort the rules by the reverse
@@ -337,6 +427,13 @@ void grammar::preprocess(const std::string & text) {
      * */
 
 
+#ifdef PRINT_LOGS
+    std::cout<<BUILD_CFG_GRAMMAR_2_PREP_4_CALCULATE_TEXT_OFF_RULE<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    start = timer::now();
+    mm.event(BUILD_CFG_GRAMMAR_2_PREP_4_CALCULATE_TEXT_OFF_RULE);
+#endif
     {
         rule::r_long t = 0;
         std::set<rule::r_long >M;
@@ -346,10 +443,19 @@ void grammar::preprocess(const std::string & text) {
 
     }
 
+#ifdef MEM_MONITOR
+    stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_CFG_GRAMMAR_2_PREP_4_CALCULATE_TEXT_OFF_RULE] = duration_cast<microseconds>(stop-start).count();;
+#endif
 
-    std::cout<<"Building structures to sort rules by reverse"<<std::endl;
 
-
+#ifdef PRINT_LOGS
+    std::cout<<BUILD_CFG_GRAMMAR_2_PREP_5_BUILD_EDA_SA_LCP_RMQ_SORT<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    start = timer::now();
+    mm.event(BUILD_CFG_GRAMMAR_2_PREP_5_BUILD_EDA_SA_LCP_RMQ_SORT);
+#endif
     std::string rev_text = text;
     std::reverse(rev_text.begin(),rev_text.end());
     sdsl::int_vector<> SA(rev_text.size(),0);
@@ -367,9 +473,21 @@ void grammar::preprocess(const std::string & text) {
         rules[j] = r.first;
         ++j;
     }
+#ifdef MEM_MONITOR
+    stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_CFG_GRAMMAR_2_PREP_5_BUILD_EDA_SA_LCP_RMQ_SORT] = duration_cast<microseconds>(stop-start).count();;
 
-    std::cout<<"sort rules by reverse ........."<<std::endl;
+#endif
 
+
+
+#ifdef PRINT_LOGS
+    std::cout<<BUILD_CFG_GRAMMAR_2_PREP_6_SORT_REV_RULES<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    mm.event(BUILD_CFG_GRAMMAR_2_PREP_6_SORT_REV_RULES);
+    start = timer::now();
+#endif
 
     std::sort(rules.begin(),rules.end(),[this,&rev_text,&SA_1,&LCP,&rmq](const rule::r_long & a, const rule::r_long &b )->bool{
 
@@ -392,23 +510,23 @@ void grammar::preprocess(const std::string & text) {
         }
 
         return sa_1_a < sa_1_b;
-
-
-        /*std::string sa,sb;
-        sa.resize(size_a);
-        sb.resize(size_b);
-
-        std::copy(rev_text.begin()+a_pos,rev_text.begin()+a_pos+size_a,sa.begin());
-        std::copy(rev_text.begin()+b_pos,rev_text.begin()+b_pos+size_b,sb.begin());
-
-        return sa < sb;*/
-
     });
 
 
-    std::cout<<"end sorting rules by reverse ........."<<std::endl;
+#ifdef MEM_MONITOR
+    stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_CFG_GRAMMAR_2_PREP_6_SORT_REV_RULES] = duration_cast<microseconds>(stop-start).count();;
+
+#endif
 
 
+#ifdef PRINT_LOGS
+    std::cout<<BUILD_CFG_GRAMMAR_2_PREP_7_UPDATE_IDS<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    start = timer::now();
+    mm.event(BUILD_CFG_GRAMMAR_2_PREP_7_UPDATE_IDS);
+#endif
     std::vector<rule::r_long> inv_rules(max_rule+1,0);
     for (int k = 0; k < rules.size(); ++k) {
         inv_rules[rules[k]] = k;
@@ -431,6 +549,16 @@ void grammar::preprocess(const std::string & text) {
         }
         ++ii;
     }
+
+
+#ifdef PRINT_LOGS
+    std::cout<<BUILD_CFG_GRAMMAR_2_PREP_7_UPDATE_IDS<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    stop = timer::now();
+    CLogger::GetLogger()->model[BUILD_CFG_GRAMMAR_2_PREP_7_UPDATE_IDS] = duration_cast<microseconds>(stop-start).count();;
+#endif
+
     ii = 1;
     for (  auto && i: rules)
     {
@@ -546,6 +674,7 @@ rule::r_long grammar::text_size()
 void grammar::save(std::fstream &f)
 {
     sdsl::serialize(initial_rule,f);
+//    std::cout<<"_size:"<<_size<<std::endl;
     sdsl::serialize(_size,f);
     rule::r_long n = alp.size();
     sdsl::serialize(n,f);
@@ -556,6 +685,8 @@ void grammar::save(std::fstream &f)
     }
 
     rule::r_long ng =  _grammar.size();
+//    std::cout<<"ng:"<<ng<<std::endl;
+
     sdsl::serialize(ng,f);
 
     for (auto && r : _grammar) {
@@ -570,6 +701,8 @@ void grammar::load(std::fstream &f)
 
     sdsl::load(initial_rule,f);
     sdsl::load(_size,f);
+
+//    std::cout<<"_size:"<<_size<<std::endl;
     rule::r_long n = 0 ;
     sdsl::load(n,f);
     alp.clear();
@@ -581,6 +714,8 @@ void grammar::load(std::fstream &f)
     }
     n = 0;
     sdsl::load(n,f);
+
+//    std::cout<<"ng:"<<n<<std::endl;
     for (int i = 0; i < n; ++i) {
         rule::r_long id;
         sdsl::load(id,f);
@@ -608,5 +743,6 @@ void grammar::write_text(fstream &out) {
             out << alp[X._rule[0]];
             return false;
         }
+        return true;
     });
 }
