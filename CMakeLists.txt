@@ -233,8 +233,8 @@ include(internal_utils)
 
 
 
-cxx_executable_with_flags(bench_locate_pattern_len    "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_qgram_locate_pattern_len.cpp ${SLP_SAMPLING})
-cxx_executable_with_flags(bench_display_pattern_len    "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_qgram_display_pattern_len.cpp ${SLP_SAMPLING} )
+#cxx_executable_with_flags(bench_locate_pattern_len    "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_qgram_locate_pattern_len.cpp ${SLP_SAMPLING})
+#cxx_executable_with_flags(bench_display_pattern_len    "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_qgram_display_pattern_len.cpp ${SLP_SAMPLING} )
 cxx_executable_with_flags(build_indices "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/build_indices.cpp ${SLP_SAMPLING})
 cxx_executable_with_flags(process_coll "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/bench_collections.cpp ${SLP_SAMPLING})
 cxx_executable_with_flags(locate_indices "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/locate_indices.cpp ${SLP_SAMPLING})
