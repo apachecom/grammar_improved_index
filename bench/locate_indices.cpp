@@ -357,21 +357,12 @@ auto giqgramlocate = [](benchmark::State &st, const string &file_index, const ui
                 }
             }
 
-            
-//            std::sort(X.begin(),X.end());
-//            auto last = std::unique(X.begin(),X.end());
-//            X.erase(last,X.end());
 
 
             nocc += X.size();
             queries++;
-//            std::cout<<"end query\n";
 
         }
-
-
-//        std::cout<<nocc<<std::endl;
-//        sleep(2);
 
     }
 
