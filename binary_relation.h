@@ -14,7 +14,7 @@
 class binary_relation {
 
     public:
-        unsigned int code;
+        unsigned int code{};
         typedef unsigned int bin_long;
         typedef sdsl::wt_int<> wavelet_tree;
         //typedef sdsl::wm_int<> wavelet_tree;
@@ -53,8 +53,10 @@ class binary_relation {
         void save(std::fstream&) const;
 
         bin_long n_columns() const ;
-
+#ifdef PRINT_LOGS
         void print_size();
+
+#endif
         void print()
         {
                 std::cout<<std::endl;

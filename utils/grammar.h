@@ -40,8 +40,7 @@ struct rule{
 
     }
     rule(const r_long & i, const bool& t):id(i),terminal(t),l(0),r(0),node(0) {}
-    rule& operator=(const rule& R)
-    = default;
+    rule& operator=(const rule& R) = default;
     rule::r_long size_in_bytes()const
     {
         return sizeof(rule::r_long)*3 + 1 + _rule.size()*sizeof(rule::r_long);

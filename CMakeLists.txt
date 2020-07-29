@@ -159,6 +159,14 @@ if (USE_PRINT_MODE STREQUAL ON)
     add_definitions(-DPRINT_LOGS)
 endif()
 
+
+option(BUILD_EXTERNAL_INDEXES "Enter print mode" OFF)
+
+if (BUILD_EXTERNAL_INDEXES STREQUAL ON)
+    add_definitions(-DBUILD_EXTERNAL_INDEXES)
+endif()
+
+
 add_executable(improved_grammar_index main.cpp ${SOURCE_FILES} )
 
 include(internal_utils)

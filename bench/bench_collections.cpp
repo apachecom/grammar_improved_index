@@ -98,12 +98,17 @@ void create_file_patterns(){}
 auto create_files= [](benchmark::State &st, const std::string& file_coll, const std::string& path_out, const uint& max_len, const uint & n)
 {
     std::string data = "";
+    std::cout<<"collection:"<<file_coll<<std::endl;
     load_data(file_coll,data);
+
 
     for (auto _ : st)
     {
         std::fstream fpoints(path_out+"-"+std::to_string(max_len)+".pos", std::ios::out|std::ios::binary);
         std::fstream fpatterns(path_out+"-"+std::to_string(max_len)+".ptt", std::ios::out|std::ios::binary);
+
+        std::cout<<"positions file:"<<path_out+"-"+std::to_string(max_len)+".pos"<<std::endl;
+        std::cout<<"patterns file:"<<path_out+"-"+std::to_string(max_len)+".ptt"<<std::endl;
 
         std::srand(std::time(nullptr));
 
@@ -128,6 +133,9 @@ auto create_files= [](benchmark::State &st, const std::string& file_coll, const 
             fpoints<< r1 << "\n";
             fpatterns.write(patt.c_str(),max_len);
         }
+
+        std::cout<<"End files created\n";
+        sleep(5);
     }
 
 };
@@ -177,14 +185,17 @@ int main (int argc, char *argv[] ){
     }
 
     std::string collection  = argv[1];
-
-    //"../tests/collections/repetitive/reals/para";
     std::string path_out    = argv[2];
+    int op    = std::atoi(argv[2]);
+
+
 
 
 //    benchmark::RegisterBenchmark("First Test",  first_test);
-    benchmark::RegisterBenchmark("PROCESSING COLLECTION",  process_coll ,collection,path_out);
-    benchmark::RegisterBenchmark("CREATING FILES",  create_files ,path_out,path_out,100,1000);
+    if(op == 1)
+     benchmark::RegisterBenchmark("PROCESSING COLLECTION",  process_coll ,collection,path_out);
+    else
+        benchmark::RegisterBenchmark("CREATING FILES",  create_files ,collection,path_out,200,1000);
 
 
 

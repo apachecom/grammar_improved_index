@@ -225,7 +225,7 @@ void binary_relation::load(std::fstream & fout) {
     xa_rank1  = bin_bit_vector_xa::rank_1_type(&XA);
     xb_rank1  = bin_bit_vector_xb::rank_1_type(&XB);
 }
-#ifdef DEBUG
+#ifdef PRINT_LOGS
 void binary_relation::print_size() {
     std::cout<<"SB "<<sdsl::size_in_mega_bytes(SB) << std::endl;
     std::cout<<"\t SB length"<<SB.size()<< std::endl;

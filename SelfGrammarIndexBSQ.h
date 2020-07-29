@@ -1082,7 +1082,6 @@ public:
         c_sel1 = sdsl::bit_vector::select_1_type(&C);
         inv_pi = sdsl::inv_perm_support<INV_PI_T_QGRAM>(&pi);
 
-
         grammarSamp = Sampling::load(G);
         reverseSamp = Sampling::load(GR);
         sequenceSamp= Sampling::load(GS);
@@ -1846,13 +1845,13 @@ public:
     virtual void display_qgram(const std::size_t& i, const std::size_t& j, std::string & s){
         s.resize(j - i + 1);
         size_t p = 0;
-        expand_interval_qgram(_g.m_tree.root(), make_pair(i, j), s, p);
+        expand_interval_qgram(compressed_grammar::parser_tree::root(), make_pair(i, j), s, p);
     }
 
     virtual void display_qgram_rec(const std::size_t& i, const std::size_t& j, std::string & s){
         s.resize(j - i + 1);
         size_t p = 0;s.resize(j - i + 1);
-        expand_interval_qgram_rec(_g.m_tree.root(), make_pair(i, j), s, p);
+        expand_interval_qgram_rec(compressed_grammar::parser_tree::root(), make_pair(i, j), s, p);
     }
 
     void expand_interval_qgram_rec(const size_t &node, const std::pair<size_t, size_t> &range, std::string &s, std::size_t &pos){
@@ -1867,7 +1866,7 @@ public:
 
 
         /* If the range only expands a unique leaf */
-        int added_ch = 0;
+        std::size_t added_ch = 0;
 
         if (llb == lle) {
             /* Need to jump to llb definition */
@@ -1997,7 +1996,7 @@ public:
 
 
         /* If the range only expands a unique leaf */
-        int added_ch = 0;
+        std::size_t added_ch = 0;
 
         if (llb == lle) {
             /* Need to jump to llb definition */
@@ -2056,17 +2055,9 @@ public:
                 /* if X is not a terminal symbol */
                 /* compute first occurrence of X in the parser tree*/
 
-                ///auto node_def = _g.m_tree[_g.select_occ(X, 1)];
-
                 /* compute new range */
 
-                ///auto p = _g.select_L(_g.m_tree.leafrank(node_def)); // pos of leftmost leaf of node_def
-
                 size_t pnllb = _g.select_L(llb + 1); // position of left + 1 leaf begin
-
-                ////auto l_range = std::make_pair(p + range.first - pllb, p + (pnllb - pllb) - 1);
-
-                ///expand_interval(node_def, l_range, s, pos);
 
                 size_t off = pnllb - range.first;
                 size_t p_f = pos;
@@ -2117,19 +2108,12 @@ public:
             {
                 /* if X is not a terminal symbol */
                 /* compute first occurrence of X in the parser tree*/
-
-                ///auto node_def = _g.m_tree[_g.select_occ(X, 1)];
-
                 /* compute new range */
 
                 auto off = range.second - plle + 1;
-                ///             auto p = _g.select_L(_g.m_tree.leafrank(node_def)); // pos of leftmost leaf of node_def
-
-///                auto l_range = std::make_pair(p, p + range.second - plle);
 
                 dfs_expand_prefix2(X,s,pos+off,pos);
 
-                ///expand_interval(node_def, l_range, s, pos);
             }
         }
 
@@ -2144,9 +2128,6 @@ public:
 
         int r = dfs_cmp_suffix_aux(node,X,limit,itera,end,off,pos);
 
-//        if(r == 0 && itera != end) return 1;
-
-//        if(r == 0 && itera == end && pos < limit.second-limit.first+1) return -1;
 
         return r;
     }
@@ -2160,11 +2141,6 @@ public:
         auto limit = _g.limits_rule(node);
 
         int r = dfs_cmp_prefix_aux(node,X,limit,itera,end,off,pos);
-
-//        if(r == 0 && itera != end) return 1;
-
-//        if(r == 0 && itera == end && pos < limit.second-limit.first+1) return -1;
-
         return r;
 
     }
