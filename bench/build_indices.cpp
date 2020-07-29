@@ -480,7 +480,7 @@ int main (int argc, char *argv[] ){
              ,mem_out
  #endif
      );
-benchmark::RegisterBenchmark("SLP-BAL-INDEX<4>",  slpbalbuild,collection,path_out, 2,true
+benchmark::RegisterBenchmark("SLP-BAL-INDEX<2>",  slpbalbuild,collection,path_out, 2,true
 #ifdef MEM_MONITOR
             ,mem_out
 #endif
@@ -490,7 +490,7 @@ benchmark::RegisterBenchmark("SLP-BAL-INDEX<4>",  slpbalbuild,collection,path_ou
             ,mem_out
 #endif
     );
-    benchmark::RegisterBenchmark("SLP-BAL-INDEX<4>",  slpbalbuild,collection,path_out, 6,true
+    benchmark::RegisterBenchmark("SLP-BAL-INDEX<6>",  slpbalbuild,collection,path_out, 6,true
 #ifdef MEM_MONITOR
             ,mem_out
 #endif
@@ -500,19 +500,19 @@ benchmark::RegisterBenchmark("SLP-BAL-INDEX<4>",  slpbalbuild,collection,path_ou
             ,mem_out
 #endif
     );
-    benchmark::RegisterBenchmark("SLP-BAL-INDEX<12>",  slpbalbuild,collection,path_out, 10,true
+    benchmark::RegisterBenchmark("SLP-BAL-INDEX<10>",  slpbalbuild,collection,path_out, 10,true
 #ifdef MEM_MONITOR
             ,mem_out
 #endif
     );
-    benchmark::RegisterBenchmark("SLP-BAL-INDEX<16>",  slpbalbuild,collection,path_out, 12,true
+    benchmark::RegisterBenchmark("SLP-BAL-INDEX<12>",  slpbalbuild,collection,path_out, 12,true
 #ifdef MEM_MONITOR
             ,mem_out
 #endif
     );
 
 
-    benchmark::RegisterBenchmark("SLP-INDEX<4>",  slpbuild ,collection,path_out,2
+    benchmark::RegisterBenchmark("SLP-INDEX<2>",  slpbuild ,collection,path_out,2
 #ifdef MEM_MONITOR
             ,mem_out
 #endif
@@ -523,7 +523,7 @@ benchmark::RegisterBenchmark("SLP-BAL-INDEX<4>",  slpbalbuild,collection,path_ou
 #endif
     );
 
-    benchmark::RegisterBenchmark("SLP-INDEX<4>",  slpbuild ,collection,path_out,6
+    benchmark::RegisterBenchmark("SLP-INDEX<6>",  slpbuild ,collection,path_out,6
 #ifdef MEM_MONITOR
             ,mem_out
 #endif
@@ -534,13 +534,13 @@ benchmark::RegisterBenchmark("SLP-BAL-INDEX<4>",  slpbalbuild,collection,path_ou
 #endif
     );
 
-    benchmark::RegisterBenchmark("SLP-INDEX<12>",  slpbuild ,collection,path_out,10
+    benchmark::RegisterBenchmark("SLP-INDEX<10>",  slpbuild ,collection,path_out,10
 #ifdef MEM_MONITOR
             ,mem_out
 #endif
     );
 
-    benchmark::RegisterBenchmark("SLP-INDEX<16>",  slpbuild ,collection,path_out,12
+    benchmark::RegisterBenchmark("SLP-INDEX<12>",  slpbuild ,collection,path_out,12
 #ifdef MEM_MONITOR
             ,mem_out
 #endif

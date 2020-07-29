@@ -420,18 +420,18 @@ int main (int argc, char *argv[] ){
 
 #ifdef BUILD_EXTERNAL_INDEXES
         benchmark::RegisterBenchmark("R-INDEX",rilocate,index_prefix,i)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("SLP-INDEX<4>" ,slplocate,index_prefix,i,2)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX<2>" ,slplocate,index_prefix,i,2)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("SLP-INDEX<4>" ,slplocate,index_prefix,i,4)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("SLP-INDEX<4>" ,slplocate,index_prefix,i,6)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX<6>" ,slplocate,index_prefix,i,6)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("SLP-INDEX<8>" ,slplocate,index_prefix,i,8)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("SLP-INDEX<12>",slplocate,index_prefix,i,10)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("SLP-INDEX<16>",slplocate,index_prefix,i,12)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("SLP-INDEX-BAL<4>" ,slplocate,index_prefix,i,2,true)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX<10>",slplocate,index_prefix,i,10)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX<12>",slplocate,index_prefix,i,12)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX-BAL<2>" ,slplocate,index_prefix,i,2,true)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("SLP-INDEX-BAL<4>" ,slplocate,index_prefix,i,4,true)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("SLP-INDEX-BAL<4>" ,slplocate,index_prefix,i,6,true)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX-BAL<6>" ,slplocate,index_prefix,i,6,true)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("SLP-INDEX-BAL<8>" ,slplocate,index_prefix,i,8,true)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("SLP-INDEX-BAL<12>",slplocate,index_prefix,i,10,true)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("SLP-INDEX-BAL<16>",slplocate,index_prefix,i,12,true)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX-BAL<10>",slplocate,index_prefix,i,10,true)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX-BAL<12>",slplocate,index_prefix,i,12,true)->Unit(benchmark::kMicrosecond);
 #endif
         benchmark::RegisterBenchmark("G-INDEX-BINARY_SEARCH-TRIE",gibslocate,index_prefix,i,1)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("G-INDEX-BINARY_SEARCH-NOTRIE",gibslocate,index_prefix,i,0)->Unit(benchmark::kMicrosecond);
@@ -451,26 +451,26 @@ int main (int argc, char *argv[] ){
         benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<32>-NOTRIE",giptslocate,index_prefix,i,32,0)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<64>-NOTRIE",giptslocate,index_prefix,i,64,0)->Unit(benchmark::kMicrosecond);
 
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>-CMP_DFS" ,giqgramlocate,index_prefix,i,2,1)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<2>-CMP_DFS" ,giqgramlocate,index_prefix,i,2,1)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>-CMP_DFS" ,giqgramlocate,index_prefix,i,4,1)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>-CMP_DFS" ,giqgramlocate,index_prefix,i,6,1)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<6>-CMP_DFS" ,giqgramlocate,index_prefix,i,6,1)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>-CMP_DFS" ,giqgramlocate,index_prefix,i,8,1)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>-CMP_DFS",giqgramlocate,index_prefix,i,10,1)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>-CMP_DFS",giqgramlocate,index_prefix,i,12,1)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<10>-CMP_DFS",giqgramlocate,index_prefix,i,10,1)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>-CMP_DFS",giqgramlocate,index_prefix,i,12,1)->Unit(benchmark::kMicrosecond);
 
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>-CMP_TRIE" ,giqgramlocate,index_prefix,i,2,2)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<2>-CMP_TRIE" ,giqgramlocate,index_prefix,i,2,2)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>-CMP_TRIE" ,giqgramlocate,index_prefix,i,4,2)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>-CMP_TRIE" ,giqgramlocate,index_prefix,i,6,2)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<6>-CMP_TRIE" ,giqgramlocate,index_prefix,i,6,2)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>-CMP_TRIE" ,giqgramlocate,index_prefix,i,8,2)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>-CMP_TRIE",giqgramlocate,index_prefix,i,10,2)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>-CMP_TRIE",giqgramlocate,index_prefix,i,12,2)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<10>-CMP_TRIE",giqgramlocate,index_prefix,i,10,2)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>-CMP_TRIE",giqgramlocate,index_prefix,i,12,2)->Unit(benchmark::kMicrosecond);
 
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>-CMP_SMP" ,giqgramlocate,index_prefix,i,2,3)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<2>-CMP_SMP" ,giqgramlocate,index_prefix,i,2,3)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>-CMP_SMP" ,giqgramlocate,index_prefix,i,4,3)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>-CMP_SMP" ,giqgramlocate,index_prefix,i,6,3)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<6>-CMP_SMP" ,giqgramlocate,index_prefix,i,6,3)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>-CMP_SMP" ,giqgramlocate,index_prefix,i,8,3)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>-CMP_SMP",giqgramlocate,index_prefix,i,10,3)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("G-INDEX-QGRAM<16>-CMP_SMP",giqgramlocate,index_prefix,i,12,3)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<10>-CMP_SMP",giqgramlocate,index_prefix,i,10,3)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>-CMP_SMP",giqgramlocate,index_prefix,i,12,3)->Unit(benchmark::kMicrosecond);
 
     }
 
