@@ -228,14 +228,19 @@ int main (int argc, char *argv[] ){
 //        std::cout<<"Searching patterns len:"<<i<<std::endl;
 
 //#ifdef BUILD_EXTERNAL_INDEXES
+        benchmark::RegisterBenchmark("SLP-INDEX<4>" ,slpdisplay,index_prefix,i,2)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("SLP-INDEX<4>" ,slpdisplay,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("SLP-INDEX<4>" ,slpdisplay,index_prefix,i,6)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("SLP-INDEX<8>" ,slpdisplay,index_prefix,i,8)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("SLP-INDEX<12>",slpdisplay,index_prefix,i,12)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("SLP-INDEX<16>",slpdisplay,index_prefix,i,16)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("SLP-INDEX<12>",slpdisplay,index_prefix,i,10)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("SLP-INDEX<16>",slpdisplay,index_prefix,i,12)->Unit({benchmark::kMicrosecond});;
+
+        benchmark::RegisterBenchmark("SLP-INDEX-BAL<4>" ,slpdisplay,index_prefix,i,2)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("SLP-INDEX-BAL<4>" ,slpdisplay,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("SLP-INDEX-BAL<4>" ,slpdisplay,index_prefix,i,6)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("SLP-INDEX-BAL<8>" ,slpdisplay,index_prefix,i,8)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("SLP-INDEX-BAL<12>",slpdisplay,index_prefix,i,12)->Unit({benchmark::kMicrosecond});;
-        benchmark::RegisterBenchmark("SLP-INDEX-BAL<16>",slpdisplay,index_prefix,i,16)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("SLP-INDEX-BAL<12>",slpdisplay,index_prefix,i,10)->Unit({benchmark::kMicrosecond});;
+        benchmark::RegisterBenchmark("SLP-INDEX-BAL<16>",slpdisplay,index_prefix,i,12)->Unit({benchmark::kMicrosecond});;
 //#endif
         benchmark::RegisterBenchmark("G-INDEX-RANK-PHRASES-NOTRIE",gibsdisplay,index_prefix,i)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("G-INDEX-RANK-PHRASES-TRIE",gibsdisplay,index_prefix,i,true)->Unit({benchmark::kMicrosecond});;

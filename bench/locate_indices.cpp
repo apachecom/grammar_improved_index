@@ -420,14 +420,18 @@ int main (int argc, char *argv[] ){
 
 #ifdef BUILD_EXTERNAL_INDEXES
         benchmark::RegisterBenchmark("R-INDEX",rilocate,index_prefix,i)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX<4>" ,slplocate,index_prefix,i,2)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("SLP-INDEX<4>" ,slplocate,index_prefix,i,4)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX<4>" ,slplocate,index_prefix,i,6)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("SLP-INDEX<8>" ,slplocate,index_prefix,i,8)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("SLP-INDEX<12>",slplocate,index_prefix,i,12)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("SLP-INDEX<16>",slplocate,index_prefix,i,16)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX<12>",slplocate,index_prefix,i,10)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX<16>",slplocate,index_prefix,i,12)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX-BAL<4>" ,slplocate,index_prefix,i,2,true)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("SLP-INDEX-BAL<4>" ,slplocate,index_prefix,i,4,true)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX-BAL<4>" ,slplocate,index_prefix,i,6,true)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("SLP-INDEX-BAL<8>" ,slplocate,index_prefix,i,8,true)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("SLP-INDEX-BAL<12>",slplocate,index_prefix,i,12,true)->Unit(benchmark::kMicrosecond);
-        benchmark::RegisterBenchmark("SLP-INDEX-BAL<16>",slplocate,index_prefix,i,16,true)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX-BAL<12>",slplocate,index_prefix,i,10,true)->Unit(benchmark::kMicrosecond);
+        benchmark::RegisterBenchmark("SLP-INDEX-BAL<16>",slplocate,index_prefix,i,12,true)->Unit(benchmark::kMicrosecond);
 #endif
         benchmark::RegisterBenchmark("G-INDEX-BINARY_SEARCH-TRIE",gibslocate,index_prefix,i,1)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("G-INDEX-BINARY_SEARCH-NOTRIE",gibslocate,index_prefix,i,0)->Unit(benchmark::kMicrosecond);
