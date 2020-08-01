@@ -319,7 +319,7 @@ auto giqgramlocate = [](benchmark::State &st, const string &file_index, const ui
     idx_giqbs.load_basics(fbs);
 //    std::cout<<"basic-index-loaded\n";
     if(!f.is_open() || !fg.is_open() || !frev.is_open() || !fseq.is_open()){
-        std::cout<<file_index+"-gram-<"+std::to_string(sampling)+">-smp.gi"<<std::endl;
+        std::cout<<file_index+"-gram-"+std::to_string(sampling)+"-smp.gi"<<std::endl;
         throw "ERROR OPENING FILES QGRAM";
     }
     idx_giqbs.loadSampling(f,fg,frev,fseq);
@@ -397,6 +397,21 @@ int main (int argc, char *argv[] ){
     uint gap_len_patten = std::atoi(argv[5]);
 
 
+    std::cout<<"INV_PI_T: "<<INV_PI_T<<std::endl;
+    std::cout<<"INV_PI_T_TRIE: "<<INV_PI_T_TRIE<<std::endl;
+    std::cout<<"INV_PI_T_QGRAM: "<<INV_PI_T_QGRAM<<std::endl;
+
+#ifdef BUILD_EXTERNAL_INDEXES
+    std::cout<<"RUNING EXTERNAL INDEXES: "<<ON<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    std::cout<<"USING MEM_MONITOR: "<<ON<<std::endl;
+#endif
+
+#ifdef PRINT_LOGS
+    std::cout<<"MODE LOG ACTIVE: "<<ON<<std::endl;
+#endif
+
 
 
     load_patterns(pattern_file+"-"+std::to_string(max_len_patten)+".ptt",max_len_patten,1000);
@@ -404,7 +419,7 @@ int main (int argc, char *argv[] ){
 
     for (uint i = min_len_patten; i <= max_len_patten; i+=gap_len_patten)
     {
-        std::cout<<"PATTERN EXAMPLE: "<<patterns[0]<<std::endl;
+//        std::cout<<"PATTERN EXAMPLE: "<<patterns[0]<<std::endl;
 
         // std::cout<<"Searching patterns len:"<<i<<std::endl;
 

@@ -235,13 +235,27 @@ int main (int argc, char *argv[] ){
     std::cout<<"POS LOADED FROM: "<<ptos_file+"-"+std::to_string(max_len_patten)+".pos"<<std::endl;
     std::cout<<"POS LEN: "<<pos.size()<<std::endl;
     std::cout<<"POS EX: "<<pos[0]<<std::endl;
+    std::cout<<"INV_PI_T: "<<INV_PI_T<<std::endl;
+    std::cout<<"INV_PI_T_TRIE: "<<INV_PI_T_TRIE<<std::endl;
+    std::cout<<"INV_PI_T_QGRAM: "<<INV_PI_T_QGRAM<<std::endl;
+
+#ifdef BUILD_EXTERNAL_INDEXES
+    std::cout<<"RUNING EXTERNAL INDEXES: "<<ON<<std::endl;
+#endif
+#ifdef MEM_MONITOR
+    std::cout<<"USING MEM_MONITOR: "<<ON<<std::endl;
+#endif
+
+#ifdef PRINT_LOGS
+    std::cout<<"MODE LOG ACTIVE: "<<ON<<std::endl;
+#endif
 
     for (uint i = min_len_patten; i <= max_len_patten; i+=gap_len_patten)
     {
 
 //        std::cout<<"Searching patterns len:"<<i<<std::endl;
 
-//#ifdef BUILD_EXTERNAL_INDEXES
+#ifdef BUILD_EXTERNAL_INDEXES
         benchmark::RegisterBenchmark("SLP-INDEX<2>" ,slpdisplay,index_prefix,i,2)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("SLP-INDEX<4>" ,slpdisplay,index_prefix,i,4)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("SLP-INDEX<6>" ,slpdisplay,index_prefix,i,6)->Unit({benchmark::kMicrosecond});;
@@ -255,7 +269,7 @@ int main (int argc, char *argv[] ){
         benchmark::RegisterBenchmark("SLP-INDEX-BAL<8>" ,slpdisplay,index_prefix,i,8)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("SLP-INDEX-BAL<10>",slpdisplay,index_prefix,i,10)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("SLP-INDEX-BAL<12>",slpdisplay,index_prefix,i,12)->Unit({benchmark::kMicrosecond});;
-//#endif
+#endif
         benchmark::RegisterBenchmark("G-INDEX-RANK-PHRASES-NOTRIE",gibsdisplay,index_prefix,i)->Unit({benchmark::kMicrosecond});;
         benchmark::RegisterBenchmark("G-INDEX-RANK-PHRASES-TRIE",gibsdisplay,index_prefix,i,true)->Unit({benchmark::kMicrosecond});;
 
