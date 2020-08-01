@@ -223,7 +223,7 @@ include(internal_utils)
 #cxx_executable_with_flags(binary_relation_benchmark "" "${LIBS};benchmark;slp;hsi;sdsl;divsufsort;divsufsort64;rmqrmmBP;cds" bench/binary_relation_benchmark.cpp ${SOURCE_FILES})
 #cxx_executable_with_flags(selfgrammarnindex_benchmark "" "${LIBS};benchmark;slp;hsi;sdsl;divsufsort;divsufsort64;rmqrmmBP;cds" bench/selfgrammarindex_bench.cpp ${SOURCE_FILES})
 #cxx_executable_with_flags(slp_benchmark "" "${LIBS};benchmark;slp;hsi;sdsl;divsufsort;divsufsort64;rmqrmmBP;cds" bench/slp_benchmark.cpp ${SOURCE_FILES})
-cxx_executable_with_flags(idx_build_lz "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64" bench/lz_build.cpp ${SOURCE_FILES})
+#cxx_executable_with_flags(idx_build_lz "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64" bench/lz_build.cpp ${SOURCE_FILES})
 #cxx_executable_with_flags(idx_build_rlcsa "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;rmqrmmBP;rlcsa" bench/idx_build_rlcsa.cpp ${SOURCE_FILES})
 #cxx_executable_with_flags(rlcsa_locate "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;rmqrmmBP;rlcsa" bench/rlcsa_locate.cpp ${SOURCE_FILES})
 
