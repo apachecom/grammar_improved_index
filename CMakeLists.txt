@@ -144,12 +144,14 @@ set(SOURCE_FILES
 
         SelfGrammarIndexBSQ.cpp SelfGrammarIndexBSQ.h
         simple_grid.cpp simple_grid.h
-        macros.h)
+        macros.h utils/qgram/qgram_sampling.cpp utils/qgram/qgram_sampling.h)
 
 option(USE_MEM_MONITOR "Enter mem-monitor mode" OFF)
 
 if (USE_MEM_MONITOR STREQUAL ON)
     add_definitions(-DMEM_MONITOR)
+else()
+    remove_definitions(-DMEM_MONITOR)
 endif()
 
 
@@ -157,6 +159,8 @@ option(USE_PRINT_MODE "Enter print mode" OFF)
 
 if (USE_PRINT_MODE STREQUAL ON)
     add_definitions(-DPRINT_LOGS)
+else()
+    remove_definitions(-DPRINT_LOGS)
 endif()
 
 
@@ -164,6 +168,8 @@ option(BUILD_EXTERNAL_INDEXES "Enter print mode" OFF)
 
 if (BUILD_EXTERNAL_INDEXES STREQUAL ON)
     add_definitions(-DBUILD_EXTERNAL_INDEXES)
+else()
+    remove_definitions(-DBUILD_EXTERNAL_INDEXES)
 endif()
 
 
@@ -217,7 +223,7 @@ include(internal_utils)
 #cxx_executable_with_flags(binary_relation_benchmark "" "${LIBS};benchmark;slp;hsi;sdsl;divsufsort;divsufsort64;rmqrmmBP;cds" bench/binary_relation_benchmark.cpp ${SOURCE_FILES})
 #cxx_executable_with_flags(selfgrammarnindex_benchmark "" "${LIBS};benchmark;slp;hsi;sdsl;divsufsort;divsufsort64;rmqrmmBP;cds" bench/selfgrammarindex_bench.cpp ${SOURCE_FILES})
 #cxx_executable_with_flags(slp_benchmark "" "${LIBS};benchmark;slp;hsi;sdsl;divsufsort;divsufsort64;rmqrmmBP;cds" bench/slp_benchmark.cpp ${SOURCE_FILES})
-#cxx_executable_with_flags(idx_build_lz "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;rmqrmmBP;cds;lzend" bench/lz_build.cpp ${SOURCE_FILES})
+cxx_executable_with_flags(idx_build_lz "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64" bench/lz_build.cpp ${SOURCE_FILES})
 #cxx_executable_with_flags(idx_build_rlcsa "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;rmqrmmBP;rlcsa" bench/idx_build_rlcsa.cpp ${SOURCE_FILES})
 #cxx_executable_with_flags(rlcsa_locate "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;rmqrmmBP;rlcsa" bench/rlcsa_locate.cpp ${SOURCE_FILES})
 
@@ -266,7 +272,7 @@ if (NOT INV_PI_T_QGRAM)
 endif()
 message("INV_PI_T_QGRAM ${INV_PI_T_QGRAM}")
 
-message("INV_PI_T_QGRAM ${PROJECT_SOURCE_DIR}/config_macros.h.in")
+message("MACROS ${PROJECT_SOURCE_DIR}/config_macros.h.in")
 
 configure_file(
         "${PROJECT_SOURCE_DIR}/config_macros.h.in"
