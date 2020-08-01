@@ -402,14 +402,14 @@ int main (int argc, char *argv[] ){
     std::cout<<"INV_PI_T_QGRAM: "<<INV_PI_T_QGRAM<<std::endl;
 
 #ifdef BUILD_EXTERNAL_INDEXES
-    std::cout<<"RUNING EXTERNAL INDEXES: "<<ON<<std::endl;
+    std::cout<<"RUNING EXTERNAL INDEXES: ON"<<std::endl;
 #endif
 #ifdef MEM_MONITOR
-    std::cout<<"USING MEM_MONITOR: "<<ON<<std::endl;
+    std::cout<<"USING MEM_MONITOR: ON"<<std::endl;
 #endif
 
 #ifdef PRINT_LOGS
-    std::cout<<"MODE LOG ACTIVE: "<<ON<<std::endl;
+    std::cout<<"MODE LOG ACTIVE:ON"<<std::endl;
 #endif
 
 
