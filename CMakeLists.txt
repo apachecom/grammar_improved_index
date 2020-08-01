@@ -144,7 +144,10 @@ set(SOURCE_FILES
 
         SelfGrammarIndexBSQ.cpp SelfGrammarIndexBSQ.h
         simple_grid.cpp simple_grid.h
-        macros.h utils/qgram/qgram_sampling.cpp utils/qgram/qgram_sampling.h)
+        macros.h
+#        utils/qgram/qgram_sampling.cpp
+#        utils/qgram/qgram_sampling.h
+        )
 
 option(USE_MEM_MONITOR "Enter mem-monitor mode" OFF)
 
