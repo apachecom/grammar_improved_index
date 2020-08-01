@@ -93,7 +93,6 @@ auto rilocate = [](benchmark::State &st, const string &file_index, const uint& l
     st.counters["pLen"] = len;
     st.counters["queries"] = ptt;
     st.counters["nOcc"] = nocc;
-
     st.counters["size"] = idx_r->print_space();
 
     delete idx_r;
