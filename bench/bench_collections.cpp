@@ -186,7 +186,9 @@ int main (int argc, char *argv[] ){
 
     std::string collection  = argv[1];
     std::string path_out    = argv[2];
-    int op    = std::atoi(argv[2]);
+    int op    = std::atoi(argv[3]);
+    int max_len = std::atoi(argv[4]);
+    int max_queries = std::atoi(argv[5]);
 
 
 
@@ -195,7 +197,7 @@ int main (int argc, char *argv[] ){
     if(op == 1)
      benchmark::RegisterBenchmark("PROCESSING COLLECTION",  process_coll ,collection,path_out);
     else
-        benchmark::RegisterBenchmark("CREATING FILES",  create_files ,collection,path_out,200,1000);
+        benchmark::RegisterBenchmark("CREATING FILES",  create_files ,collection,path_out,max_len,max_queries);
 
 
 
