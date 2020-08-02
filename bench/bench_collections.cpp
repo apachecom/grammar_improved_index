@@ -10,6 +10,14 @@
 #include <ctime>
 #include "unistd.h"
 
+bool valid(const std::string &patt) {
+    int c = 0;
+    for (const auto &item : patt) {
+        c += item == 'N'?1:0;
+    }
+
+    return float(c)/float(patt.size()) > 0.80;
+}
 
 int process_data(const std::string &collection,const std::string &file_out, uint &sigma){
 
@@ -101,7 +109,7 @@ auto create_files= [](benchmark::State &st, const std::string& file_coll, const 
     std::cout<<"collection:"<<file_coll<<std::endl;
     load_data(file_coll,data);
 
-
+    uint invalid_patt = 0;
     for (auto _ : st)
     {
         std::fstream fpoints(path_out+"-"+std::to_string(max_len)+".pos", std::ios::out|std::ios::binary);
@@ -113,22 +121,29 @@ auto create_files= [](benchmark::State &st, const std::string& file_coll, const 
         std::srand(std::time(nullptr));
 
         for (int i = 0; i < n ; ++i) {
-
-            size_t r1 = std::rand()%data.size();
+            std::string patt;
+            size_t r1 = 0;
             size_t  r2 = 0;
 
-            if (r1 > data.size() / 2) {
-                r2 = r1 - max_len;
-            } else {
-                r2 = r1 + max_len;
+            do{
+
+                r1 = std::rand()%data.size();
+                r2 = 0;
+
+                if (r1 > data.size() / 2) {
+                    r2 = r1 - max_len;
+                } else {
+                    r2 = r1 + max_len;
+                }
+                if(r1 > r2) std::swap(r1,r2);
+                patt.resize(max_len);
+                std::copy(data.begin() + r1, data.begin() + r2 +1, patt.begin());
+
+                if(!valid(patt))
+                    invalid_patt++;
+
             }
-            if(r1 > r2) std::swap(r1,r2);
-
-
-            std::string patt;
-            patt.resize(max_len);
-            std::copy(data.begin() + r1, data.begin() + r2 +1, patt.begin());
-
+            while(!valid(patt));
 
             fpoints<< r1 << "\n";
             fpatterns.write(patt.c_str(),max_len);
@@ -137,6 +152,8 @@ auto create_files= [](benchmark::State &st, const std::string& file_coll, const 
         std::cout<<"End files created\n";
         sleep(5);
     }
+
+    st.counters["invalid"] = invalid_patt;
 
 };
 
@@ -186,14 +203,11 @@ int main (int argc, char *argv[] ){
 
     std::string collection  = argv[1];
     std::string path_out    = argv[2];
+
     int op    = std::atoi(argv[3]);
     int max_len = std::atoi(argv[4]);
     int max_queries = std::atoi(argv[5]);
 
-
-
-
-//    benchmark::RegisterBenchmark("First Test",  first_test);
     if(op == 1)
      benchmark::RegisterBenchmark("PROCESSING COLLECTION",  process_coll ,collection,path_out);
     else
