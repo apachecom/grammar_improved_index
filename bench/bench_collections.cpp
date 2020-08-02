@@ -10,13 +10,13 @@
 #include <ctime>
 #include "unistd.h"
 
-bool valid(const std::string &patt) {
-    int c = 0;
+bool valid(const std::string &patt,int& c) {
+    c = 0;
     for (const auto &item : patt) {
-        c += item == 'N'?1:0;
+        c += (item == 'N')?1:0;
     }
 
-    return float(c)/float(patt.size()) > 0.80;
+    return (float(c)/float(patt.size())) > 0.80;
 }
 
 int process_data(const std::string &collection,const std::string &file_out, uint &sigma){
@@ -124,7 +124,7 @@ auto create_files= [](benchmark::State &st, const std::string& file_coll, const 
             std::string patt;
             size_t r1 = 0;
             size_t  r2 = 0;
-
+            int c = 0;
             do{
 
                 r1 = std::rand()%data.size();
@@ -139,11 +139,13 @@ auto create_files= [](benchmark::State &st, const std::string& file_coll, const 
                 patt.resize(max_len);
                 std::copy(data.begin() + r1, data.begin() + r2 +1, patt.begin());
 
-                if(!valid(patt))
+                if(valid(patt,c)){
                     invalid_patt++;
+//                    std::cout<<c<<":->"<<patt<<std::endl;
+                }
 
             }
-            while(!valid(patt));
+            while(valid(patt,c));
 
             fpoints<< r1 << "\n";
             fpatterns.write(patt.c_str(),max_len);
