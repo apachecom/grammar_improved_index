@@ -239,7 +239,7 @@ int main (int argc, char *argv[] ){
     std::cout<<"INV_PI_T_QGRAM: "<<INV_PI_T_QGRAM<<std::endl;
 
 #ifdef BUILD_EXTERNAL_INDEXES
-    std::cout<<"RUNING EXTERNAL INDEXES"<<ON<<std::endl;
+    std::cout<<"RUNING EXTERNAL INDEXES"<<std::endl;
 #endif
 #ifdef MEM_MONITOR
     std::cout<<"USING MEM_MONITOR"<<std::endl;
