@@ -197,8 +197,7 @@ auto giqgramdisplay = [](benchmark::State &st, const string &file_index, const u
 
     }
 
-    st.counters["size"] = idx_giqbs.size_in_bytes() - idx_giqbs.get_grammar().get_right_trie().size_in_bytes()
-            - idx_giqbs.get_grammar().get_left_trie().size_in_bytes();
+    st.counters["size"] = idx_giqbs.size_in_bytes() - idx_giqbs.get_grammar().get_right_trie().size_in_bytes() - idx_giqbs.get_grammar().get_left_trie().size_in_bytes();
 
     st.counters["pLen"] = len;
     st.counters["queries"] = queries;
@@ -240,14 +239,14 @@ int main (int argc, char *argv[] ){
     std::cout<<"INV_PI_T_QGRAM: "<<INV_PI_T_QGRAM<<std::endl;
 
 #ifdef BUILD_EXTERNAL_INDEXES
-    std::cout<<"RUNING EXTERNAL INDEXES: "<<ON<<std::endl;
+    std::cout<<"RUNING EXTERNAL INDEXES"<<ON<<std::endl;
 #endif
 #ifdef MEM_MONITOR
-    std::cout<<"USING MEM_MONITOR: "<<ON<<std::endl;
+    std::cout<<"USING MEM_MONITOR"<<std::endl;
 #endif
 
 #ifdef PRINT_LOGS
-    std::cout<<"MODE LOG ACTIVE: "<<ON<<std::endl;
+    std::cout<<"MODE LOG ACTIVE"<<std::endl;
 #endif
 
     for (uint i = min_len_patten; i <= max_len_patten; i+=gap_len_patten)
