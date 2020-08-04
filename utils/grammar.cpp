@@ -8,7 +8,7 @@
 #include <sdsl/inv_perm_support.hpp>
 #include <sdsl/lcp_bitcompressed.hpp>
 #include <sdsl/rmq_succinct_sada.hpp>
-
+#define PRINT_LOGS 1
 #include "grammar.h"
 
 
@@ -476,7 +476,10 @@ void grammar::preprocess(const std::string & text
     sdsl::register_cache_file(sdsl::conf::KEY_TEXT, config);
 
     sdsl::construct(m_lcp, sdsl::conf::KEY_TEXT, config, 1);
+
+//    std::cout<<"TEXT.size()"<<text.size()<<std::endl;
 //    std::cout<<"LCP.size()"<<m_lcp.size()<<std::endl;
+
 //    for (uint32_t i = 0; i < m_lcp.size(); i++) {
 //         cout << "LCP[i] = " << m_lcp[i] << endl;
 //    }
@@ -489,11 +492,15 @@ void grammar::preprocess(const std::string & text
 //             cout << "SA[i] = " << m_SA[i] << endl;
             m_ISA[m_SA[i]] = i;
         }
+//        std::cout<<"size SA "<<m_SA.size()<<std::endl;
+
+//        std::cout<<"size SA_1 "<<m_ISA.size()<<std::endl;
         sdsl::util::clear(m_SA);
     }
 
     // Builds the RMQ Support.
     m_rmq = sdsl::rmq_succinct_sada<>(&m_lcp);
+//    std::cout<<"size m_rmq "<<m_rmq.size()<<std::endl;
 
     sdsl::remove(sdsl::cache_file_name(sdsl::conf::KEY_SA, config));
     sdsl::remove(sdsl::cache_file_name(sdsl::conf::KEY_TEXT, config));
@@ -542,37 +549,37 @@ void grammar::preprocess(const std::string & text
 
         if(a_pos == b_pos)
             return size_a < size_b;
-
-        auto sa_1_a = m_ISA[a_pos];
-        auto sa_1_b = m_ISA[b_pos];
-
-        int min= m_lcp[m_rmq(std::min(sa_1_a,sa_1_b)+2,std::max(sa_1_a,sa_1_b)+1)];
-
-        if(std::min(size_a,size_b) <= min){
-            return size_a < size_b;
-        }
-
-        return sa_1_a < sa_1_b;
-
-//        uint32_t rmq;
-//        if (m_ISA[a_pos] < m_ISA[b_pos]) {
-//            rmq = m_rmq(m_ISA[a_pos] + 1, m_ISA[b_pos]);
-//        } else {
-//            rmq = m_rmq(m_ISA[b_pos] + 1, m_ISA[a_pos]);
-//        }
-//        if (size_a <= m_lcp[rmq] && size_b <= m_lcp[rmq]) {
+//
+//        auto sa_1_a = m_ISA[a_pos];
+//        auto sa_1_b = m_ISA[b_pos];
+//
+//        int min= m_lcp[m_rmq(std::min(sa_1_a,sa_1_b)+2,std::max(sa_1_a,sa_1_b)+1)];
+//
+//        if(std::min(size_a,size_b) <= min){
 //            return size_a < size_b;
-//        } else if (size_a <= m_lcp[rmq]) {
-//            return true;
-//        } else if (size_b <= m_lcp[rmq]) {
-//            return false;
-//        } else {
-//            /***
-//             * Neither is a prefix of the other. Use ISA to find
-//             *the order
-//             ***/
-//            return m_ISA[a_pos] < m_ISA[b_pos];
 //        }
+//
+//        return sa_1_a < sa_1_b;
+
+        uint32_t rmq;
+        if (m_ISA[a_pos] < m_ISA[b_pos]) {
+            rmq = m_rmq(m_ISA[a_pos] + 1, m_ISA[b_pos]);
+        } else {
+            rmq = m_rmq(m_ISA[b_pos] + 1, m_ISA[a_pos]);
+        }
+        if (size_a <= m_lcp[rmq] && size_b <= m_lcp[rmq]) {
+            return size_a < size_b;
+        } else if (size_a <= m_lcp[rmq]) {
+            return true;
+        } else if (size_b <= m_lcp[rmq]) {
+            return false;
+        } else {
+            /***
+             * Neither is a prefix of the other. Use ISA to find
+             *the order
+             ***/
+            return m_ISA[a_pos] < m_ISA[b_pos];
+        }
     });
 
 

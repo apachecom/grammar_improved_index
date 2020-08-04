@@ -11,7 +11,9 @@
 #include <cassert>
 #include "repair/RePair.h"
 #include <sdsl/io.hpp>
+#include <set>
 #include "../macros.h"
+#include "sdsl/int_vector.hpp"
 
 #ifdef MEM_MONITOR
 #include <ctime>

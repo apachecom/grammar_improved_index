@@ -164,11 +164,12 @@ public:
                 std::string temp;
                 size_t pos = 0;
                 temp.resize(qsampling);
-                this->bp_expand_suffix(i, temp, qsampling, pos);
+                this->expand_suffix(i, temp, qsampling, pos);
                 temp[pos] = '\0';
                 strcpy((char *) prefix, temp.c_str());
                 prefix[pos] = '\0';
 
+//                std::cout<<"GRAM-"<<i<<"-"<<prefix<<std::endl;
 
                 if (strcmp((char *) current, (char *) prefix) != 0) {
                     strcpy((char *) ptr, (char *) prefix);
@@ -244,7 +245,8 @@ public:
                 std::string temp;
                 size_t pos = 0;
                 temp.resize(qsampling);
-                this->bp_expand_prefix(crule, temp, qsampling, pos);
+                this->expand_prefix(crule, temp, qsampling, pos);
+
                 temp[pos] = '\0';
                 std::copy(temp.begin(), temp.end(), prefix);
                 prefix[qsampling] = '\0';
@@ -322,8 +324,11 @@ public:
                 std::string ss;
                 ss.resize(qsampling);
                 this->expand_grammar_sfx(i,ss,qsampling);
+
                 std::copy(ss.begin(), ss.end(), prefix);
                 prefix[ss.size()] = '\0';
+//                std::cout<<"SEQ-"<<i<<"-"<<prefix<<std::endl;
+
 
                 if (strcmp((char*)current, (char*)prefix) != 0)
                 {

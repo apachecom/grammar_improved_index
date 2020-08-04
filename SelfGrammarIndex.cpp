@@ -1731,12 +1731,14 @@ void SelfGrammarIndex::build_basics(
         }
 
         sdsl::util::clear(SA);
-    }else{
-
     }
+//    std::cout<<"SA_1.size()"<<SA_1.size()<<std::endl;
+
 
     // Builds the RMQ Support.
     rmq = sdsl::rmq_succinct_sada<>(&LCP);
+//    std::cout<<"RMQ.size()"<<rmq.size()<<std::endl;
+
 
     sdsl::remove(sdsl::cache_file_name(sdsl::conf::KEY_SA, config));
     sdsl::remove(sdsl::cache_file_name(sdsl::conf::KEY_TEXT, config));
@@ -1768,11 +1770,11 @@ void SelfGrammarIndex::build_basics(
                   ulong size_a = a.first.second - a.first.first +1;
                   ulong size_b = b.first.second - b.first.first +1;
 
-//                  /*
-//                   * is start at the same position return the shortest
-//                   * */
-//                  if(a_pos == b_pos)
-//                      return size_a < size_b;
+                  /*
+                   * is start at the same position return the shortest
+                   * */
+                  if(a_pos == b_pos)
+                      return size_a < size_b;
 //
 //                  auto sa_1_a = SA_1[a_pos];
 //                  auto sa_1_b = SA_1[b_pos];
@@ -1793,26 +1795,26 @@ void SelfGrammarIndex::build_basics(
 //
 //                  return sa_1_a < sa_1_b;
 //
-
-                  uint32_t _rmq;
-                  if (SA_1[a_pos] < SA_1[b_pos]) {
-                      _rmq = rmq(SA_1[a_pos] + 1, SA_1[b_pos]);
-                  } else {
-                      _rmq = rmq(SA_1[b_pos] + 1, SA_1[a_pos]);
-                  }
-                  if (size_a <= LCP[_rmq] && size_b <= LCP[_rmq]) {
-                      return size_a < size_b;
-                  } else if (size_a <= LCP[_rmq]) {
-                      return true;
-                  } else if (size_b <= LCP[_rmq]) {
-                      return false;
-                  } else {
-                      /***
-                       * Neither is a prefix of the other. Use ISA to find
-                       *the order
-                       ***/
-                      return SA_1[a_pos] < SA_1[b_pos];
-                  }
+    //
+                      uint32_t _rmq;
+                      if (SA_1[a_pos] < SA_1[b_pos]) {
+                          _rmq = rmq(SA_1[a_pos] + 1, SA_1[b_pos]);
+                      } else {
+                          _rmq = rmq(SA_1[b_pos] + 1, SA_1[a_pos]);
+                      }
+                      if (size_a <= LCP[_rmq] && size_b <= LCP[_rmq]) {
+                          return size_a < size_b;
+                      } else if (size_a <= LCP[_rmq]) {
+                          return true;
+                      } else if (size_b <= LCP[_rmq]) {
+                          return false;
+                      } else {
+                          /***
+                           * Neither is a prefix of the other. Use ISA to find
+                           *the order
+                           ***/
+                          return SA_1[a_pos] < SA_1[b_pos];
+                      }
 
 
 
