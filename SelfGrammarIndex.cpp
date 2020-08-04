@@ -1698,8 +1698,8 @@ void SelfGrammarIndex::build_basics(
     start = timer::now();
 #endif
 
-//    sdsl::int_vector<> SA(text.size(),0);
-//    sdsl::algorithm::calculate_sa( (unsigned char*)text.c_str(),text.size(),SA);
+//    sdsl::int_vector<> SA_(text.size(),0);
+//    sdsl::algorithm::calculate_sa( (unsigned char*)text.c_str(),text.size(),SA_);
 //    sdsl::inv_perm_support<> SA_1(&SA);
 //    sdsl::lcp_wt<> LCP;
 //    sdsl::construct_im(LCP,text.c_str(),sizeof(char));
@@ -1710,32 +1710,29 @@ void SelfGrammarIndex::build_basics(
     sdsl::lcp_bitcompressed<> LCP;
     sdsl::rmq_succinct_sada<> rmq;
 
-    // Computes the text reverse
-    uint32_t text_size = text.length();
-
-    auto *rev_text = new unsigned char[text_size + 1];
-    for (uint32_t i = 0; i < text_size; i++) {
-        rev_text[i] = text[text_size - i - 1];
-    }
-    rev_text[text_size] = 0;
-    sdsl::cache_config config(false, ".", "cache");
-    sdsl::store_to_file((const char *)rev_text, sdsl::conf::KEY_TEXT);
+    uint32_t text_size = text.size();
+    sdsl::cache_config config(false, ".", "cache-normal");
+    sdsl::store_to_file((const char *)text.c_str(), sdsl::conf::KEY_TEXT);
     sdsl::register_cache_file(sdsl::conf::KEY_TEXT, config);
 
     sdsl::construct(LCP, sdsl::conf::KEY_TEXT, config, 1);
-    for (uint32_t i = 0; i < LCP.size(); i++) {
-        // cout << "LCP[i] = " << m_lcp[i] << endl;
-    }
+//    std::cout<<"TEXT.size()"<<text.size()<<std::endl;
+//    std::cout<<"LCP.size()"<<LCP.size()<<std::endl;
+//    for (uint32_t i = 0; i < LCP.size(); i++) {
+//         cout << "LCP[i] = " << LCP[i] << endl;
+//    }
 
     if (sdsl::cache_file_exists(sdsl::conf::KEY_SA, config)) {
         sdsl::load_from_cache(SA, sdsl::conf::KEY_SA, config);
         SA_1 = SA;
-
-        for (uint32_t  i = 0; i < SA.size(); i++) {
-            // cout << "SA[i] = " << m_SA[i] << endl;
+        for (uint32_t i = 0; i < SA.size(); i++) {
+//            cout << "SA[i] = " << SA[i] << endl;
             SA_1[SA[i]] = i;
         }
+
         sdsl::util::clear(SA);
+    }else{
+
     }
 
     // Builds the RMQ Support.
@@ -1771,31 +1768,53 @@ void SelfGrammarIndex::build_basics(
                   ulong size_a = a.first.second - a.first.first +1;
                   ulong size_b = b.first.second - b.first.first +1;
 
-                  /*
-                   * is start at the same position return the shortest
-                   * */
-                  if(a_pos == b_pos)
+//                  /*
+//                   * is start at the same position return the shortest
+//                   * */
+//                  if(a_pos == b_pos)
+//                      return size_a < size_b;
+//
+//                  auto sa_1_a = SA_1[a_pos];
+//                  auto sa_1_b = SA_1[b_pos];
+//
+//                  int min= LCP[rmq(std::min(sa_1_a,sa_1_b)+2,std::max(sa_1_a,sa_1_b)+1)];
+//                  /*
+//                   * Check if one is prefix of the other
+//                   * return the shortest
+//                   * */
+//
+//                  if(std::min(size_a,size_b) <= min){
+//                      return size_a < size_b;
+//                  }
+//
+//                  /*
+//                   * then return the lowest lexicographical
+//                   * */
+//
+//                  return sa_1_a < sa_1_b;
+//
+
+                  uint32_t _rmq;
+                  if (SA_1[a_pos] < SA_1[b_pos]) {
+                      _rmq = rmq(SA_1[a_pos] + 1, SA_1[b_pos]);
+                  } else {
+                      _rmq = rmq(SA_1[b_pos] + 1, SA_1[a_pos]);
+                  }
+                  if (size_a <= LCP[_rmq] && size_b <= LCP[_rmq]) {
                       return size_a < size_b;
-
-                  auto sa_1_a = SA_1[a_pos];
-                  auto sa_1_b = SA_1[b_pos];
-
-                  int min= LCP[rmq(std::min(sa_1_a,sa_1_b)+2,std::max(sa_1_a,sa_1_b)+1)];
-
-                  /*
-                   * Check if one is prefix of the other
-                   * return the shortest
-                   * */
-
-                  if(std::min(size_a,size_b) <= min){
-                      return size_a < size_b;
+                  } else if (size_a <= LCP[_rmq]) {
+                      return true;
+                  } else if (size_b <= LCP[_rmq]) {
+                      return false;
+                  } else {
+                      /***
+                       * Neither is a prefix of the other. Use ISA to find
+                       *the order
+                       ***/
+                      return SA_1[a_pos] < SA_1[b_pos];
                   }
 
-                  /*
-                   * then return the lowest lexicographical
-                   * */
 
-                  return sa_1_a < sa_1_b;
 
               });
 

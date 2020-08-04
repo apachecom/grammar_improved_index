@@ -476,16 +476,17 @@ void grammar::preprocess(const std::string & text
     sdsl::register_cache_file(sdsl::conf::KEY_TEXT, config);
 
     sdsl::construct(m_lcp, sdsl::conf::KEY_TEXT, config, 1);
-    for (uint32_t i = 0; i < m_lcp.size(); i++) {
-        // cout << "LCP[i] = " << m_lcp[i] << endl;
-    }
+//    std::cout<<"LCP.size()"<<m_lcp.size()<<std::endl;
+//    for (uint32_t i = 0; i < m_lcp.size(); i++) {
+//         cout << "LCP[i] = " << m_lcp[i] << endl;
+//    }
 
     if (sdsl::cache_file_exists(sdsl::conf::KEY_SA, config)) {
         sdsl::load_from_cache(m_SA, sdsl::conf::KEY_SA, config);
         m_ISA = m_SA;
 
         for (uint32_t  i = 0; i < m_SA.size(); i++) {
-            // cout << "SA[i] = " << m_SA[i] << endl;
+//             cout << "SA[i] = " << m_SA[i] << endl;
             m_ISA[m_SA[i]] = i;
         }
         sdsl::util::clear(m_SA);
@@ -552,6 +553,26 @@ void grammar::preprocess(const std::string & text
         }
 
         return sa_1_a < sa_1_b;
+
+//        uint32_t rmq;
+//        if (m_ISA[a_pos] < m_ISA[b_pos]) {
+//            rmq = m_rmq(m_ISA[a_pos] + 1, m_ISA[b_pos]);
+//        } else {
+//            rmq = m_rmq(m_ISA[b_pos] + 1, m_ISA[a_pos]);
+//        }
+//        if (size_a <= m_lcp[rmq] && size_b <= m_lcp[rmq]) {
+//            return size_a < size_b;
+//        } else if (size_a <= m_lcp[rmq]) {
+//            return true;
+//        } else if (size_b <= m_lcp[rmq]) {
+//            return false;
+//        } else {
+//            /***
+//             * Neither is a prefix of the other. Use ISA to find
+//             *the order
+//             ***/
+//            return m_ISA[a_pos] < m_ISA[b_pos];
+//        }
     });
 
 
