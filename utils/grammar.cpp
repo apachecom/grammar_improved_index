@@ -456,16 +456,58 @@ void grammar::preprocess(const std::string & text
     start = timer::now();
     mm.event(BUILD_CFG_GRAMMAR_2_PREP_5_BUILD_EDA_SA_LCP_RMQ_SORT);
 #endif
-    std::string rev_text = text;
-    std::reverse(rev_text.begin(),rev_text.end());
-    sdsl::int_vector<> SA(rev_text.size(),0);
-    sdsl::algorithm::calculate_sa( (unsigned char*)rev_text.c_str(),rev_text.size(),SA);
 
 
-    sdsl::inv_perm_support<> SA_1(&SA);
-    sdsl::lcp_wt<> LCP;
-    sdsl::construct_im(LCP, rev_text.c_str(),sizeof(unsigned char));
-    sdsl::rmq_succinct_sada<true,sdsl::bp_support_sada<>> rmq(&LCP);
+    sdsl::int_vector<> m_SA;
+    sdsl::int_vector<> m_ISA;
+    sdsl::lcp_bitcompressed<> m_lcp;
+    sdsl::rmq_succinct_sada<> m_rmq;
+
+    // Computes the text reverse
+    uint32_t text_size = text.length();
+
+    auto *rev_text = new unsigned char[text_size + 1];
+    for (uint32_t i = 0; i < text_size; i++) {
+        rev_text[i] = text[text_size - i - 1];
+    }
+    rev_text[text_size] = 0;
+    sdsl::cache_config config(false, ".", "cache_reverse");
+    sdsl::store_to_file((const char *)rev_text, sdsl::conf::KEY_TEXT);
+    sdsl::register_cache_file(sdsl::conf::KEY_TEXT, config);
+
+    sdsl::construct(m_lcp, sdsl::conf::KEY_TEXT, config, 1);
+    for (uint32_t i = 0; i < m_lcp.size(); i++) {
+        // cout << "LCP[i] = " << m_lcp[i] << endl;
+    }
+
+    if (sdsl::cache_file_exists(sdsl::conf::KEY_SA, config)) {
+        sdsl::load_from_cache(m_SA, sdsl::conf::KEY_SA, config);
+        m_ISA = m_SA;
+
+        for (uint32_t  i = 0; i < m_SA.size(); i++) {
+            // cout << "SA[i] = " << m_SA[i] << endl;
+            m_ISA[m_SA[i]] = i;
+        }
+        sdsl::util::clear(m_SA);
+    }
+
+    // Builds the RMQ Support.
+    m_rmq = sdsl::rmq_succinct_sada<>(&m_lcp);
+
+    sdsl::remove(sdsl::cache_file_name(sdsl::conf::KEY_SA, config));
+    sdsl::remove(sdsl::cache_file_name(sdsl::conf::KEY_TEXT, config));
+    sdsl::remove(sdsl::cache_file_name(sdsl::conf::KEY_LCP, config));
+
+//    std::string rev_text = text;
+//    std::reverse(rev_text.begin(),rev_text.end());
+//    sdsl::int_vector<> SA(rev_text.size(),0);
+//    sdsl::algorithm::calculate_sa( (unsigned char*)rev_text.c_str(),rev_text.size(),SA);
+//
+//
+//    sdsl::inv_perm_support<> SA_1(&SA);
+//    sdsl::lcp_wt<> LCP;
+//    sdsl::construct_im(LCP, rev_text.c_str(),sizeof(unsigned char));
+//    sdsl::rmq_succinct_sada<true,sdsl::bp_support_sada<>> rmq(&LCP);
 
     std::vector<rule::r_long> rules(_grammar.size(),0);
     rule::r_long j =0;
@@ -489,10 +531,10 @@ void grammar::preprocess(const std::string & text
     start = timer::now();
 #endif
 
-    std::sort(rules.begin(),rules.end(),[this,&rev_text,&SA_1,&LCP,&rmq](const rule::r_long & a, const rule::r_long &b )->bool{
+    std::sort(rules.begin(),rules.end(),[this,text_size,&rev_text,&m_ISA,&m_lcp,&m_rmq](const rule::r_long & a, const rule::r_long &b )->bool{
 
-        rule::r_long a_pos = rev_text.size() - _grammar[a].r - 1;
-        rule::r_long b_pos = rev_text.size() - _grammar[b].r - 1;
+        rule::r_long a_pos = text_size - _grammar[a].r - 1;
+        rule::r_long b_pos = text_size - _grammar[b].r - 1;
 
         rule::r_long size_a = _grammar[a].r - _grammar[a].l +1;
         rule::r_long size_b = _grammar[b].r - _grammar[b].l +1;
@@ -500,10 +542,10 @@ void grammar::preprocess(const std::string & text
         if(a_pos == b_pos)
             return size_a < size_b;
 
-        auto sa_1_a = SA_1[a_pos];
-        auto sa_1_b = SA_1[b_pos];
+        auto sa_1_a = m_ISA[a_pos];
+        auto sa_1_b = m_ISA[b_pos];
 
-        int min= LCP[rmq(std::min(sa_1_a,sa_1_b)+2,std::max(sa_1_a,sa_1_b)+1)];
+        int min= m_lcp[m_rmq(std::min(sa_1_a,sa_1_b)+2,std::max(sa_1_a,sa_1_b)+1)];
 
         if(std::min(size_a,size_b) <= min){
             return size_a < size_b;

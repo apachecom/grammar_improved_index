@@ -1192,12 +1192,53 @@ void SelfGrammarIndex::build_basics_bal(const std::string & text, fstream& R, fs
      * */
 
     std::cout<<"Building structures for sorting"<<std::endl;
-    sdsl::int_vector<> SA(text.size(),0);
-    sdsl::algorithm::calculate_sa( (unsigned char*)text.c_str(),text.size(),SA);
-    sdsl::inv_perm_support<> SA_1(&SA);
-    sdsl::lcp_wt<> LCP;
-    sdsl::construct_im(LCP,text.c_str(),sizeof(char));
-    sdsl::rmq_succinct_sada<true,sdsl::bp_support_sada<>> rmq(&LCP);
+//    sdsl::int_vector<> SA(text.size(),0);
+//    sdsl::algorithm::calculate_sa( (unsigned char*)text.c_str(),text.size(),SA);
+//    sdsl::inv_perm_support<> SA_1(&SA);
+//    sdsl::lcp_wt<> LCP;
+//    sdsl::construct_im(LCP,text.c_str(),sizeof(char));
+//    sdsl::rmq_succinct_sada<true,sdsl::bp_support_sada<>> rmq(&LCP);
+
+    sdsl::int_vector<> SA;
+    sdsl::int_vector<> SA_1;
+    sdsl::lcp_bitcompressed<> LCP;
+    sdsl::rmq_succinct_sada<> rmq;
+
+    // Computes the text reverse
+    uint32_t text_size = text.length();
+
+    auto *rev_text = new unsigned char[text_size + 1];
+    for (uint32_t i = 0; i < text_size; i++) {
+        rev_text[i] = text[text_size - i - 1];
+    }
+    rev_text[text_size] = 0;
+    sdsl::cache_config config(false, ".", "cache");
+    sdsl::store_to_file((const char *)rev_text, sdsl::conf::KEY_TEXT);
+    sdsl::register_cache_file(sdsl::conf::KEY_TEXT, config);
+
+    sdsl::construct(LCP, sdsl::conf::KEY_TEXT, config, 1);
+    for (uint32_t i = 0; i < LCP.size(); i++) {
+        // cout << "LCP[i] = " << m_lcp[i] << endl;
+    }
+
+    if (sdsl::cache_file_exists(sdsl::conf::KEY_SA, config)) {
+        sdsl::load_from_cache(SA, sdsl::conf::KEY_SA, config);
+        SA_1 = SA;
+
+        for (uint32_t  i = 0; i < SA.size(); i++) {
+            // cout << "SA[i] = " << m_SA[i] << endl;
+            SA_1[SA[i]] = i;
+        }
+        sdsl::util::clear(SA);
+    }
+
+    // Builds the RMQ Support.
+    rmq = sdsl::rmq_succinct_sada<>(&LCP);
+
+    sdsl::remove(sdsl::cache_file_name(sdsl::conf::KEY_SA, config));
+    sdsl::remove(sdsl::cache_file_name(sdsl::conf::KEY_TEXT, config));
+    sdsl::remove(sdsl::cache_file_name(sdsl::conf::KEY_LCP, config));
+
 
     std::cout<<"sorting suffixes ........."<<std::endl;
     std::sort(grammar_sfx.begin(),grammar_sfx.end(),
@@ -1657,12 +1698,54 @@ void SelfGrammarIndex::build_basics(
     start = timer::now();
 #endif
 
-    sdsl::int_vector<> SA(text.size(),0);
-    sdsl::algorithm::calculate_sa( (unsigned char*)text.c_str(),text.size(),SA);
-    sdsl::inv_perm_support<> SA_1(&SA);
-    sdsl::lcp_wt<> LCP;
-    sdsl::construct_im(LCP,text.c_str(),sizeof(char));
-    sdsl::rmq_succinct_sada<true,sdsl::bp_support_sada<>> rmq(&LCP);
+//    sdsl::int_vector<> SA(text.size(),0);
+//    sdsl::algorithm::calculate_sa( (unsigned char*)text.c_str(),text.size(),SA);
+//    sdsl::inv_perm_support<> SA_1(&SA);
+//    sdsl::lcp_wt<> LCP;
+//    sdsl::construct_im(LCP,text.c_str(),sizeof(char));
+//    sdsl::rmq_succinct_sada<true,sdsl::bp_support_sada<>> rmq(&LCP);
+
+    sdsl::int_vector<> SA;
+    sdsl::int_vector<> SA_1;
+    sdsl::lcp_bitcompressed<> LCP;
+    sdsl::rmq_succinct_sada<> rmq;
+
+    // Computes the text reverse
+    uint32_t text_size = text.length();
+
+    auto *rev_text = new unsigned char[text_size + 1];
+    for (uint32_t i = 0; i < text_size; i++) {
+        rev_text[i] = text[text_size - i - 1];
+    }
+    rev_text[text_size] = 0;
+    sdsl::cache_config config(false, ".", "cache");
+    sdsl::store_to_file((const char *)rev_text, sdsl::conf::KEY_TEXT);
+    sdsl::register_cache_file(sdsl::conf::KEY_TEXT, config);
+
+    sdsl::construct(LCP, sdsl::conf::KEY_TEXT, config, 1);
+    for (uint32_t i = 0; i < LCP.size(); i++) {
+        // cout << "LCP[i] = " << m_lcp[i] << endl;
+    }
+
+    if (sdsl::cache_file_exists(sdsl::conf::KEY_SA, config)) {
+        sdsl::load_from_cache(SA, sdsl::conf::KEY_SA, config);
+        SA_1 = SA;
+
+        for (uint32_t  i = 0; i < SA.size(); i++) {
+            // cout << "SA[i] = " << m_SA[i] << endl;
+            SA_1[SA[i]] = i;
+        }
+        sdsl::util::clear(SA);
+    }
+
+    // Builds the RMQ Support.
+    rmq = sdsl::rmq_succinct_sada<>(&LCP);
+
+    sdsl::remove(sdsl::cache_file_name(sdsl::conf::KEY_SA, config));
+    sdsl::remove(sdsl::cache_file_name(sdsl::conf::KEY_TEXT, config));
+    sdsl::remove(sdsl::cache_file_name(sdsl::conf::KEY_LCP, config));
+
+
 
 #ifdef MEM_MONITOR
     stop = timer::now();

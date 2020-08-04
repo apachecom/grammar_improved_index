@@ -217,11 +217,11 @@ class grammar {
 
                 return sa < sb;
             });
-//            std::cout<<"pi: ";
-//            for (int j = 0; j < n_rules()+1; ++j) {
-//                std::cout<<Pi[j]<<" ";
-//            }
-//            std::cout<<"\n";
+            std::cout<<"pi: ";
+            for (int j = 0; j < n_rules()+1; ++j) {
+                std::cout<<Pi[j]<<" ";
+            }
+            std::cout<<"\n";
 
         }
 
