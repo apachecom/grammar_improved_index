@@ -276,13 +276,17 @@ size_t compressed_grammar::size_in_bytes() const{
 
     return size_t(
                                sdsl::size_in_bytes(X_p) +
+
                                sdsl::size_in_bytes(Z) +
+
                                sdsl::size_in_bytes(select0_Z) +
                                sdsl::size_in_bytes(select1_Z) +
                                sdsl::size_in_bytes(rank1_Z) +
 
+
                                sdsl::size_in_bytes(F) +
                                sdsl::size_in_bytes(F_inv) +
+
                                sdsl::size_in_bytes(Y) +
                                sdsl::size_in_bytes(rank_Y) +
                                sdsl::size_in_bytes(select_Y)+
@@ -292,10 +296,12 @@ size_t compressed_grammar::size_in_bytes() const{
                                sdsl::size_in_bytes(rank_L)+
 
                                m_tree.size_in_bytes() +
-                               left_path.size_in_bytes() +
 
+                               left_path.size_in_bytes() +
                                right_path.size_in_bytes() +
+
                                sdsl::size_in_bytes(alp)
+
                                );
 
 }
