@@ -20,6 +20,16 @@
 
 std::vector<std::string> patterns;
 
+void load_patterns(const std::string & file) {
+   std::fstream in(file,std::ios::in);
+   if(in.good()){
+      std::string ss;
+      while(in >> ss){
+        patterns.push_back(ss);
+      }
+   }		
+}
+
 void load_patterns(const std::string& pattern_file,uint max_len, uint samples){
     std::cout<<pattern_file<<std::endl;
 //    patterns.resize(MAX_SAMPLES);

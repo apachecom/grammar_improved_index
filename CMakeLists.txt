@@ -59,6 +59,7 @@ include(ConfigGBench)
 
 include_directories(~/include)
 include_directories(~/include/ri)
+include_directories(~/include/slp)
 link_directories(~/lib)
 
 set(SLP_SAMPLING
@@ -257,7 +258,7 @@ cxx_executable_with_flags(process_coll "" "${LIBS};benchmark;slp;sdsl;divsufsort
 cxx_executable_with_flags(locate_indices "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/locate_indices.cpp ${SLP_SAMPLING})
 cxx_executable_with_flags(display_indices "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/display_indices.cpp ${SLP_SAMPLING})
 cxx_executable_with_flags(space "" "${LIBS};benchmark;sdsl;slp;divsufsort;divsufsort64;cds" bench/bench_space.cpp ${SLP_SAMPLING})
-
+cxx_executable_with_flags(locate "" "${LIBS};benchmark;sdsl;slp;divsufsort;divsufsort64;cds" bench/locate_patterns_file.cpp ${SLP_SAMPLING} ${SOURCE_FILES})
 
 
 if (NOT INV_PI_T)
