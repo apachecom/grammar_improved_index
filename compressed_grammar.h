@@ -109,7 +109,7 @@ class compressed_grammar {
                 return m_tree.children(node);
         }
 
-        uint label_i_child(const uint &node,const uint& i)const{
+        uint labeconstl_i_child(const uint &node,const uint& i)const{
                 return (*this)[m_tree.pre_order( m_tree.child(node,i) ) ];
         }
 

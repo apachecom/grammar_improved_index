@@ -2,8 +2,6 @@
 // Created by inspironXV on 8/16/2018.
 //
 
-#include <sdsl/lcp_bitcompressed.hpp>
-#include <sdsl/rmq_succinct_sada.hpp>
 #include "SelfGrammarIndex.h"
 
 #define _MAX_PROOF 1000
@@ -1851,5 +1849,90 @@ void SelfGrammarIndex::build_basics(
 
 
 }
+
+
+uint64_t SelfGrammarIndex::estimate_size_of_ed_graph(const uint64_t& len, const uint64_t& n_missmatch) {
+    auto editD = [](const std::string & s1, const std::string & s2){
+        if(s1.size() != s2.size()) return -1L;
+        long D = 0L;
+        for (uint64_t i = 0; i <s1.size() ; ++i) {
+            if(s1[i] != s2[i])
+                ++D;
+        }
+        return D;
+    };
+
+    std::vector<std::string> p_occ;
+    uint64_t sfx = grid.n_columns();
+    {
+        sdsl::int_vector<> off (sfx,0);
+        sdsl::int_vector<> off_parent (sfx,0);
+        sdsl::int_vector<> end_parent (sfx,0);
+
+        for (uint64_t i = 0; i < sfx ; ++i) {
+            // compute de start position of the suffix and store the position in off...
+            uint64_t preorder_node = grid.first_label_col(i+1);
+            auto node = _g.m_tree[preorder_node];
+            auto lf = _g.m_tree.leafrank(node);
+            off[i] = _g.select_L(lf);
+            auto parent = _g.m_tree.parent(node);
+            auto pre_parent = _g.m_tree.pre_order(parent);
+            off_parent[i] = _g.offsetText(pre_parent);
+            if(lf + 1 == sfx)
+                end_parent[i] = _g.get_size_text();
+            else
+                end_parent[i] = (_g.select_L(lf+1)) - 1;
+        }
+        for(uint64_t i = 0; i < sfx; i++)
+        {
+            //            extract substring S = T[off - len + 1 ,...,off + len - 1]
+            std::string S;
+            //            check do not analyze substring outside the primary occ (outside of the parent)
+            uint64_t lw = off[i] - len < off_parent[i] ? off_parent[i]:off[i] - len ;
+            uint64_t hi = off[i] + len > end_parent[i] ? end_parent[i]:off[i] + len - 1;
+            display(lw,hi,S);
+            //            and store it in pocc
+            p_occ.push_back(S);
+        }
+
+    }
+    std::set<std::tuple<uint64_t,uint64_t>> edges;
+    //init matrix
+//        M.resize(sfx);
+//        for (uint64_t i = 0; i < sfx; ++i) {
+//            M[i].resize(sfx);
+//            for (uint64_t j = 0; j < sfx ; ++j) {
+//                M[i][j] = 0;
+//            }
+//        }
+    for(uint64_t i = 0; i < sfx; i++)
+        for(uint64_t i2 = i+1; i2 < sfx; i++)
+            for(long j = 0; j < len ; ++j) {
+                std::string si;si.resize(len);
+                std::copy(p_occ[i].begin()+j,p_occ[i].begin()+j+len,si.begin());
+                for (long j2 = 0; j2 < len; ++j2) {
+                    std::string si2;si2.resize(len);
+                    std::copy(p_occ[i2].begin()+j2,p_occ[i2].begin()+j2+len,si2.begin());
+                    // compute Edit distance between S[j ... j +off] y S[j2 ... j+off]
+                    long D = editD(si,si2);
+                    if(D <= n_missmatch){
+                        //add point to the graph...
+                        edges.insert(std::make_pair(i,i2));
+//                            M[i][i2] = 1;
+                    }
+                }
+            }
+    p_occ.clear();
+    std::vector<std::tuple<uint64_t,uint64_t>> G(edges.size());
+    uint64_t i = 0;
+    for (const auto &e : edges)
+        G[i++] = e;
+    edges.clear();
+    //compute k2-tree
+    sdsl::k2_tree<4> K(G,sfx);
+//    return sdsl::size_in_bytes(K);
+        return 0;
+}
+
 
 

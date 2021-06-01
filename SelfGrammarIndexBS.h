@@ -135,9 +135,12 @@ public:
 
     }
 
+    virtual uint64_t estimate_size_of_ed_graph(const uint64_t& len, const uint64_t& n_missmatch){
+        return SelfGrammarIndex::estimate_size_of_ed_graph(len,n_missmatch);
+     }
 
 
-protected:
+    protected:
 
 
 

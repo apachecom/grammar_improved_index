@@ -8,7 +8,9 @@
 
 #include <string>
 #include <stack>
-#include <sdsl/bit_vectors.hpp>
+#include <sdsl/k2_tree.hpp>
+#include <sdsl/lcp_bitcompressed.hpp>
+#include <sdsl/rmq_succinct_sada.hpp>
 #include "compressed_grammar.h"
 #include "binary_relation.h"
 #include "trees/patricia_tree/compact_patricia_tree.h"
@@ -1252,6 +1254,9 @@ public:
 
         return 0;
     }
+
+
+    virtual uint64_t estimate_size_of_ed_graph(const uint64_t& len, const uint64_t& n_missmatch);
 
 
 };
