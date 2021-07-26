@@ -493,54 +493,54 @@ int main (int argc, char *argv[] ){
 #endif
     load_data(collection);
 #ifdef BUILD_EXTERNAL_INDEXES
-     benchmark::RegisterBenchmark("R-INDEX",  ribuild,collection,path_out
- #ifdef MEM_MONITOR
-             ,mem_out
- #endif
-     );
-benchmark::RegisterBenchmark("SLP-BAL-INDEX<2>",  slpbalbuild,collection,path_out, 2,true
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-    benchmark::RegisterBenchmark("SLP-BAL-INDEX<4>",  slpbalbuild,collection,path_out, 4,true
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-    benchmark::RegisterBenchmark("SLP-BAL-INDEX<6>",  slpbalbuild,collection,path_out, 6,true
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-    benchmark::RegisterBenchmark("SLP-BAL-INDEX<8>",  slpbalbuild,collection,path_out, 8,true
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-    benchmark::RegisterBenchmark("SLP-BAL-INDEX<10>",  slpbalbuild,collection,path_out, 10,true
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-    benchmark::RegisterBenchmark("SLP-BAL-INDEX<12>",  slpbalbuild,collection,path_out, 12,true
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
+  //   benchmark::RegisterBenchmark("R-INDEX",  ribuild,collection,path_out
+ //#ifdef MEM_MONITOR
+ //            ,mem_out
+ //#endif
+//     );
+//benchmark::RegisterBenchmark("SLP-BAL-INDEX<2>",  slpbalbuild,collection,path_out, 2,true
+//#ifdef MEM_MONITOR
+  //          ,mem_out
+//#endif
+ //   );
+//    benchmark::RegisterBenchmark("SLP-BAL-INDEX<4>",  slpbalbuild,collection,path_out, 4,true
+//#ifdef MEM_MONITOR
+//            ,mem_out
+//#endif
+  //  );
+  //  benchmark::RegisterBenchmark("SLP-BAL-INDEX<6>",  slpbalbuild,collection,path_out, 6,true
+//#ifdef MEM_MONITOR
+  //          ,mem_out
+//#endif
+  //  );
+  //  benchmark::RegisterBenchmark("SLP-BAL-INDEX<8>",  slpbalbuild,collection,path_out, 8,true
+//#ifdef MEM_MONITOR
+//            ,mem_out
+//#endif
+//    );
+//    benchmark::RegisterBenchmark("SLP-BAL-INDEX<10>",  slpbalbuild,collection,path_out, 10,true
+//#ifdef MEM_MONITOR
+//            ,mem_out
+//#endif
+//    );
+ //   benchmark::RegisterBenchmark("SLP-BAL-INDEX<12>",  slpbalbuild,collection,path_out, 12,true
+//#ifdef MEM_MONITOR
+//            ,mem_out
+//#endif
+//    );
 
-//
-//    benchmark::RegisterBenchmark("SLP-INDEX<2>",  slpbalbuild ,collection,path_out,2,false
+
+//   benchmark::RegisterBenchmark("SLP-INDEX<2>",  slpbalbuild ,collection,path_out,2,false
+//#ifdef MEM_MONITOR
+ //           ,mem_out
+//#endif
+//    );
+   // benchmark::RegisterBenchmark("SLP-INDEX<4>",  slpbalbuild ,collection,path_out,4,false
 //#ifdef MEM_MONITOR
 //            ,mem_out
 //#endif
 //    );
-//    benchmark::RegisterBenchmark("SLP-INDEX<4>",  slpbalbuild ,collection,path_out,4,false
-//#ifdef MEM_MONITOR
-//            ,mem_out
-//#endif
-//    );
-//
+
 //    benchmark::RegisterBenchmark("SLP-INDEX<6>",  slpbalbuild ,collection,path_out,6,false
 //#ifdef MEM_MONITOR
 //            ,mem_out
@@ -551,14 +551,14 @@ benchmark::RegisterBenchmark("SLP-BAL-INDEX<2>",  slpbalbuild,collection,path_ou
 //            ,mem_out
 //#endif
 //    );
-//
+
 //    benchmark::RegisterBenchmark("SLP-INDEX<10>",  slpbalbuild ,collection,path_out,10,false
 //#ifdef MEM_MONITOR
 //            ,mem_out
 //#endif
 //    );
-//
-//    benchmark::RegisterBenchmark("SLP-INDEX<12>",  slpbalbuild ,collection,path_out,12,false
+
+  //  benchmark::RegisterBenchmark("SLP-INDEX<12>",  slpbalbuild ,collection,path_out,12,false
 //#ifdef MEM_MONITOR
 //            ,mem_out
 //#endif
@@ -566,75 +566,75 @@ benchmark::RegisterBenchmark("SLP-BAL-INDEX<2>",  slpbalbuild,collection,path_ou
 
 #endif
 
-benchmark::RegisterBenchmark("G-INDEX",  g_imp_build_basics ,collection,path_out
-     #ifdef MEM_MONITOR
-                 ,mem_out
-     #endif
-         );
+//benchmark::RegisterBenchmark("G-INDEX",  g_imp_build_basics ,collection,path_out
+//     #ifdef MEM_MONITOR
+//                 ,mem_out
+//     #endif
+//         );
 
-    benchmark::RegisterBenchmark("G-INDEX-PTS<2>",  g_imp_pts_build ,collection,path_out,2
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
+//    benchmark::RegisterBenchmark("G-INDEX-PTS<2>",  g_imp_pts_build ,collection,path_out,2
+//#ifdef MEM_MONITOR
+//            ,mem_out
+//#endif
+//    );
 
-     benchmark::RegisterBenchmark("G-INDEX-PTS<4>",  g_imp_pts_build ,collection,path_out,4
- #ifdef MEM_MONITOR
-             ,mem_out
- #endif
-     );
+///     benchmark::RegisterBenchmark("G-INDEX-PTS<4>",  g_imp_pts_build ,collection,path_out,4
+// #ifdef MEM_MONITOR
+//             ,mem_out
+// #endif
+//     );
 
-     benchmark::RegisterBenchmark("G-INDEX-PTS<8>",  g_imp_pts_build ,collection,path_out,8
- #ifdef MEM_MONITOR
-             ,mem_out
- #endif
-     );
-     benchmark::RegisterBenchmark("G-INDEX-PTS<16>",  g_imp_pts_build ,collection,path_out,16
- #ifdef MEM_MONITOR
-             ,mem_out
- #endif
-     );
-     benchmark::RegisterBenchmark("G-INDEX-PTS<32>",  g_imp_pts_build ,collection,path_out,32
- #ifdef MEM_MONITOR
-             ,mem_out
- #endif
-     );
+//     benchmark::RegisterBenchmark("G-INDEX-PTS<8>",  g_imp_pts_build ,collection,path_out,8
+// #ifdef MEM_MONITOR
+//             ,mem_out
+// #endif
+//     );
+//     benchmark::RegisterBenchmark("G-INDEX-PTS<16>",  g_imp_pts_build ,collection,path_out,16
+// #ifdef MEM_MONITOR
+//             ,mem_out
+// #endif
+//     );
+//     benchmark::RegisterBenchmark("G-INDEX-PTS<32>",  g_imp_pts_build ,collection,path_out,32
+// #ifdef MEM_MONITOR
+//             ,mem_out
+// #endif
+//     );
 
      benchmark::RegisterBenchmark("G-INDEX-PTS<64>",  g_imp_pts_build ,collection,path_out,64
- #ifdef MEM_MONITOR
-             ,mem_out
- #endif
-     );
-    benchmark::RegisterBenchmark("G-INDEX-QGRAM<2>",  g_imp_qgram_build ,collection,path_out,2
 #ifdef MEM_MONITOR
             ,mem_out
-#endif
-    );
-     benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>",  g_imp_qgram_build ,collection,path_out,4
- #ifdef MEM_MONITOR
-             ,mem_out
  #endif
      );
-    benchmark::RegisterBenchmark("G-INDEX-QGRAM<6>",  g_imp_qgram_build ,collection,path_out,6
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-     benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>",  g_imp_qgram_build ,collection,path_out,8
- #ifdef MEM_MONITOR
-             ,mem_out
- #endif
-     );
-    benchmark::RegisterBenchmark("G-INDEX-QGRAM<10>",  g_imp_qgram_build ,collection,path_out,10
-#ifdef MEM_MONITOR
-            ,mem_out
-#endif
-    );
-     benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>",  g_imp_qgram_build ,collection,path_out,12
- #ifdef MEM_MONITOR
-             ,mem_out
- #endif
-     );
+//    benchmark::RegisterBenchmark("G-INDEX-QGRAM<2>",  g_imp_qgram_build ,collection,path_out,2
+//#ifdef MEM_MONITOR
+//            ,mem_out
+//#endif
+//    );
+//     benchmark::RegisterBenchmark("G-INDEX-QGRAM<4>",  g_imp_qgram_build ,collection,path_out,4
+// #ifdef MEM_MONITOR
+//             ,mem_out
+// #endif
+//     );
+//    benchmark::RegisterBenchmark("G-INDEX-QGRAM<6>",  g_imp_qgram_build ,collection,path_out,6
+//#ifdef MEM_MONITOR
+//           ,mem_out
+//#endif
+///   );
+//     benchmark::RegisterBenchmark("G-INDEX-QGRAM<8>",  g_imp_qgram_build ,collection,path_out,8
+// #ifdef MEM_MONITOR
+//             ,mem_out
+// #endif
+//     );
+//    benchmark::RegisterBenchmark("G-INDEX-QGRAM<10>",  g_imp_qgram_build ,collection,path_out,10
+//#ifdef MEM_MONITOR
+//            ,mem_out
+//#endif
+//    );
+//     benchmark::RegisterBenchmark("G-INDEX-QGRAM<12>",  g_imp_qgram_build ,collection,path_out,12
+// #ifdef MEM_MONITOR
+//             ,mem_out
+// #endif
+//     );
 
     benchmark::Initialize(&argc, argv);
     benchmark::RunSpecifiedBenchmarks();
