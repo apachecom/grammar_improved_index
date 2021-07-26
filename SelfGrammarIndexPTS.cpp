@@ -648,6 +648,335 @@ void SelfGrammarIndexPTS::locateNoTrie( std::string & pattern, std::vector<uint>
     }
 }
 
+void SelfGrammarIndexPTS::locateNoTrie( std::string & pattern, std::vector<uint> &occ, uint64_t& time_p,uint64_t& time_s)
+{
+
+    if(pattern.size() == 1)
+    {
+        locate_ch(pattern[0],occ);
+        return;
+    }
+
+    size_t p_n = pattern.size();
+    const auto& g_tree = _g.get_parser_tree();
+    auto nrules = _g.n_rules()-1;
+    auto nsfx = grid.n_columns();
+
+
+    for (size_t i = 1; i <= p_n ; ++i) {
+
+        auto start = std::chrono::high_resolution_clock::now();
+
+        auto itera = pattern.begin() + i - 1;
+        /*
+           *
+           * Extracting range for rev(p[1...k]) in the rule patricia tree
+           *
+           * */
+
+        m_patricia::rev_string_pairs sp1(pattern, 1);
+        sp1.set_left(0);
+        sp1.set_right(i - 1);
+
+        const auto &rules_t = rules_p_tree.get_tree();
+        auto node_match_rules = rules_p_tree.node_match(sp1);
+        //const auto& rules_leaf = rules_t.leafrank(node_match_rules);
+
+        size_t p_r2 = nrules, p_r1 = rules_t.leafrank(node_match_rules);
+
+        auto begin_r_string = pattern.begin();
+        auto end_r_string = itera;
+
+        auto rcmp_rules = dfs_cmp_suffix(_st(p_r1), end_r_string, begin_r_string);
+        auto match_rules = itera - end_r_string;
+
+
+        begin_r_string = pattern.begin();
+        end_r_string = itera;
+
+        if (match_rules == sp1.size()) // match_node  == locus_node && all the symbols of pattern are consumed
+        {
+
+            p_r2 = p_r1 + rules_t.leafnum(node_match_rules) - 1;
+            // sampled rules corresponding to leaves.
+            size_t ii = _st(p_r1), jj = _st(p_r2);
+            // new range of search
+            size_t ii_low = (ii == 1) ? 1 : ii - sampling;
+            size_t jj_hight = (jj + sampling <= nrules) ? jj + sampling : nrules;
+
+            grammar_representation::g_long lb = ii_low, ub = ii;
+            bool found = false;
+            lower_bound(found,lb, ub, [&begin_r_string,&end_r_string, this](const grammar_representation::g_long &a) -> int {
+                auto begin = begin_r_string;
+                auto end = end_r_string;
+                auto r = dfs_cmp_suffix(a,end,begin);
+                if (r == 0 && end != begin - 1) return 1;
+                return r;
+            });
+            if(!found)
+                continue;
+
+            p_r1 = lb;
+
+            lb = jj, ub = jj_hight;
+            //BINARY SEARCH ON THE INTERVAL FOR UPPER BOUND
+
+            found = false;
+            upper_bound(found,lb,ub,[&begin_r_string,&end_r_string,this](const grammar_representation::g_long & a)->int
+            {
+                auto begin = begin_r_string;
+                auto end = end_r_string;
+                auto r =  dfs_cmp_suffix(a,end,begin);
+                if (r == 0 && end != begin - 1) return 1;
+                return r;
+            });
+            if(!found)
+                continue;
+
+            p_r2 = ub;
+
+            // sampling_range_rules(p_r1,p_r2,begin_r_string,end_r_string);
+
+        } else  // if all the symbols of the patterns were not consumed
+        {
+            unsigned int pos_locus = 0;
+            auto locus_node_rules = rules_p_tree.node_locus(sp1, match_rules, pos_locus);
+            // find the left most leaf in the real range
+            size_t ii, jj;
+            if (rules_t.isleaf(locus_node_rules)) {
+                p_r1 = rules_t.leafrank(node_match_rules);
+                ii = (p_r1 == 1) ? 1 : p_r1 - 1;
+                ii = _st(ii), jj = ii + ((p_r1 == 1) ? sampling : 2 * sampling);
+            } else {
+                p_r1 = rules_p_tree.find_child_range(locus_node_rules, sp1, pos_locus, rcmp_rules);
+                // sampled rules corresponding to leaves.
+                ii = _st(p_r1), jj = ii + sampling;
+
+            }
+
+            jj = (jj < nrules) ? jj : nrules;
+
+
+
+
+            ///////////////////////////////////////////////////
+            grammar_representation::g_long lb = ii, ub = jj;
+            bool found = false;
+            lower_bound(found,lb, ub, [&begin_r_string,&end_r_string, this](const grammar_representation::g_long &a) -> int {
+                auto begin = begin_r_string;
+                auto end = end_r_string;
+                auto r = dfs_cmp_suffix(a,end,begin);
+                if (r == 0 && end != begin - 1) return 1;
+                return r;
+            });
+            if(!found)
+                continue;
+
+            p_r1 = lb;
+            ub = jj;
+
+            found = false;
+            upper_bound(found,lb,ub,[&begin_r_string,&end_r_string,this](const grammar_representation::g_long & a)->int
+            {
+                auto begin = begin_r_string;
+                auto end = end_r_string;
+                auto r =  dfs_cmp_suffix(a,end,begin);
+                if (r == 0 && end != begin - 1) return 1;
+                return r;
+            });
+            if(!found)
+                continue;
+
+            p_r2 = ub;
+
+
+        }
+
+        /*
+         *
+         * Extracting range for (p[k...m]) in the suffix patricia tree
+         *
+         * */
+        //start = timer::now();
+        m_patricia::string_pairs sp2(pattern, 2);
+        sp2.set_left(i);
+        sp2.set_right(pattern.size() - 1);
+
+        const auto &suff_t = sfx_p_tree.get_tree();
+        auto node_match_suff = sfx_p_tree.node_match(sp2);
+        //const auto& suff_leaf = suff_t.leafrank(node_match_suff);
+
+        size_t p_c2 = nsfx, p_c1 = suff_t.leafrank(node_match_suff);
+
+        auto begin_sfx_string = itera + 1;
+        auto end_sfx_string = pattern.end();
+
+        auto rcmp_sfx = cmp_suffix_grammar(_st(p_c1), begin_sfx_string, end_sfx_string);
+        auto match = begin_sfx_string - itera - 1;
+
+
+        begin_sfx_string = itera + 1;
+        end_sfx_string = pattern.end();
+
+        if (match == sp2.size())// match_node  == locus_node && all the symbols of pattern are consumed
+        {
+            p_c2 = p_c1 + suff_t.leafnum(node_match_suff) - 1;
+            // sampled suffix corresponding to leaves.
+            size_t ii = _st(p_c1), jj = _st(p_c2);
+            // new range of search
+            size_t ii_low = (ii == 1) ? 1 : ii - sampling;
+            size_t jj_hight = (jj + sampling <= nsfx) ? jj + sampling : nsfx;
+
+            //////////////////////////////////////////////
+
+            grammar_representation::g_long lb = ii_low, ub = ii;
+            bool found = false;
+            lower_bound(found,lb, ub, [&begin_sfx_string,&end_sfx_string, this](const grammar_representation::g_long &a) -> int {
+                auto begin = begin_sfx_string;
+                auto end = end_sfx_string;
+                auto r = cmp_suffix_grammar(a, begin, end);
+                return r;
+            });
+            if(!found)
+                continue;
+
+            p_c1 = lb;
+
+            lb = jj, ub = jj_hight;
+            //BINARY SEARCH ON THE INTERVAL FOR UPPER BOUND
+
+            found = false;
+            upper_bound(found,lb,ub,[&begin_sfx_string,&end_sfx_string,this](const grammar_representation::g_long & a)->int
+            {
+                auto begin = begin_sfx_string;
+                auto end = end_sfx_string;
+
+                auto r =  cmp_suffix_grammar(a,begin,end);
+                return r;
+            });
+            if(!found)
+                continue;
+
+            p_c2 = ub;
+
+        } else {// if all the symbols of the patterns are not consumed
+
+
+            unsigned int pos_locus;
+            auto locus_node_suff = sfx_p_tree.node_locus(sp2, match,pos_locus);
+
+            size_t ii, jj;
+
+            if (suff_t.isleaf(locus_node_suff)) {
+
+                p_c1 = suff_t.leafrank(locus_node_suff);
+                ii = (p_c1 == 1) ? 1 : p_c1 - 1;
+                ii = _st(ii), jj = ii + ((p_c1 == 1) ? sampling : 2 * sampling);
+
+
+            } else {
+                // find the left most leaf in the real range
+                p_c1 = sfx_p_tree.find_child_range(locus_node_suff, sp2, pos_locus, rcmp_sfx);
+                ii = _st(p_c1), jj = ii + sampling;
+
+            }
+            jj = (jj < nsfx) ? jj : nsfx;
+
+
+            ///////////////////////////////////////////////////
+
+
+            grammar_representation::g_long lb = ii, ub = jj;
+            bool found = false;
+            lower_bound(found,lb, ub, [&begin_sfx_string,&end_sfx_string, this](const grammar_representation::g_long &a) -> int {
+                auto begin = begin_sfx_string;
+                auto end = end_sfx_string;
+
+                auto r =  cmp_suffix_grammar(a,begin,end);
+                return r;
+            });
+            if(!found)
+                continue;
+
+            p_c1 = lb;
+            ub = jj;
+            found = false;
+            upper_bound(found,lb,ub,[&begin_sfx_string,&end_sfx_string,this](const grammar_representation::g_long & a)->int
+            {
+                auto begin = begin_sfx_string;
+                auto end = end_sfx_string;
+                auto r = cmp_suffix_grammar(a, begin, end);
+                return r;
+            });
+            if(!found) continue;
+
+            p_c2 = ub;
+
+        }
+
+//        std::vector<std::pair<size_t, size_t> > pairs;
+        auto x1 = (uint) p_r1, x2 = (uint) p_r2, y1 = (uint) p_c1, y2 = (uint) p_c2;
+
+
+        long len = itera-pattern.begin() +1;
+
+
+        const auto& g_tree = _g.get_parser_tree();
+
+        std::vector< std::pair<size_t,size_t> > pairs;
+
+
+        grid.range2(x1,x2,y1,y2,pairs);
+
+        auto end = std::chrono::high_resolution_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+        time_p += elapsed;
+
+        for (auto &pair : pairs) {
+
+            start = std::chrono::high_resolution_clock::now();
+
+                size_t p = grid.first_label_col(pair.second);
+                size_t pos_p = _g.offsetText(g_tree[p]);
+                unsigned int parent = g_tree.parent(g_tree[p]);
+                long  l = long (- len + pos_p) - _g.offsetText(parent);
+
+            end = std::chrono::high_resolution_clock::now();
+            elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+            time_p += elapsed;
+
+            start = std::chrono::high_resolution_clock::now();
+
+                find_second_occ(l,parent,occ);
+
+            end = std::chrono::high_resolution_clock::now();
+            elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+            time_s += elapsed;
+
+        }
+//        find_second_occ(x1,x2,y1,y2,len,occ);
+
+        //        long len = itera - pattern.begin() + 1;
+
+//        grid.range2(x1, x2, y1, y2, pairs);
+//
+//
+//        for (auto &pair : pairs) {
+//
+//            size_t p = grid.first_label_col(pair.second);
+//            size_t pos_p = _g.offsetText(g_tree[p]);
+//            unsigned int parent = g_tree.parent(g_tree[p]);
+//            long int l = (-len + pos_p) - _g.offsetText(parent);
+//            unsigned int preP = g_tree.pre_order(parent);
+//            //find_second_occ_rec(l, preP, occ);
+//            find_second_occ(l, parent, occ);
+//        }
+
+
+    }
+}
+
+
 
 void SelfGrammarIndexPTS::locate2( std::string & pattern, std::vector<uint> &occ)
 {

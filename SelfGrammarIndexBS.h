@@ -63,6 +63,7 @@ public:
     void locate( std::string& , std::vector<uint> &) override;
     void locate2( std::string& , sdsl::bit_vector &) ;
     void locateNoTrie( std::string &, std::vector<uint> &) override;
+    void locateNoTrie( std::string & pattern, std::vector<uint> & occ, uint64_t& time_p, uint64_t& time_s);
     void display(const std::size_t& , const std::size_t&, std::string & ) override ;
     void display_trie(const std::size_t& , const std::size_t&, std::string & ) override ;
     void display_L_trie(const std::size_t& i, const std::size_t& j, std::string & s) override {

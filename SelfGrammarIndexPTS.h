@@ -46,6 +46,7 @@ class SelfGrammarIndexPTS:public SelfGrammarIndexPT{
         void locate2( std::string & , std::vector<uint> & );
         void locate( std::string & , std::vector<uint> & ) override;
         void locateNoTrie( std::string &, std::vector<uint> &) override;
+        void locateNoTrie( std::string &, std::vector<uint> &, uint64_t&,uint64_t& );
         compressed_grammar& get_grammar() override { return _g;}
         void display(const std::size_t& , const std::size_t&, std::string & ) override ;
 
