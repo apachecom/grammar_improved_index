@@ -452,6 +452,7 @@ void SelfGrammarIndexBS::locateNoTrie( std::string & pattern, std::vector<uint> 
 //        find_second_occ(r1,r2,c1,c2,len,occ);
 
     }
+}
 
 void SelfGrammarIndexBS::locateNoTrie( std::string & pattern, std::vector<uint> & occ){
 
