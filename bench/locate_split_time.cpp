@@ -21,7 +21,7 @@
 
 std::vector<std::string> patterns;
 
-void load_patterns(const std::string& pattern_file){
+uint32_t load_patterns(const std::string& pattern_file){
     std::fstream in(pattern_file,std::ios::in|std::ios::binary);
     if(in.good()){
         uint32_t len, samples;
@@ -30,13 +30,18 @@ void load_patterns(const std::string& pattern_file){
         char *buff = new char[len];
         for (uint32_t i = 0; i < samples ; ++i) {
             in.read(buff,len);
-            std::string ss;
+            std::string ss;ss.resize(len);
+            std::copy(buff, buff+len,ss.begin());
+            //std::cout<<ss<<std::endl;
             patterns.push_back(ss);
         }
         delete buff;
+        std::cout<<"Total patterns readed:"<<patterns.size()<<std::endl;
+        return len;
     }
+    std::cout<<"File not good"<<std::endl;
+    return 0;
 }
-
 
     auto gibslocate = [](benchmark::State &st, const string &file_index, const uint& len, bool trie
 //#ifdef MEM_MONITOR
@@ -294,19 +299,21 @@ void load_patterns(const std::string& pattern_file){
 
 
 
-    int main (int argc, char *argv[] ){
+int main (int argc, char *argv[] ){
+
 
         if(argc < 2){
             std::cout<<"bad parameters...."<<std::endl;
             return 0;
         }
-        /**
-         * collection-name
-         */
+
+
         std::string index_prefix  = argv[1];
         std::string pattern_file = argv[2];
 
-     std::cout<<"INV_PI_T_TRIE: "<<INV_PI_T_TRIE<<std::endl;
+
+        std::cout<<"INV_PI_T: "<<INV_PI_T<<std::endl;
+        std::cout<<"INV_PI_T_TRIE: "<<INV_PI_T_TRIE<<std::endl;
         std::cout<<"INV_PI_T_QGRAM: "<<INV_PI_T_QGRAM<<std::endl;
 
 #ifdef BUILD_EXTERNAL_INDEXES
@@ -321,8 +328,11 @@ void load_patterns(const std::string& pattern_file){
 #endif
 
 
-        load_patterns(pattern_file);
+        uint32_t i = load_patterns(pattern_file);
+        if(!i) return 0;
         std::cout<<"PATTERNS LOADED FROM: "<<pattern_file<<std::endl;
+        std::cout<<"PATTERN LEN: "<<i<<std::endl;
+
 
         benchmark::RegisterBenchmark("G-INDEX-BINARY_SEARCH-NOTRIE",gibslocate_split,index_prefix,i,0)->Unit(benchmark::kMicrosecond);
         benchmark::RegisterBenchmark("G-INDEX-PATRICIA_TREE<4>-NOTRIE",giptslocate_split,index_prefix,i,4,0)->Unit(benchmark::kMicrosecond);
@@ -336,4 +346,4 @@ void load_patterns(const std::string& pattern_file){
 
         return 0;
 
-    }
+}
