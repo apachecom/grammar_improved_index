@@ -259,7 +259,7 @@ cxx_executable_with_flags(locate_indices "" "${LIBS};benchmark;slp;sdsl;divsufso
 cxx_executable_with_flags(display_indices "" "${LIBS};benchmark;slp;sdsl;divsufsort;divsufsort64;cds" bench/display_indices.cpp ${SLP_SAMPLING})
 cxx_executable_with_flags(space "" "${LIBS};benchmark;sdsl;slp;divsufsort;divsufsort64;cds" bench/bench_space.cpp ${SLP_SAMPLING})
 cxx_executable_with_flags(locate "" "${LIBS};benchmark;sdsl;slp;divsufsort;divsufsort64;cds" bench/locate_patterns_file.cpp ${SLP_SAMPLING} ${SOURCE_FILES})
-
+cxx_executable_with_flags(locate_time_split "" "${LIBS};benchmark;sdsl;divsufsort;divsufsort64;" bench/locate_split_time.cpp ${SLP_SAMPLING})
 
 if (NOT INV_PI_T)
     set(INV_PI_T 8)

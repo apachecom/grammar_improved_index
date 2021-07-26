@@ -35,7 +35,7 @@ void load_patterns(const std::string& pattern_file){
         }
         delete buff;
     }
-
+}
 
 
     auto gibslocate = [](benchmark::State &st, const string &file_index, const uint& len, bool trie
