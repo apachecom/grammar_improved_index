@@ -35,7 +35,6 @@ int load_data(const std::string &collection){
     std::cout<<"DATA LOADED\n";
     return 1;
 }
-
 auto g_imp_build_basics = [](benchmark::State &st, const string &file_collection, const std::string& file_out){
 
     std::fstream fbasics(file_out+"-basics", std::ios::out| std::ios::binary);
@@ -74,8 +73,6 @@ auto g_imp_build_basics = [](benchmark::State &st, const string &file_collection
     }
     st.counters["size"] = g_index.size_in_bytes();
 };
-
-
 int main (int argc, char *argv[] ){
 
         if(argc < 2){
