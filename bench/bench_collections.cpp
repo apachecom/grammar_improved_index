@@ -208,13 +208,16 @@ int main (int argc, char *argv[] ){
     std::string path_out    = argv[2];
 
     int op    = std::atoi(argv[3]);
-    int max_len = std::atoi(argv[4]);
-    int max_queries = std::atoi(argv[5]);
+
 
     if(op == 1)
      benchmark::RegisterBenchmark("PROCESSING COLLECTION",  process_coll ,collection,path_out);
-    else
+    else{
+        int max_len = std::atoi(argv[4]);
+        int max_queries = std::atoi(argv[5]);
         benchmark::RegisterBenchmark("CREATING FILES",  create_files ,collection,path_out,max_len,max_queries);
+    }
+
 
 
 
