@@ -15,7 +15,7 @@
 typedef std::vector<std::pair<uint, uint>> rvect;
 typedef std::vector<uint> lvect;
 
-grammar::grammar():_size(0),initial_rule(0) {
+grammar::grammar():initial_rule(0),_size(0) {
 
 }
 
@@ -58,7 +58,7 @@ void grammar::buildRepair(const std::string &text
 
     std::map<unsigned char,rule::r_long > inv_alp;
 
-    for (int k = 0; k < terminals; ++k) {
+    for (uint64_t  k = 0; k < terminals; ++k) {
         alp[k] = symbols[k];
         inv_alp[symbols[k]] = k;
     }
@@ -147,7 +147,7 @@ void grammar::buildBalRepair( const std::string &text,std::fstream & in_grammar,
 
     symbols = new unsigned char[terminals];
 
-    for (int i = 0; i < terminals; ++i) {
+    for (uint64_t  i = 0; i < terminals; ++i) {
         char b;
         in_grammar.read((char *) &b, sizeof(char));
 
@@ -176,7 +176,7 @@ void grammar::buildBalRepair( const std::string &text,std::fstream & in_grammar,
     V.pop_back();
     L.resize(V.size());
 
-    for (int k = 0; k < L.size(); ++k) {
+    for (uint64_t  k = 0; k < L.size(); ++k) {
         L[k] = 0;
     }
 
@@ -217,7 +217,7 @@ void grammar::buildBalRepair( const std::string &text,std::fstream & in_grammar,
 
     std::map<unsigned char,rule::r_long > inv_alp;
 
-    for (int k = 0; k < terminals; ++k) {
+    for (uint64_t  k = 0; k < terminals; ++k) {
         alp[k] = symbols[k];
 //        std::cout<<symbols[k]<<" ";
         inv_alp[symbols[k]] = k;
@@ -399,7 +399,7 @@ void grammar::preprocess(const std::string & text
         std::map<rule::r_long, rule::r_long> occ;
         for (auto &&iter : _grammar) {
             if (!iter.second.terminal) {
-                for (int i = 0; i < iter.second._rule.size(); ++i) {
+                for (uint64_t  i = 0; i < iter.second._rule.size(); ++i) {
                     occ[iter.second._rule[i]]++;
                 }
             }
@@ -466,36 +466,30 @@ void grammar::preprocess(const std::string & text
     // Computes the text reverse
     uint32_t text_size = text.length();
 
-    auto *rev_text = new unsigned char[text_size + 1];
+    std::string rev_text; rev_text.resize(text_size);
     for (uint32_t i = 0; i < text_size; i++) {
         rev_text[i] = text[text_size - i - 1];
+        if(i < 10) std::cout<<rev_text[i];
     }
-    rev_text[text_size] = 0;
+    std::cout<<std::endl;
     sdsl::cache_config config(false, ".", "cache_reverse");
-    sdsl::store_to_file((const char *)rev_text, sdsl::conf::KEY_TEXT);
+    sdsl::store_to_file((const char *)rev_text.c_str(), sdsl::conf::KEY_TEXT);
     sdsl::register_cache_file(sdsl::conf::KEY_TEXT, config);
-
+    std::cout<<"A!!!!!!!!!!!!!!!\n";
     sdsl::construct(m_lcp, sdsl::conf::KEY_TEXT, config, 1);
-
-//    std::cout<<"TEXT.size()"<<text.size()<<std::endl;
-//    std::cout<<"LCP.size()"<<m_lcp.size()<<std::endl;
-
-//    for (uint32_t i = 0; i < m_lcp.size(); i++) {
-//         cout << "LCP[i] = " << m_lcp[i] << endl;
-//    }
+    std::cout<<"TEXT.size()"<<text.size()<<std::endl;
+    std::cout<<"LCP.size()"<<m_lcp.size()<<std::endl;
 
     if (sdsl::cache_file_exists(sdsl::conf::KEY_SA, config)) {
         sdsl::load_from_cache(m_SA, sdsl::conf::KEY_SA, config);
         m_ISA = m_SA;
 
         for (uint32_t  i = 0; i < m_SA.size(); i++) {
-//             cout << "SA[i] = " << m_SA[i] << endl;
             m_ISA[m_SA[i]] = i;
         }
-//        std::cout<<"size SA "<<m_SA.size()<<std::endl;
-
-//        std::cout<<"size SA_1 "<<m_ISA.size()<<std::endl;
         sdsl::util::clear(m_SA);
+    } else {
+        std::cout<<"ERROR CACHE FILE DIDN'T FOUNDED"<<std::endl;
     }
 
     // Builds the RMQ Support.
@@ -598,7 +592,7 @@ void grammar::preprocess(const std::string & text
     mm.event(BUILD_CFG_GRAMMAR_2_PREP_7_UPDATE_IDS);
 #endif
     std::vector<rule::r_long> inv_rules(max_rule+1,0);
-    for (int k = 0; k < rules.size(); ++k) {
+    for (uint64_t k = 0; k < rules.size(); ++k) {
         inv_rules[rules[k]] = k;
     }
 
@@ -648,7 +642,7 @@ void grammar::replace(const rule::r_long & id, std::map<rule::r_long, rule::r_lo
     if(M.find(id) != M.end())
         return;
 
-    int i = 0;
+    uint64_t i = 0;
 
     while(i < _grammar[id]._rule.size()){
 
@@ -723,7 +717,7 @@ void grammar::compute_offset_text(const rule::r_long & Xj,  rule::r_long & pos, 
 
     _grammar[Xj].l = pos;
 
-    for(int i = 0 ; i < _grammar[Xj]._rule.size(); i++){
+    for(uint64_t i = 0 ; i < _grammar[Xj]._rule.size(); i++){
         compute_offset_text(_grammar[Xj]._rule[i],pos,mark);
     }
     _grammar[Xj].r =pos-1;
@@ -776,7 +770,7 @@ void grammar::load(std::fstream &f)
     rule::r_long n = 0 ;
     sdsl::load(n,f);
     alp.clear();
-    for (int i = 0; i < n; ++i) {
+    for (rule::r_long i = 0; i < n; ++i) {
         unsigned int key; unsigned char v;
         sdsl::load(key,f);
         sdsl::load(v,f);
@@ -786,7 +780,7 @@ void grammar::load(std::fstream &f)
     sdsl::load(n,f);
 
 //    std::cout<<"ng:"<<n<<std::endl;
-    for (int i = 0; i < n; ++i) {
+    for (rule::r_long i = 0; i < n; ++i) {
         rule::r_long id;
         sdsl::load(id,f);
         rule r;

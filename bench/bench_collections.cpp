@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <gflags/gflags.h>
+//#include <gflags/gflags.h>
 #include <benchmark/benchmark.h>
 #include <cstring>
 #include <ctime>
@@ -103,7 +103,7 @@ void create_file_patterns(){}
  * n numero de samplings
  *
  */
-auto create_files= [](benchmark::State &st, const std::string& file_coll, const std::string& path_out, const uint& max_len, const uint & n)
+auto create_files= [](benchmark::State &st, const std::string& file_coll, const std::string& path_out, const uint32_t& max_len, const uint32_t & n)
 {
     std::string data = "";
     std::cout<<"collection:"<<file_coll<<std::endl;
@@ -114,13 +114,14 @@ auto create_files= [](benchmark::State &st, const std::string& file_coll, const 
     {
         std::fstream fpoints(path_out+"-"+std::to_string(max_len)+".pos", std::ios::out|std::ios::binary);
         std::fstream fpatterns(path_out+"-"+std::to_string(max_len)+".ptt", std::ios::out|std::ios::binary);
-
+        fpatterns.write((const char *)&max_len,sizeof (uint32_t ));
+        fpatterns.write((const char *)&n,sizeof (uint32_t ));
         std::cout<<"positions file:"<<path_out+"-"+std::to_string(max_len)+".pos"<<std::endl;
         std::cout<<"patterns file:"<<path_out+"-"+std::to_string(max_len)+".ptt"<<std::endl;
 
         std::srand(std::time(nullptr));
 
-        for (int i = 0; i < n ; ++i) {
+        for (uint i = 0; i < n ; ++i) {
             std::string patt;
             size_t r1 = 0;
             size_t  r2 = 0;

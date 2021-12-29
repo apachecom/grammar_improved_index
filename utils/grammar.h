@@ -38,10 +38,10 @@ struct rule{
      * */
     rule::r_long l,r;
 
-    rule():id(0),terminal(false),l(0),r(0),node(0){
+    rule():id(0),terminal(false),node(0),l(0),r(0){
 
     }
-    rule(const r_long & i, const bool& t):id(i),terminal(t),l(0),r(0),node(0) {}
+    rule(const r_long & i, const bool& t):id(i),terminal(t),node(0),l(0),r(0) {}
     rule& operator=(const rule& R) = default;
     rule::r_long size_in_bytes()const
     {
@@ -60,7 +60,7 @@ struct rule{
         sdsl::load(n,f);
         _rule.clear();
         _rule.resize(n);
-        for (int i = 0; i < n ; ++i) {
+        for (uint64_t  i = 0; i < n ; ++i) {
             rule::r_long item;
             sdsl::load(item,f);
             _rule[i] = item;
@@ -236,7 +236,7 @@ class grammar {
 
                 if(!f(r)) return;
 
-                for (int i = 0; i < r._rule.size() ; ++i) {
+                for (uint64_t  i = 0; i < r._rule.size() ; ++i) {
                     dfs(r._rule[i],f);
                 }
             }

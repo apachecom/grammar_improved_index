@@ -11,7 +11,7 @@ void dfuds_tree::build(const sdsl::bit_vector &v) {
     auto _bv = sdsl::bit_vector(v.size()+3);
     _bv[0]=1;_bv[1]=1;_bv[2]=0;
 
-    for (int i = 0; i < v.size(); ++i) {
+    for (uint64_t i = 0; i < v.size(); ++i) {
         _bv[3+i] = v[i];
     }
     bit_vector = bv(_bv);

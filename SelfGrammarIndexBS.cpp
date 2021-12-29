@@ -637,7 +637,7 @@ void SelfGrammarIndexBS::find_ranges_trie(std::string & pattern, std::vector<uin
 void SelfGrammarIndexBS::find_ranges(std::string &pattern, std::vector<uint> &X) {
 
     size_t p_n = pattern.size();
-    size_t n_xj = _g.n_rules()-1;
+//    size_t n_xj = _g.n_rules()-1;
     size_t n_sj = grid.n_columns();
 
     for (size_t  i = 1; i <= p_n ; ++i) {

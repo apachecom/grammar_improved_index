@@ -87,7 +87,7 @@ class binary_relation {
                 }
                 std::cout<<"\n";
                 std::cout<<"SL: ";
-                for (int i = 0; i < SL.size() ; ++i) {
+                for (uint64_t  i = 0; i < SL.size() ; ++i) {
                         std::cout<<SL[i]<<" ";
                 }
                 std::cout<<"\n";

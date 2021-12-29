@@ -358,7 +358,7 @@ public:
 
 
         /* If the range only expands a unique leaf */
-        int added_ch = 0;
+        uint64_t added_ch = 0;
 
         if (llb == lle) {
             /* Need to jump to llb definition */
@@ -513,7 +513,7 @@ public:
 
 
         /* If the range only expands a unique leaf */
-        int added_ch = 0;
+        uint64_t added_ch = 0;
 
         if (llb == lle) {
             /* Need to jump to llb definition */
@@ -670,7 +670,7 @@ public:
 
 
         /* If the range only expands a unique leaf */
-        int added_ch = 0;
+        uint64_t added_ch = 0;
 
         if (llb == lle) {
             /* Need to jump to llb definition */
@@ -885,7 +885,7 @@ public:
         uint rule_node = _g.m_tree[_g.select_occ(X,1)];
 
         uint nch  = _g.m_tree.children(rule_node);
-        for (int j = 1; j <= nch ; ++j)
+        for (uint j = 1; j <= nch ; ++j)
         {   uint child = _g.m_tree.child(rule_node,j);
             uint V = _g[_g.m_tree.pre_order(child)];
             dfs_expand_prefix(V,s,l,pos);
@@ -1028,7 +1028,7 @@ public:
 
 
         /* If the range only expands a unique leaf */
-        int added_ch = 0;
+        uint64_t  added_ch = 0;
 
         if (llb == lle) {
             /* Need to jump to llb definition */
@@ -1241,7 +1241,7 @@ public:
         uint rule_node = _g.m_tree[_g.select_occ(X,1)];
 
         uint nch  = _g.m_tree.children(rule_node);
-        for (int j = 1; j <= nch ; ++j)
+        for (uint j = 1; j <= nch ; ++j)
         {   uint child = _g.m_tree.child(rule_node,j);
             uint V = _g[_g.m_tree.pre_order(child)];
             int r = dfs_cmp_prefix(V,itera,end);

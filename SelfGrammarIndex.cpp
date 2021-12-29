@@ -1505,7 +1505,7 @@ void SelfGrammarIndex::build_bitvector_occ(sdsl::bit_vector &B) const
     sdsl::bit_vector T(size_gr*n_cols,0);
 
 
-    for (int i = 1; i <= n_cols ; ++i) {
+    for (uint64_t  i = 1; i <= n_cols ; ++i) {
 
         uint preorder_node = grid.first_label_col(i);
         uint begin = i*n_cols;
@@ -1536,7 +1536,7 @@ void SelfGrammarIndex::track_occ(uint &pnode, sdsl::bit_vector& B, const uint& b
 
     uint n_occ = _g.n_occ(label);
 
-    for (int i = 2; i <= n_occ ; ++i)
+    for (uint64_t i = 2; i <= n_occ ; ++i)
     {
         uint p = _g.select_occ(label,i);
         track_occ(p,B,begin);
@@ -1731,6 +1731,9 @@ void SelfGrammarIndex::build_basics(
         }
 
         sdsl::util::clear(SA);
+    } else {
+        std::cout<<"ERROR CACHE NO ENCONTRADA"<<std::endl;
+
     }
 //    std::cout<<"SA_1.size()"<<SA_1.size()<<std::endl;
 

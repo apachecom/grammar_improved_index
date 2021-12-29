@@ -416,7 +416,7 @@ void compressed_grammar::left_most_path(){
     trie::Trie<std::vector<g_long>> left_trie;
     auto num_leaf = m_tree.leafnum(m_tree.root());
     std::map<g_long, std::vector<g_long > > paths;
-    for(int l = 0; l < num_leaf; ++l){
+    for(uint64_t  l = 0; l < num_leaf; ++l){
         std::vector<uint > current_path;
         auto current_leaf = m_tree.leafselect(l+1);
         auto Xj = (*this)[m_tree.pre_order(current_leaf)];

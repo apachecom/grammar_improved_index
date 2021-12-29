@@ -42,7 +42,7 @@ bp_tree::bp_long bp_tree::child(const bp_tree::bp_long & v, const bp_tree::bp_lo
     auto l = v+2;
     auto r = bps.find_close(v);
 
-    for(int i = 2; i <= t ; ++i)
+    for(uint64_t  i = 2; i <= t ; ++i)
     {
         auto next = bps.rmq(l,r);
         if(next+1 >= r) return bit_vector.size();
