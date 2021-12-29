@@ -120,9 +120,7 @@ class compressed_grammar {
          * the i-th occurrence of variable Xi
          * */
         g_long select_occ(const g_long&, const g_long& ) const;
-
         bool is_first_occ(const g_long&) const;
-
         /*
          *  return the variable Xj associated to the i-th preorder node
          *  in the parser tree

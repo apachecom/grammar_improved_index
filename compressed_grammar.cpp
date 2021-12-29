@@ -29,17 +29,17 @@ compressed_grammar::g_long compressed_grammar::operator[](const g_long & i)const
    //// assert(i > 0 && i <= Z.size());
 
 
-    /*
-     * first occurrence
-     *
-     * */
-    if(Z[i-1])
-        return F_inv[rank1_Z(i)];
-    /*
-     * not first occurrence
-     *
-     * */
-    return X_p[i-rank1_Z(i)-1];
+        /*
+         * first occurrence
+         *
+         * */
+        if(Z[i-1])
+            return F_inv[rank1_Z(i)];
+        /*
+         * not first occurrence
+         *
+         * */
+        return X_p[i-rank1_Z(i)-1];
 
 }
 
