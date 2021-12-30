@@ -475,10 +475,10 @@ void grammar::preprocess(const std::string & text
     sdsl::cache_config config(false, ".", "cache_reverse");
     sdsl::store_to_file((const char *)rev_text.c_str(), sdsl::conf::KEY_TEXT);
     sdsl::register_cache_file(sdsl::conf::KEY_TEXT, config);
-    std::cout<<"A!!!!!!!!!!!!!!!\n";
+//    std::cout<<"A!!!!!!!!!!!!!!!\n";
     sdsl::construct(m_lcp, sdsl::conf::KEY_TEXT, config, 1);
-    std::cout<<"TEXT.size()"<<text.size()<<std::endl;
-    std::cout<<"LCP.size()"<<m_lcp.size()<<std::endl;
+//    std::cout<<"TEXT.size()"<<text.size()<<std::endl;
+//    std::cout<<"LCP.size()"<<m_lcp.size()<<std::endl;
 
     if (sdsl::cache_file_exists(sdsl::conf::KEY_SA, config)) {
         sdsl::load_from_cache(m_SA, sdsl::conf::KEY_SA, config);

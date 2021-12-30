@@ -55,7 +55,7 @@ auto gibsdisplay = [](benchmark::State &st, const string &file_index, const uint
 
     st.counters["pLen"] = len;
     st.counters["queries"] = queries;
-    st.counters["size"] = idx_gibs.size_in_bytes() - idx_gibs.get_grammar().get_right_trie().size_in_bytes() - idx_gibs.get_grammar().get_left_trie().size_in_bytes();
+    st.counters["size"] = idx_gibs.size_in_bytes();
 
 };
 
@@ -83,7 +83,7 @@ auto gibsdisplaybs = [](benchmark::State &st, const string &file_index, const ui
 
     st.counters["pLen"] = len;
     st.counters["queries"] = queries;
-    st.counters["size"] = idx_gibs.size_in_bytes() - idx_gibs.get_grammar().get_right_trie().size_in_bytes() - idx_gibs.get_grammar().get_left_trie().size_in_bytes();
+    st.counters["size"] = idx_gibs.size_in_bytes();
 
 
 };

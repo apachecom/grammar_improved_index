@@ -75,9 +75,9 @@ set(SLP_SAMPLING
         compressed_grammar.cpp compressed_grammar.h
 
         trees/dfuds_tree.cpp trees/dfuds_tree.h
-        trees/bp_tree.cpp trees/bp_tree.h
-        trees/trie/compact_trie.cpp trees/trie/compact_trie.h
-        trees/trie/Trie.cpp trees/trie/Trie.h
+#        trees/bp_tree.cpp trees/bp_tree.h
+#        trees/trie/compact_trie.cpp trees/trie/compact_trie.h
+#        trees/trie/Trie.cpp trees/trie/Trie.h
 
         utils/grammar.cpp utils/grammar.h
         )

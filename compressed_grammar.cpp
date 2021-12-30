@@ -248,8 +248,8 @@ void compressed_grammar::build(compressed_grammar::plain_grammar &grammar
     stop = timer::now();
     mm.event(BUILD_COMPRESSED_GRAMMAR_3_TRIES);
 #endif
-    left_most_path(grammar);
-    right_most_path(grammar);
+//    left_most_path(grammar);
+//    right_most_path(grammar);
 #ifdef MEM_MONITOR
     stop = timer::now();
         CLogger::GetLogger()->model[BUILD_COMPRESSED_GRAMMAR_3_TRIES] = duration_cast<microseconds>(stop-start).count();;
@@ -297,8 +297,8 @@ size_t compressed_grammar::size_in_bytes() const{
 
                                m_tree.size_in_bytes() +
 
-                               left_path.size_in_bytes() +
-                               right_path.size_in_bytes() +
+//                               left_path.size_in_bytes() +
+//                               right_path.size_in_bytes() +
 
                                sdsl::size_in_bytes(alp)
 
@@ -329,10 +329,10 @@ void compressed_grammar::print_size_in_bytes() const {
     std::cout<<"select_L \t"<<sdsl::size_in_mega_bytes(select_L)   <<"(bytes)"<<std::endl;
     std::cout<<"parser tree \t"<<m_tree.size_in_bytes()          <<"(bytes)"<<std::endl;
     m_tree.print_size_in_bytes("\t\t");
-    std::cout<<"left trie \t"<<left_path.size_in_bytes()          <<"(bytes)"<<std::endl;
-    left_path.print_size_in_bytes("\t\t");
-    std::cout<<"right trie \t"<<right_path.size_in_bytes()          <<"(bytes)"<<std::endl;
-    right_path.print_size_in_bytes("\t\t");
+//    std::cout<<"left trie \t"<<left_path.size_in_bytes()          <<"(bytes)"<<std::endl;
+//    left_path.print_size_in_bytes("\t\t");
+//    std::cout<<"right trie \t"<<right_path.size_in_bytes()          <<"(bytes)"<<std::endl;
+//    right_path.print_size_in_bytes("\t\t");
 }
 //#endif
 
@@ -356,8 +356,8 @@ void compressed_grammar::save(std::fstream &f) {
     sdsl::serialize(rank_L   ,f);
     sdsl::serialize(select_L ,f);
     m_tree.save(f);
-    left_path.save(f);
-    right_path.save(f);
+//    left_path.save(f);
+//    right_path.save(f);
 
     size_t n = alp.size();
     sdsl::serialize(n ,f);
@@ -397,8 +397,8 @@ void compressed_grammar::load(std::fstream & f) {
     select_L = l_vector::select_1_type(&L);
     rank_L = l_vector::rank_1_type(&L);
     m_tree.load(f);
-    left_path.load(f);
-    right_path.load(f);
+//    left_path.load(f);
+//    right_path.load(f);
     size_t n;
     sdsl::load(n,f);
     alp.clear();
@@ -411,229 +411,229 @@ void compressed_grammar::load(std::fstream & f) {
 
 }
 
+//
+//void compressed_grammar::left_most_path(){
+//    trie::Trie<std::vector<g_long>> left_trie;
+//    auto num_leaf = m_tree.leafnum(m_tree.root());
+//    std::map<g_long, std::vector<g_long > > paths;
+//    for(uint64_t  l = 0; l < num_leaf; ++l){
+//        std::vector<uint > current_path;
+//        auto current_leaf = m_tree.leafselect(l+1);
+//        auto Xj = (*this)[m_tree.pre_order(current_leaf)];
+//
+//        if(paths.find(Xj) == paths.end())
+//        {
+//            paths[Xj] = {Xj};
+//
+//
+//        }else{
+//
+//        }
+//
+//    }
+//
+//
+//
+//}
 
-void compressed_grammar::left_most_path(){
-    trie::Trie<std::vector<g_long>> left_trie;
-    auto num_leaf = m_tree.leafnum(m_tree.root());
-    std::map<g_long, std::vector<g_long > > paths;
-    for(uint64_t  l = 0; l < num_leaf; ++l){
-        std::vector<uint > current_path;
-        auto current_leaf = m_tree.leafselect(l+1);
-        auto Xj = (*this)[m_tree.pre_order(current_leaf)];
-
-        if(paths.find(Xj) == paths.end())
-        {
-            paths[Xj] = {Xj};
-
-
-        }else{
-
-        }
-
-    }
-
-
-
-}
-
-void compressed_grammar::left_most_path(const plain_grammar& grammar)
-{
-    trie::Trie<std::vector<g_long>> left_trie;
-    std::vector<uint> _stack(m_tree.subtree(m_tree.root()),0);
-    g_long top = 0;
-    std::map<g_long ,std::vector<g_long> > seconds_paths;
-
-    m_tree.dfs_posorder(m_tree.root(),[&_stack,&top,&left_trie,&seconds_paths,this](const parser_tree::dfuds_long &node)->bool{
-        parser_tree::dfuds_long rank_ch = m_tree.childrank(node);
-        parser_tree::dfuds_long p = m_tree.pre_order(node);
-        g_long Xj = (*this)[p];
-        if(m_tree.isleaf(node))
-        {
-            g_long first = select_occ(Xj,1);
-            if(first == p)
-            {
-                std::vector<g_long > XX;
-                XX.push_back(Xj);
-                left_trie.insert(XX);
-            }
-
-            if(rank_ch == 1){
-
-                if(first != p)
-                {
-
-                    for (auto &&  k: seconds_paths[Xj]) {
-                        _stack[top] = k;
-                        top++;
-                    }
-                    _stack[top] = p;
-                    top++;
-
-                    return false;
-                }
-
-                _stack[top]=p;
-                top++;
-            }
-            return false;
-        }
-
-
-        parser_tree::dfuds_long current = node;
-        long pointer = (long)top-1;
-
-
-        {
-            std::vector<g_long > tt;
-            std::vector<compact_trie::c_trie_long > sctt;
-            tt.insert(tt.begin(),Xj);
-
-            while(pointer >= 0  &&  m_tree.parent(m_tree[_stack[pointer]]) == current ){
-
-                auto Xi = (*this)[_stack[pointer]];
-                auto pre = _stack[pointer];
-
-                sctt.insert(sctt.begin(),pre);
-                tt.insert(tt.begin(),Xi);
-                current = m_tree[_stack[pointer]];
-                pointer--;
-                auto first = select_occ(Xi,1);
-
-                if(m_tree.isleaf(current) && pre != first)
-                    current = m_tree[first];
-            }
-            left_trie.insert(tt);
-            seconds_paths[Xj] = sctt;
-        }
-
-
-
-        if(rank_ch == 1){
-            _stack[top] = p;
-            top++;
-            return true;
-        }
-
-        top = pointer+1;
-
-        return false;
-    });
-
-    _stack.clear();
-
-    left_path.build(left_trie);
-}
-
-void compressed_grammar::right_most_path(const plain_grammar& grammar)
-{
-    trie::Trie<std::vector<compact_trie::c_trie_long>> right_trie;
-    std::vector<g_long> _stack(m_tree.subtree(m_tree.root()),0);
-    g_long top = 0;
-    std::map<g_long ,std::vector<g_long> > seconds_paths;
-
-    m_tree.dfs_posorder(m_tree.root(),[&_stack,&top,&right_trie,&seconds_paths,this](const parser_tree::dfuds_long &node)->bool{
-
-        uint rank_ch = m_tree.childrank(node);
-        uint n_ch = m_tree.children(m_tree.parent(node));
-        uint p = m_tree.pre_order(node);
-        auto Xj = (*this)[p];
-
-        if(m_tree.isleaf(node))
-        {
-            g_long first = select_occ(Xj,1);
-            if(first == p)
-            {
-                std::vector<g_long > XX;
-                XX.push_back(Xj);
-                right_trie.insert(XX);
-            }
-
-            if(rank_ch == n_ch)
-            {
-
-                if(first != p)
-                {
-                    for (auto &&  k: seconds_paths[Xj]) {
-                        _stack[top] = k;
-                        top++;
-                    }
-                    _stack[top] = p;
-                    top++;
-                    return false;
-                }
-                _stack[top]=p;
-                top++;
-            }
-            return false;
-        }
-
-        uint current = node;
-        long pointer = (long) top-1;
-        {
-            std::vector<compact_trie::c_trie_long > tt;
-            std::vector<compact_trie::c_trie_long > sctt;
-            tt.insert(tt.begin(),Xj);
-
-            while(pointer >= 0  &&  m_tree.parent(m_tree[_stack[pointer]]) == current ){
-
-                auto Xi = (*this)[_stack[pointer]];
-                auto pre = _stack[pointer];
-
-                sctt.insert(sctt.begin(),pre);
-                tt.insert(tt.begin(),Xi);
-                current = m_tree[_stack[pointer]];
-                pointer--;
-                auto first = select_occ(Xi,1);
-
-                if(m_tree.isleaf(current) && pre != first)
-                    current = m_tree[first];
-
-            }
-
-            right_trie.insert(tt);
-            seconds_paths[Xj] = sctt;
-        }
-
-
-        if(rank_ch == n_ch){
-            _stack[top] = p;
-            top++;
-            return true;
-        }
-
-        top = pointer+1;
-
-
-        return false;
-    });
-
- /////////   right_trie.print();
-
-    _stack.clear();
-    right_path.build(right_trie);
-}
+//void compressed_grammar::left_most_path(const plain_grammar& grammar)
+//{
+//    trie::Trie<std::vector<g_long>> left_trie;
+//    std::vector<uint> _stack(m_tree.subtree(m_tree.root()),0);
+//    g_long top = 0;
+//    std::map<g_long ,std::vector<g_long> > seconds_paths;
+//
+//    m_tree.dfs_posorder(m_tree.root(),[&_stack,&top,&left_trie,&seconds_paths,this](const parser_tree::dfuds_long &node)->bool{
+//        parser_tree::dfuds_long rank_ch = m_tree.childrank(node);
+//        parser_tree::dfuds_long p = m_tree.pre_order(node);
+//        g_long Xj = (*this)[p];
+//        if(m_tree.isleaf(node))
+//        {
+//            g_long first = select_occ(Xj,1);
+//            if(first == p)
+//            {
+//                std::vector<g_long > XX;
+//                XX.push_back(Xj);
+//                left_trie.insert(XX);
+//            }
+//
+//            if(rank_ch == 1){
+//
+//                if(first != p)
+//                {
+//
+//                    for (auto &&  k: seconds_paths[Xj]) {
+//                        _stack[top] = k;
+//                        top++;
+//                    }
+//                    _stack[top] = p;
+//                    top++;
+//
+//                    return false;
+//                }
+//
+//                _stack[top]=p;
+//                top++;
+//            }
+//            return false;
+//        }
+//
+//
+//        parser_tree::dfuds_long current = node;
+//        long pointer = (long)top-1;
+//
+//
+//        {
+//            std::vector<g_long > tt;
+//            std::vector<compact_trie::c_trie_long > sctt;
+//            tt.insert(tt.begin(),Xj);
+//
+//            while(pointer >= 0  &&  m_tree.parent(m_tree[_stack[pointer]]) == current ){
+//
+//                auto Xi = (*this)[_stack[pointer]];
+//                auto pre = _stack[pointer];
+//
+//                sctt.insert(sctt.begin(),pre);
+//                tt.insert(tt.begin(),Xi);
+//                current = m_tree[_stack[pointer]];
+//                pointer--;
+//                auto first = select_occ(Xi,1);
+//
+//                if(m_tree.isleaf(current) && pre != first)
+//                    current = m_tree[first];
+//            }
+//            left_trie.insert(tt);
+//            seconds_paths[Xj] = sctt;
+//        }
+//
+//
+//
+//        if(rank_ch == 1){
+//            _stack[top] = p;
+//            top++;
+//            return true;
+//        }
+//
+//        top = pointer+1;
+//
+//        return false;
+//    });
+//
+//    _stack.clear();
+//
+//    left_path.build(left_trie);
+//}
+//
+//void compressed_grammar::right_most_path(const plain_grammar& grammar)
+//{
+//    trie::Trie<std::vector<compact_trie::c_trie_long>> right_trie;
+//    std::vector<g_long> _stack(m_tree.subtree(m_tree.root()),0);
+//    g_long top = 0;
+//    std::map<g_long ,std::vector<g_long> > seconds_paths;
+//
+//    m_tree.dfs_posorder(m_tree.root(),[&_stack,&top,&right_trie,&seconds_paths,this](const parser_tree::dfuds_long &node)->bool{
+//
+//        uint rank_ch = m_tree.childrank(node);
+//        uint n_ch = m_tree.children(m_tree.parent(node));
+//        uint p = m_tree.pre_order(node);
+//        auto Xj = (*this)[p];
+//
+//        if(m_tree.isleaf(node))
+//        {
+//            g_long first = select_occ(Xj,1);
+//            if(first == p)
+//            {
+//                std::vector<g_long > XX;
+//                XX.push_back(Xj);
+//                right_trie.insert(XX);
+//            }
+//
+//            if(rank_ch == n_ch)
+//            {
+//
+//                if(first != p)
+//                {
+//                    for (auto &&  k: seconds_paths[Xj]) {
+//                        _stack[top] = k;
+//                        top++;
+//                    }
+//                    _stack[top] = p;
+//                    top++;
+//                    return false;
+//                }
+//                _stack[top]=p;
+//                top++;
+//            }
+//            return false;
+//        }
+//
+//        uint current = node;
+//        long pointer = (long) top-1;
+//        {
+//            std::vector<compact_trie::c_trie_long > tt;
+//            std::vector<compact_trie::c_trie_long > sctt;
+//            tt.insert(tt.begin(),Xj);
+//
+//            while(pointer >= 0  &&  m_tree.parent(m_tree[_stack[pointer]]) == current ){
+//
+//                auto Xi = (*this)[_stack[pointer]];
+//                auto pre = _stack[pointer];
+//
+//                sctt.insert(sctt.begin(),pre);
+//                tt.insert(tt.begin(),Xi);
+//                current = m_tree[_stack[pointer]];
+//                pointer--;
+//                auto first = select_occ(Xi,1);
+//
+//                if(m_tree.isleaf(current) && pre != first)
+//                    current = m_tree[first];
+//
+//            }
+//
+//            right_trie.insert(tt);
+//            seconds_paths[Xj] = sctt;
+//        }
+//
+//
+//        if(rank_ch == n_ch){
+//            _stack[top] = p;
+//            top++;
+//            return true;
+//        }
+//
+//        top = pointer+1;
+//
+//
+//        return false;
+//    });
+//
+// /////////   right_trie.print();
+//
+//    _stack.clear();
+//    right_path.build(right_trie);
+//}
 
 compressed_grammar::g_long compressed_grammar::n_rules() const {
     return F.size() ;
 }
-
-compressed_grammar::g_long compressed_grammar::pre_right_trie(const g_long & pre_g_tree) const {
-    return left_path.preorder(pre_g_tree);
-
-
-}
-
-compressed_grammar::g_long compressed_grammar::pre_left_trie(const g_long & pre_g_tree) const {
-    return right_path.preorder(pre_g_tree);
-}
-
-const compact_trie &compressed_grammar::get_right_trie() const {
-    return right_path;
-}
-
-const compact_trie &compressed_grammar::get_left_trie() const {
-    return left_path;
-}
+//
+//compressed_grammar::g_long compressed_grammar::pre_right_trie(const g_long & pre_g_tree) const {
+//    return left_path.preorder(pre_g_tree);
+//
+//
+//}
+//
+//compressed_grammar::g_long compressed_grammar::pre_left_trie(const g_long & pre_g_tree) const {
+//    return right_path.preorder(pre_g_tree);
+//}
+//
+//const compact_trie &compressed_grammar::get_right_trie() const {
+//    return right_path;
+//}
+//
+//const compact_trie &compressed_grammar::get_left_trie() const {
+//    return left_path;
+//}
 
 //unsigned char compressed_grammar::terminal_simbol(const g_long &i) const{
 //    return alp[rank_Y(i)];
@@ -667,8 +667,8 @@ compressed_grammar &compressed_grammar::operator=(const compressed_grammar & G) 
     Y = G.Y;
     rank_Y = y_vector::rank_1_type(&Y);
     select_Y = y_vector::select_1_type(&Y);
-    left_path = G.left_path;
-    right_path = G.right_path;
+//    left_path = G.left_path;
+//    right_path = G.right_path;
     ///l_occ_xp = G.l_occ_xp;
     alp = G.alp;
 
@@ -706,10 +706,10 @@ const sdsl::wt_ap<> &compressed_grammar::get_Xp() const {
 const compressed_grammar::compact_perm &compressed_grammar::get_F() const {
     return F;
 }
-
-void compressed_grammar::right_most_path() {
-
-}
+//
+//void compressed_grammar::right_most_path() {
+//
+//}
 
 void compressed_grammar::load_z(std::fstream &f) {
 
@@ -742,16 +742,16 @@ void compressed_grammar::load_F(std::fstream &f) {
 void compressed_grammar::load_X_p(std::fstream &f) {
     sdsl::load(X_p      ,f);
 }
-
-void compressed_grammar::load_ltrie(std::fstream &f) {
-
-    left_path.load(f);
-}
-
-void compressed_grammar::load_rtrie(std::fstream &f) {
-
-    right_path.load(f);
-}
+//
+//void compressed_grammar::load_ltrie(std::fstream &f) {
+//
+//    left_path.load(f);
+//}
+//
+//void compressed_grammar::load_rtrie(std::fstream &f) {
+//
+//    right_path.load(f);
+//}
 
 void compressed_grammar::load_alp(std::fstream &f) {
     sdsl::load(alp,f);

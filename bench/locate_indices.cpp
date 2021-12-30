@@ -56,7 +56,7 @@ auto gibslocate = [](benchmark::State &st, const string &file_index, const uint&
     st.counters["pLen"] = len;
     st.counters["queries"] = ptt;
     st.counters["nOcc"] = nocc;
-    st.counters["size"] = idx_gibs.size_in_bytes() - idx_gibs.get_grammar().get_right_trie().size_in_bytes() - idx_gibs.get_grammar().get_left_trie().size_in_bytes();
+    st.counters["size"] = idx_gibs.size_in_bytes();
 
 
 };

@@ -11,7 +11,6 @@
 #include <sdsl/inv_perm_support.hpp>
 #include "trees/dfuds_tree.h"
 #include "utils/grammar.h"
-#include "trees/trie/compact_trie.h"
 #include "macros.h"
 #include <ctime>
 
@@ -61,8 +60,8 @@ class compressed_grammar {
         /*
          * Trie store the lefth/right most path of every node in the parser tree that is not a leaf
          */
-        compact_trie left_path;
-        compact_trie right_path;
+//        compact_trie left_path;
+//        compact_trie right_path;
         /*
          * alphabeth
          * */
@@ -164,20 +163,20 @@ class compressed_grammar {
          * preorder of a node in parser tree;
          *
          * */
-        g_long pre_left_trie( const g_long& ) const;
+//        g_long pre_left_trie( const g_long& ) const;
         /*
          * Return the pre-order of the node asociated in the right trie to the
          * preorder of a node in parser tree;
          *
          * */
-        g_long pre_right_trie( const g_long& ) const;
+//        g_long pre_right_trie( const g_long& ) const;
 
         /*
          * return a const referernces to left/right mosth path tries
          *
          * */
-        const compact_trie& get_left_trie() const;
-        const compact_trie& get_right_trie() const;
+//        const compact_trie& get_left_trie() const;
+//        const compact_trie& get_right_trie() const;
         /*
          * return the size of the original text
          * */
@@ -204,8 +203,8 @@ class compressed_grammar {
         compressed_grammar& operator=(const compressed_grammar&);
 
         auto get_tree_size() const {return m_tree.size_in_bytes();}
-        auto get_compact_trie_left_size()const {return left_path.size_in_bytes();}
-        auto get_compact_trie_right_size()const {return right_path.size_in_bytes();}
+//        auto get_compact_trie_left_size()const {return left_path.size_in_bytes();}
+//        auto get_compact_trie_right_size()const {return right_path.size_in_bytes();}
         const compressed_grammar::y_vector& get_Y()const{ return Y;}
         auto get_X_size()const {return sdsl::size_in_bytes(X_p);}
         auto get_F_size()const {return sdsl::size_in_bytes(F) + sdsl::size_in_bytes(F_inv);}
@@ -223,8 +222,8 @@ class compressed_grammar {
         void load_l(std::fstream&);
         void load_F(std::fstream&);
         void load_X_p(std::fstream&);
-        void load_ltrie(std::fstream&);
-        void load_rtrie(std::fstream&);
+//        void load_ltrie(std::fstream&);
+//        void load_rtrie(std::fstream&);
         void load_alp(std::fstream&);
         void load_mtree(std::fstream&);
 
@@ -232,11 +231,11 @@ class compressed_grammar {
 
 
     protected:
-
-        void left_most_path(const plain_grammar&);
-        void right_most_path(const plain_grammar&);
-        void left_most_path();
-        void right_most_path();
+//
+//        void left_most_path(const plain_grammar&);
+//        void right_most_path(const plain_grammar&);
+//        void left_most_path();
+//        void right_most_path();
 
 
 
